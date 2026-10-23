@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | Carewise Digital Assistant</title>
-  <meta name="description" content="Carewise senior companion dashboard — medicine reminders, doctor visits, and emergency support." />
+  <meta name="description" content="Carewise senior companion dashboard — medicine reminders, doctor visits, and health tools." />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
     /* Dashboard specific layout */
@@ -13,19 +13,6 @@
       grid-template-columns: 1fr;
       gap: 1.5rem;
     }
-    .notification-first-visit { 
-      width: min(90vw, 420px);
-      padding: 1.5rem;
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-lg);
-      color: var(--text-main);
-      background: linear-gradient(135deg, #FFFDF9, #F4F5ED);
-      box-shadow: var(--shadow-md);
-    }
-    .notification-first-visit::backdrop { background: rgba(48, 37, 31, .36); }
-    .notification-first-visit p { margin: .55rem 0 1rem; color: var(--text-sub); line-height: 1.5; }
-    .notification-first-visit-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .6rem; }
-    #notification-status[data-state="error"] { color: #A83227; }
     @media (min-width: 900px) {
       .dashboard-grid {
         grid-template-columns: 1.25fr 1fr;
@@ -71,7 +58,7 @@
     }
 
     .voice-mascot-wrap.listening {
-      animation: sosPulse 1.4s infinite;
+      animation: carewisePulse 1.4s infinite;
       border-color: var(--sage-main);
     }
 
@@ -129,7 +116,7 @@
 
     .btn-mic.active {
       background: #D32F2F;
-      animation: sosPulse 1.5s infinite;
+      animation: carewisePulse 1.5s infinite;
     }
 
     /* Section Cards */
@@ -200,49 +187,6 @@
     .status-pill.pending { background: #FFF3E0; color: #E65100; }
     .status-pill.taken { background: #E8F5E9; color: #2E7D32; }
     .status-pill.missed { background: #FFEBEE; color: #C62828; }
-
-    /* SOS Section */
-    .sos-panel {
-      background: linear-gradient(135deg, #FFF5F5 0%, #FED7D7 100%);
-      border: 2px solid #FEB2B2;
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      text-align: center;
-      box-shadow: 0 4px 16px rgba(229, 62, 62, 0.15);
-    }
-
-    .sos-panel h3 {
-      color: #C53030;
-      font-size: 1.4rem;
-      margin-bottom: 0.35rem;
-    }
-
-    .sos-panel p {
-      font-size: 0.92rem;
-      color: #742A2A;
-      margin-bottom: 1.25rem;
-    }
-
-    .btn-big-sos {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      background: #E53E3E;
-      color: #FFF;
-      font-size: 1.15rem;
-      font-weight: 900;
-      padding: 1rem 2.5rem;
-      border-radius: var(--radius-full);
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(229, 62, 62, 0.45);
-      transition: var(--transition);
-    }
-
-    .btn-big-sos:hover {
-      background: #C53030;
-      transform: scale(1.03);
-    }
 
     /* ============================================================
        MODAL & DRAWER SYSTEM (Carewise Design Preserved)
@@ -385,8 +329,6 @@
     }
     .assistant-transcript { width: 100%; min-height: 88px; resize: vertical; font: inherit; color: var(--text-main); background: #FFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: .8rem; }
     .assistant-response { width: 100%; min-height: 52px; height: auto; flex: 0 0 auto; line-height: 1.45; overflow-wrap: anywhere; padding: .75rem; margin: .5rem 0; color: var(--text-sub); background: rgba(255,255,255,.7); border: 1px solid var(--border-light); border-radius: var(--radius-md); }
-    .sms-test-card { margin-top: 1.5rem; }
-    .sms-test-card input { width: 100%; margin: .5rem 0; }
     @media (max-width: 600px) {
       .drawer-overlay { padding: .65rem; }
       .drawer-box { padding: 1.25rem; max-height: 94vh; }
@@ -395,17 +337,6 @@
   </style>
 </head>
 <body>
-
-  <dialog class="notification-first-visit" id="notification-first-visit" aria-labelledby="notification-first-visit-title">
-    <h2 class="section-title" id="notification-first-visit-title">Browser notifications</h2>
-    <p id="notification-first-visit-message">Would you like to set up browser notifications for Carewise on this device? You can change this later.</p>
-    <p id="notification-status" role="status" aria-live="polite" hidden></p>
-    <div class="notification-first-visit-actions">
-      <button type="button" class="btn btn-secondary" id="notification-first-visit-dismiss">Not now</button>
-      <button type="button" class="btn btn-primary" id="notification-first-visit-enable">Enable notifications</button>
-    </div>
-    <a id="notification-first-visit-retry" href="notifications.html" hidden style="margin-top:.8rem;color:var(--terra-main);font-weight:700;">Open Notifications to retry or manage settings</a>
-  </dialog>
 
   <!-- Top App Navigation -->
   <header class="app-nav">
@@ -433,10 +364,6 @@
       <a href="javascript:void(0)" class="nav-link" id="nav-health" onclick="openVitalsModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Health Vitals
-      </a>
-      <a href="javascript:void(0)" class="nav-link" id="nav-sos" style="color:#D32F2F;" onclick="openSosModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Emergency SOS
       </a>
     </nav>
 
@@ -516,7 +443,7 @@
 
       </div>
 
-      <!-- RIGHT COLUMN: Appointments + Health + Emergency SOS -->
+      <!-- RIGHT COLUMN: Appointments + Health -->
       <div style="display:flex; flex-direction:column; gap:1.5rem;">
 
         <!-- Upcoming Appointment Preview Card -->
@@ -562,25 +489,6 @@
           </div>
         </div>
 
-        <!-- Emergency SOS Panel -->
-        <div class="sos-panel">
-          <h3>🚨 Emergency Assistance</h3>
-          <p>Instantly notify emergency family contacts via automated Twilio SMS alert.</p>
-          <button type="button" class="btn-big-sos" id="btn-dashboard-sos" onclick="openSosModal()">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            Send SOS Family Alert
-          </button>
-        </div>
-
-        <div class="card sms-test-card">
-          <h3 class="section-title">SMS test</h3>
-          <p id="sms-provider-status" style="font-size:.88rem;color:var(--text-muted);margin:.4rem 0;">Checking Twilio configuration…</p>
-          <label for="sms-test-recipient" style="font-size:.85rem;font-weight:700;">Account phone number</label>
-          <input class="form-input" id="sms-test-recipient" type="tel" autocomplete="tel" placeholder="Your registered phone number">
-          <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.8rem;color:var(--text-sub);"><input type="checkbox" id="sms-test-confirm"> Send one test message to my account phone only. This does not contact emergency contacts.</label>
-          <button type="button" class="btn btn-secondary" id="btn-sms-test" onclick="runSmsTest()" style="margin-top:.75rem;">Send test SMS</button>
-        </div>
-
       </div>
 
     </div>
@@ -593,7 +501,7 @@
     <div class="dash-modal-box">
       <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
       <h2 id="med-modal-title" style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.25rem;">Medicines &amp; Prescriptions</h2>
-      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Manage your scheduled doses and track medication intake.</p>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Manage your scheduled doses and track medication intake. Browser speech recognition may use browser-vendor services and may require internet; audio handling depends on your browser.</p>
 
       <!-- Tabs -->
       <div class="modal-tab-group">
@@ -614,11 +522,11 @@
         <form onsubmit="handleModalAddMedicine(event)">
           <div class="form-group">
             <label class="form-label" for="m-med-name">Medicine Name *</label>
-            <input type="text" id="m-med-name" class="form-input" placeholder="e.g. Lisinopril, Metformin" required />
+            <div class="dictation-field"><input type="text" id="m-med-name" class="form-input" placeholder="e.g. Lisinopril, Metformin" required /><button class="dictation-button" data-dictation-for="m-med-name" aria-label="Start voice input for medicine name">🎙</button></div><span class="dictation-status" data-dictation-status="m-med-name" role="status" aria-live="polite"></span>
           </div>
           <div class="form-group">
             <label class="form-label" for="m-med-dosage">Dosage *</label>
-            <input type="text" id="m-med-dosage" class="form-input" placeholder="e.g. 500mg, 1 tablet with water" required />
+            <div class="dictation-field"><input type="text" id="m-med-dosage" class="form-input" placeholder="e.g. 500mg, 1 tablet with water" required /><button class="dictation-button" data-dictation-for="m-med-dosage" aria-label="Start voice input for dosage">🎙</button></div><span class="dictation-status" data-dictation-status="m-med-dosage" role="status" aria-live="polite"></span>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
             <div class="form-group">
@@ -651,7 +559,7 @@
     <div class="dash-modal-box">
       <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
       <h2 id="appt-modal-title" style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.25rem;">Doctor Appointments</h2>
-      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Upcoming checkups, clinic visits, and scheduled specialists.</p>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Upcoming checkups, clinic visits, and scheduled specialists. Browser speech recognition may use browser-vendor services and may require internet; audio handling depends on your browser.</p>
 
       <!-- Tabs -->
       <div class="modal-tab-group">
@@ -672,7 +580,7 @@
         <form onsubmit="handleModalAddAppointment(event)">
           <div class="form-group">
             <label class="form-label" for="m-doc-name">Doctor or Clinic Name *</label>
-            <input type="text" id="m-doc-name" class="form-input" placeholder="e.g. Dr. Michael Chen (Cardiology)" required />
+            <div class="dictation-field"><input type="text" id="m-doc-name" class="form-input" placeholder="e.g. Dr. Michael Chen (Cardiology)" required /><button class="dictation-button" data-dictation-for="m-doc-name" aria-label="Start voice input for doctor or clinic name">🎙</button></div><span class="dictation-status" data-dictation-status="m-doc-name" role="status" aria-live="polite"></span>
           </div>
           <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:0.75rem;">
             <div class="form-group">
@@ -686,7 +594,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="m-doc-loc">Location or Clinic Address *</label>
-            <input type="text" id="m-doc-loc" class="form-input" placeholder="e.g. St. Jude Wellness Center, Suite 402" required />
+            <div class="dictation-field"><input type="text" id="m-doc-loc" class="form-input" placeholder="e.g. St. Jude Wellness Center, Suite 402" required /><button class="dictation-button" data-dictation-for="m-doc-loc" aria-label="Start voice input for appointment location">🎙</button></div><span class="dictation-status" data-dictation-status="m-doc-loc" role="status" aria-live="polite"></span>
           </div>
           <button type="submit" class="btn btn-sage" id="btn-modal-save-appt" style="width:100%; margin-top:0.4rem;">
             Confirm &amp; Schedule Visit
@@ -703,7 +611,7 @@
     <div class="dash-modal-box">
       <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
       <h2 id="vitals-modal-title" style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.25rem;">Record Health Vitals</h2>
-      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Log heart rate and steps. Readings outside 60-100 bpm automatically notify family contacts.</p>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Log heart rate and steps. Readings outside 60-100 bpm will be flagged for review.</p>
 
       <div id="modal-vitals-alert" class="alert alert-danger" style="display:none;"></div>
 
@@ -727,36 +635,7 @@
   </div>
 
   <!-- ============================================================
-       4. EMERGENCY SOS CONFIRMATION MODAL
-  ============================================================ -->
-  <div class="dash-modal-overlay" id="modal-sos-dialog" role="dialog" aria-modal="true" aria-labelledby="sos-dialog-title">
-    <div class="dash-modal-box" style="text-align:center; max-width:480px;">
-      <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
-      <div style="font-size:2.8rem; margin-bottom:0.3rem;">🚨</div>
-      <h2 id="sos-dialog-title" style="font-size:1.6rem; color:#C53030; margin-bottom:0.4rem;">Broadcast Emergency SOS?</h2>
-      <p style="font-size:0.92rem; color:var(--text-sub); margin-bottom:1.25rem;">
-        This will immediately dispatch automated Twilio SMS text alerts with your name and emergency details to all configured family members.
-      </p>
-
-      <div id="sos-dialog-contacts" style="background:var(--bg-subtle); border-radius:var(--radius-md); padding:0.85rem; font-size:0.85rem; color:var(--text-main); margin-bottom:1.25rem; text-align:left;">
-        Loading family contacts...
-      </div>
-
-      <div id="sos-dialog-result" class="alert alert-success" style="display:none; text-align:left; margin-bottom:1rem;"></div>
-
-      <div style="display:flex; gap:0.75rem;">
-        <button type="button" class="btn btn-secondary" onclick="closeAllModals()" style="flex:1;">
-          Cancel
-        </button>
-        <button type="button" class="btn btn-danger" id="btn-confirm-sos-dispatch" onclick="executeModalDispatchSOS()" style="flex:1.5;">
-          🚨 Send SOS Alert Now
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       5. RIGHT-SIDE DRAWER: VOICE COMPANION ASSISTANT
+       4. RIGHT-SIDE DRAWER: VOICE COMPANION ASSISTANT
   ============================================================ -->
   <div class="drawer-overlay" id="drawer-voice" role="dialog" aria-modal="true" aria-labelledby="drawer-voice-title">
     <div class="drawer-box">
@@ -771,6 +650,25 @@
         <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem;">Hands-free voice assistant for daily reminders &amp; health.</p>
       </div>
 
+      <section id="voice-action-options" aria-labelledby="voice-action-options-title" style="margin-bottom:1rem;">
+        <h3 id="voice-action-options-title" style="font-size:1rem; color:var(--terra-main); margin-bottom:.65rem;">Create a new record</h3>
+        <div style="display:grid; grid-template-columns:1fr; gap:.65rem;">
+          <button type="button" class="btn btn-secondary" id="voice-action-add-medicine" onclick="beginVoiceAction('medicine')" style="justify-content:center;">💊 Add Medicine</button>
+          <button type="button" class="btn btn-sage" id="voice-action-add-visit" onclick="beginVoiceAction('visit')" style="justify-content:center;">🩺 Add Visit</button>
+        </div>
+      </section>
+
+      <section id="voice-action-view" aria-labelledby="voice-action-title" hidden>
+        <h3 id="voice-action-title" style="font-size:1.1rem; color:var(--terra-main); margin-bottom:.35rem;"></h3>
+        <p id="voice-action-guidance" style="font-size:.88rem; color:var(--text-sub); margin-bottom:.75rem;"></p>
+        <div style="display:flex; gap:.6rem; margin-bottom:.75rem;">
+          <button type="button" class="btn btn-secondary" onclick="returnToVoiceActions()">Back to actions</button>
+          <button type="button" class="btn btn-secondary" onclick="cancelVoiceAction()">Cancel</button>
+        </div>
+        <div id="voice-action-form-slot"></div>
+      </section>
+
+      <div id="voice-assistant-controls">
       <label for="drawer-voice-transcript" style="font-size:.85rem;font-weight:700;margin:.25rem 0;">Your transcript (editable)</label>
       <textarea class="assistant-transcript" id="drawer-voice-transcript" aria-label="Editable voice transcript" placeholder="Tap to Speak, or type a request here."></textarea>
       <div class="assistant-response" id="drawer-voice-response" role="status" aria-live="polite">Assistant response will appear here.</div>
@@ -806,12 +704,12 @@
           </button>
         </div>
       </div>
+      </div>
     </div>
   </div>
 
   <script src="../js/api.js"></script>
-  <script src="../js/firebase-config.js"></script>
-  <script type="module" src="../js/notifications.js"></script>
+  <script src="../js/dictation.js"></script>
   <script>
     'use strict';
 
@@ -836,6 +734,9 @@
     let medicineDataState = 'loading';
     let appointmentDataState = 'loading';
     let modalOpener = null;
+    let voiceActionFormNode = null;
+    let voiceActionFormPlaceholder = null;
+    let voiceActionKind = null;
     const pendingDoseUpdates = new Set();
     const todayKey = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
 
@@ -860,6 +761,8 @@
     }
 
     function closeAllModals(restoreScroll = true) {
+      if (voiceActionFormNode) restoreVoiceActionForm();
+      stopSpeech();
       document.querySelectorAll('.dash-modal-overlay, .drawer-overlay').forEach(el => {
         el.classList.remove('open');
       });
@@ -882,7 +785,6 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeAllModals();
-        stopSpeech();
       } else if (e.key === 'Tab') {
         const modal = document.querySelector('.dash-modal-overlay.open, .drawer-overlay.open');
         if (!modal) return;
@@ -960,6 +862,10 @@
 
     async function handleModalAddMedicine(e) {
       e.preventDefault();
+      const form = e.currentTarget;
+      if (form.dataset.saving === 'true') return;
+      form.dataset.saving = 'true';
+      const fromVoiceAction = Boolean(form.closest('#voice-action-form-slot'));
       const name = document.getElementById('m-med-name').value.trim();
       const dosage = document.getElementById('m-med-dosage').value.trim();
       const time = document.getElementById('m-med-time').value.trim();
@@ -972,6 +878,7 @@
       if (!timeRegex.test(time)) {
         alertBox.textContent = 'Please enter time in 24-hour format HH:MM (e.g. 08:30 or 14:00).';
         alertBox.style.display = 'block';
+        form.dataset.saving = 'false';
         return;
       }
 
@@ -993,7 +900,11 @@
           document.getElementById('m-med-dosage').value = '';
           document.getElementById('m-med-time').value = '';
           await loadDashboard();
-          switchMedTab('list');
+          if (fromVoiceAction) {
+            finishVoiceAction('Medicine saved. It is available in your Medicines list.');
+          } else {
+            switchMedTab('list');
+          }
         } else {
           alertBox.textContent = res.error || 'Could not save medicine.';
           alertBox.style.display = 'block';
@@ -1004,6 +915,7 @@
       } finally {
         btn.textContent = 'Save Prescription Schedule';
         btn.disabled = false;
+        form.dataset.saving = 'false';
       }
     }
 
@@ -1066,6 +978,10 @@
 
     async function handleModalAddAppointment(e) {
       e.preventDefault();
+      const form = e.currentTarget;
+      if (form.dataset.saving === 'true') return;
+      form.dataset.saving = 'true';
+      const fromVoiceAction = Boolean(form.closest('#voice-action-form-slot'));
       const docName = document.getElementById('m-doc-name').value.trim();
       const date = document.getElementById('m-doc-date').value.trim();
       const time = document.getElementById('m-doc-time').value.trim();
@@ -1080,6 +996,7 @@
       if (!dateRegex.test(date) || !timeRegex.test(time)) {
         alertBox.textContent = 'Invalid date (YYYY-MM-DD) or time (HH:MM 24h format).';
         alertBox.style.display = 'block';
+        form.dataset.saving = 'false';
         return;
       }
 
@@ -1100,7 +1017,11 @@
           document.getElementById('m-doc-name').value = '';
           document.getElementById('m-doc-loc').value = '';
           await loadDashboard();
-          switchApptTab('list');
+          if (fromVoiceAction) {
+            finishVoiceAction('Visit saved. It is available in your Appointments list.');
+          } else {
+            switchApptTab('list');
+          }
         } else {
           alertBox.textContent = res.error || 'Could not schedule appointment.';
           alertBox.style.display = 'block';
@@ -1111,6 +1032,7 @@
       } finally {
         btn.textContent = 'Confirm & Schedule Visit';
         btn.disabled = false;
+        form.dataset.saving = 'false';
       }
     }
 
@@ -1147,8 +1069,8 @@
 
           const isFlagged = res.data && res.data.flagged !== undefined ? res.data.flagged : (hr < 60 || hr > 100);
           if (isFlagged) {
-            speak(`Warning: Heart rate of ${hr} beats per minute is outside normal range. Emergency contacts have been notified.`);
-            alert(`⚠️ Health Alert: Heart rate reading of ${hr} bpm is abnormal. An alert SMS has been dispatched to emergency contacts.`);
+            speak(`Heart rate of ${hr} beats per minute is outside the expected range. Consider reviewing this reading with your healthcare provider.`);
+            alert(`⚠️ Heart rate reading of ${hr} bpm is outside the expected range. Consider reviewing it with your healthcare provider.`);
           } else {
             speak(`Vitals recorded successfully. Heart rate is normal.`);
           }
@@ -1167,52 +1089,96 @@
       }
     }
 
-    // 4. Emergency SOS Modal Triggers
-    function openSosModal() {
-      openModalOverlay('modal-sos-dialog');
-      document.getElementById('sos-dialog-result').style.display = 'none';
+    // 4. Voice Companion Drawer Triggers
+    function beginVoiceAction(kind) {
+      const config = {
+        medicine: {
+          paneId: 'pane-med-add',
+          title: 'Add Medicine',
+          guidance: 'Enter the medicine name, dosage, time, and frequency. Use the microphones for the name or dosage, review every field, then save.',
+          focusId: 'm-med-name',
+        },
+        visit: {
+          paneId: 'pane-appt-add',
+          title: 'Add Visit',
+          guidance: 'Enter the doctor or clinic, date, time, and location. Dictate the name and location if helpful, review every field, then confirm.',
+          focusId: 'm-doc-name',
+        },
+      }[kind];
+      if (!config || voiceActionFormNode) return;
 
-      const contactsBox = document.getElementById('sos-dialog-contacts');
-      if (userProfile && Array.isArray(userProfile.emergencyContacts) && userProfile.emergencyContacts.length > 0) {
-        contactsBox.innerHTML = `
-          <strong>Notified Contacts:</strong><br>
-          ${userProfile.emergencyContacts.map(c => `• ${escapeHtml(c.name)} (${escapeHtml(c.phone)})`).join('<br>')}
-        `;
-      } else {
-        contactsBox.innerHTML = `<strong>Recipients:</strong> Family emergency contacts registered on profile.`;
+      stopSpeech();
+      const pane = document.getElementById(config.paneId);
+      const slot = document.getElementById('voice-action-form-slot');
+      if (!pane || !pane.parentNode || !slot) return;
+
+      voiceActionFormPlaceholder = document.createComment('Voice Companion form return point');
+      pane.parentNode.insertBefore(voiceActionFormPlaceholder, pane);
+      voiceActionFormNode = pane;
+      voiceActionKind = kind;
+      pane.style.display = 'block';
+      slot.appendChild(pane);
+
+      document.getElementById('voice-action-title').textContent = config.title;
+      document.getElementById('voice-action-guidance').textContent = config.guidance;
+      document.getElementById('voice-action-options').hidden = true;
+      document.getElementById('voice-assistant-controls').hidden = true;
+      document.getElementById('voice-action-view').hidden = false;
+
+      if (kind === 'visit') {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('m-doc-date').value = tomorrow.toISOString().split('T')[0];
       }
+      if (window.CareWiseDictation) window.CareWiseDictation.init();
+      setTimeout(() => document.getElementById(config.focusId).focus(), 0);
     }
 
-    async function executeModalDispatchSOS() {
-      const btn = document.getElementById('btn-confirm-sos-dispatch');
-      btn.textContent = '🚨 Dispatching Alert...';
-      btn.disabled = true;
-      const resBox = document.getElementById('sos-dialog-result');
-      resBox.style.display = 'none';
-
-      try {
-        const res = await window.CareMateAPI.triggerEmergencySOS(userId);
-        if (res.success) {
-          resBox.className = 'alert alert-success';
-          resBox.innerHTML = `<strong>🚨 EMERGENCY SOS DISPATCHED!</strong><br>${res.data && res.data.message ? res.data.message : 'Automated Twilio SMS alerts have been broadcasted to emergency contacts.'}`;
-          resBox.style.display = 'block';
-          speak('Emergency alert has been sent. Help is on the way.');
-        } else {
-          resBox.className = 'alert alert-danger';
-          resBox.textContent = res.error || 'Could not dispatch SOS alert.';
-          resBox.style.display = 'block';
-        }
-      } catch (e) {
-        resBox.className = 'alert alert-danger';
-        resBox.textContent = 'Network error while contacting server.';
-        resBox.style.display = 'block';
-      } finally {
-        btn.textContent = '🚨 Send SOS Alert Now';
-        btn.disabled = false;
+    function restoreVoiceActionForm(stopRecognition = true) {
+      if (!voiceActionFormNode) return;
+      if (stopRecognition && window.CareWiseDictation) window.CareWiseDictation.stopAll();
+      if (voiceActionFormPlaceholder && voiceActionFormPlaceholder.parentNode) {
+        voiceActionFormPlaceholder.parentNode.insertBefore(voiceActionFormNode, voiceActionFormPlaceholder);
+        voiceActionFormPlaceholder.remove();
       }
+      voiceActionFormNode.style.display = 'none';
+      voiceActionFormNode = null;
+      voiceActionFormPlaceholder = null;
+      voiceActionKind = null;
+      document.getElementById('voice-action-options').hidden = false;
+      document.getElementById('voice-assistant-controls').hidden = false;
+      document.getElementById('voice-action-view').hidden = true;
     }
 
-    // 5. Voice Companion Drawer Triggers
+    function returnToVoiceActions() {
+      if (voiceActionFormNode && voiceActionFormNode.querySelector('form').dataset.saving === 'true') return;
+      const triggerId = voiceActionKind === 'visit' ? 'voice-action-add-visit' : 'voice-action-add-medicine';
+      restoreVoiceActionForm();
+      document.getElementById(triggerId).focus();
+      setVoiceState('Ready', 'Your form draft is kept. Choose an action or return to continue it.');
+    }
+
+    function cancelVoiceAction() {
+      const triggerId = voiceActionKind === 'visit' ? 'voice-action-add-visit' : 'voice-action-add-medicine';
+      if (voiceActionFormNode) {
+        const form = voiceActionFormNode.querySelector('form');
+        if (form.dataset.saving === 'true') return;
+        if (window.CareWiseDictation) window.CareWiseDictation.stopAll();
+        form.reset();
+        voiceActionFormNode.querySelectorAll('.alert').forEach(alertBox => { alertBox.style.display = 'none'; });
+        voiceActionFormNode.querySelectorAll('.dictation-status').forEach(status => { status.textContent = ''; });
+      }
+      restoreVoiceActionForm(false);
+      document.getElementById(triggerId).focus();
+      setVoiceState('Ready', 'The form was cancelled. Choose another action whenever you are ready.');
+    }
+
+    function finishVoiceAction(message) {
+      restoreVoiceActionForm();
+      setAssistantResponse(message);
+      setVoiceState('Success', message);
+    }
+
     function openVoiceDrawer(autoListen = false) {
       openModalOverlay('drawer-voice');
       if (autoListen) {
@@ -1569,9 +1535,6 @@
           return;
         }
         answer = userAppointments.length ? `Your next visit is with ${userAppointments[0].doctorName} on ${userAppointments[0].date} at ${userAppointments[0].time}.` : 'You have no upcoming doctor appointments listed.';
-      } else if (request.includes('emergency') || request.includes('help') || request.includes('sos')) {
-        answer = 'Opening emergency SOS confirmation.';
-        setAssistantResponse(answer); setVoiceState('Success', answer); speak(answer); openSosModal(); return;
       } else if (request.includes('heart') || request.includes('pulse') || request.includes('vitals') || request.includes('steps')) {
         answer = 'No current health reading is available to report.';
       } else {
@@ -1591,32 +1554,9 @@
       });
     }
 
-    async function runSmsTest() {
-      const status = document.getElementById('sms-provider-status');
-      const button = document.getElementById('btn-sms-test');
-      const recipient = document.getElementById('sms-test-recipient').value.trim();
-      const confirmed = document.getElementById('sms-test-confirm').checked;
-      if (!recipient || !confirmed) { status.textContent = 'Enter the account phone and confirm the one-message test.'; return; }
-      button.disabled = true; button.textContent = 'Sending?'; status.textContent = 'Sending test SMS to the account phone?';
-      const result = await window.CareMateAPI.sendTestSms(recipient, true);
-      button.disabled = false; button.textContent = 'Send test SMS';
-      if (result.success) status.textContent = `Twilio accepted the test message. Reference: ${result.data.referenceId} (delivery: ${result.data.deliveryStatus || 'pending'}).`;
-      else status.textContent = result.error || 'SMS send failed.';
-    }
-
-    async function loadSmsConfiguration() {
-      const status = document.getElementById('sms-provider-status');
-      const phoneInput = document.getElementById('sms-test-recipient');
-      phoneInput.value = localStorage.getItem('caremate_user_phone') || '';
-      const result = await window.CareMateAPI.getSmsStatus();
-      if (!result.success) { status.textContent = 'Cannot read SMS provider status. Ensure the backend is running.'; return; }
-      const config = result.data;
-      status.textContent = config.configured ? 'Twilio is configured. Test messages go only to your account phone.' : `Provider not configured. ${config.error || ('Twilio requires: ' + (config.missing || []).join(', ') + '. Set these on the backend.')}`;
-    }
 
     // Initialize
     loadDashboard();
-    loadSmsConfiguration();
   </script>
 </body>
 </html>
