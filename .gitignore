@@ -1,0 +1,19 @@
+﻿node_modules/
+.env
+.env.local
+.env.*
+!.env.example
+*.bak
+dist/
+build/
+.DS_Store
+*.log
+.vscode/
+.idea/
+.aistudio/
+.carewise-*/
+.chrome-check-profile/
+current_1440.png
+
+# Local runtime and browser logs
+*.log

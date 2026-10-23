@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-cream: #FAF2E9;
+    --terracotta: #87382B;
+    --terracotta-hover: #722E23;
+    --terracotta-light: #C96856;
+    --text-main: #753326;
+    --text-sub: #5F524C;
+    --sage-pill: #D8DFD7;
+    --sage-text: #445949;
+  }
+
+  body {
+    background-color: var(--bg-cream);
+    font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-sub);
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.font-serif-warm {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+.font-handwriting {
+  font-family: 'Caveat', cursive, sans-serif;
+}
+
+/* Organic thought bubble style */
+
+/* Softer, more organic thought bubbles */
+.thought-bubble-card {
+  background: rgba(255, 250, 245, 0.78);
+  border-radius: 36px;
+  box-shadow:
+    0 6px 20px rgba(186, 154, 137, 0.10),
+    0 2px 8px rgba(186, 154, 137, 0.06);
+  border: 1px solid rgba(230, 215, 203, 0.25);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.thought-bubble-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(150, 95, 78, 0.12);
+}
+
+
+/* Gentle floating animation */
+@keyframes gentleBob {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-7px) rotate(1deg);
+  }
+}
+
+.animate-gentle-bob {
+  animation: gentleBob 5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(247, 196, 186, 0.4));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 24px rgba(247, 196, 186, 0.8));
+  }
+}
+
+.animate-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+/* Sage brush pill */
+.sage-brush-badge {
+  background: #DCE3DB;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Background warm gradient */
+.page-bg-gradient {
+  background: radial-gradient(circle at 18% 35%, #FFFDF9 0%, #FAF1E8 45%, #F4E5D6 100%);
+}

@@ -10,14 +10,24 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'null', // allows file:// opened pages during dev
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Main API Routing
-app.use('/', apiRouter);
-
 // Basic root route for verification and viva demonstration
+// NOTE: Must be defined BEFORE apiRouter mount to avoid being shadowed
 app.get('/', (req, res) => {
   res.status(200).json({
     message: 'AI Digital Personal Assistant for Elderly - Backend API is running.',
@@ -26,6 +36,10 @@ app.get('/', (req, res) => {
     documentation: 'See README.md for endpoint and configuration details.'
   });
 });
+
+// Main API Routing (support both /api/* and /*)
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // 404 Route handler
 app.use((req, res) => {

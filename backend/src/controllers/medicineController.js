@@ -1,4 +1,30 @@
 const { getDb } = require('../config/firebase');
+const crypto = require('crypto');
+
+function sendFirestoreError(res, operation, error) {
+  const code = Number.isInteger(error.code) ? error.code : null;
+  let message = String(error.message || 'Unknown Firestore error');
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  for (const secret of [privateKey, clientEmail]) {
+    if (secret) message = message.split(secret).join('[redacted]');
+  }
+  message = message
+    .replace(/-----BEGIN [^-]+-----[\s\S]*?-----END [^-]+-----/g, '[redacted credential]')
+    .replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, '[redacted email]')
+    .replace(/projects\/[^/\s]+/g, 'projects/[redacted]')
+    .slice(0, 600);
+  console.error(`[Firestore] ${operation} failed (${code ?? error.code ?? 'unknown'}): ${message}`);
+
+  const responses = {
+    4: [504, 'Firestore request timed out. Please retry shortly.', 'FIRESTORE_DEADLINE_EXCEEDED'],
+    7: [503, 'Firestore denied the request. Check backend service-account permissions.', 'FIRESTORE_PERMISSION_DENIED'],
+    14: [503, 'Firestore is temporarily unavailable. Please retry shortly.', 'FIRESTORE_UNAVAILABLE'],
+    16: [503, 'Firestore rejected backend credentials. Check the configured service account.', 'FIRESTORE_UNAUTHENTICATED'],
+  };
+  const [status, errorMessage, errorCode] = responses[code] || [500, 'Firestore operation failed. Check backend configuration and logs.', 'FIRESTORE_ERROR'];
+  return res.status(status).json({ error: errorMessage, code: errorCode });
+}
 
 /**
  * POST /medicine
@@ -48,8 +74,7 @@ const addMedicine = async (req, res) => {
       medicine: { medId: docRef.id, ...medicineData }
     });
   } catch (error) {
-    console.error('Error in addMedicine:', error);
-    return res.status(500).json({ error: error.message });
+    return sendFirestoreError(res, 'add medicine', error);
   }
 };
 
@@ -70,15 +95,50 @@ const getMedicines = async (req, res) => {
       .where('userId', '==', userId)
       .get();
 
+    const date = req.query.date;
     const medicines = [];
     snapshot.forEach(doc => {
       medicines.push({ medId: doc.id, ...doc.data() });
     });
 
+    if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      const doseSnapshot = await db.collection('medicine_doses')
+        .where('userId', '==', userId).get();
+      const doses = new Map();
+      doseSnapshot.forEach(doc => { if (doc.data().scheduledDate === date) doses.set(doc.data().medId, doc.data()); });
+      medicines.forEach(medicine => {
+        const dose = doses.get(medicine.medId);
+        medicine.todayStatus = dose ? dose.status : 'pending';
+        medicine.doseId = dose ? dose.doseId : null;
+      });
+    }
+
     return res.status(200).json(medicines);
   } catch (error) {
-    console.error('Error in getMedicines:', error);
-    return res.status(500).json({ error: error.message });
+    return sendFirestoreError(res, 'get medicines', error);
+  }
+};
+
+/** POST /medicine/:medId/dose — daily dose status, separate from the recurring schedule. */
+const updateDoseStatus = async (req, res) => {
+  try {
+    const { medId } = req.params;
+    const { userId, scheduledDate, status } = req.body;
+    if (!userId || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDate || '') || !['pending', 'taken'].includes(status)) {
+      return res.status(400).json({ error: 'userId, scheduledDate (YYYY-MM-DD), and status (pending or taken) are required.' });
+    }
+    const db = getDb();
+    const medicineRef = db.collection('medicines').doc(medId);
+    const medicine = await medicineRef.get();
+    if (!medicine.exists) return res.status(404).json({ error: 'Medicine schedule not found.' });
+    if (medicine.data().userId !== userId) return res.status(403).json({ error: 'Medicine does not belong to this user.' });
+    const doseId = crypto.createHash('sha256').update(`${userId}:${medId}:${scheduledDate}`).digest('hex');
+    const doseRef = db.collection('medicine_doses').doc(doseId);
+    if (status === 'pending') await doseRef.delete();
+    else await doseRef.set({ doseId, userId, medId, medicineName: medicine.data().medicineName, dosage: medicine.data().dosage, scheduledTime: medicine.data().time, scheduledDate, status: 'taken', updatedAt: new Date().toISOString() });
+    return res.status(200).json({ doseId, medId, scheduledDate, status });
+  } catch (error) {
+    return sendFirestoreError(res, 'update medicine dose', error);
   }
 };
 
@@ -118,8 +178,7 @@ const updateMedicineStatus = async (req, res) => {
       status
     });
   } catch (error) {
-    console.error('Error in updateMedicineStatus:', error);
-    return res.status(500).json({ error: error.message });
+    return sendFirestoreError(res, 'update medicine status', error);
   }
 };
 
@@ -127,4 +186,6 @@ module.exports = {
   addMedicine,
   getMedicines,
   updateMedicineStatus,
+  updateDoseStatus,
+  sendFirestoreError,
 };

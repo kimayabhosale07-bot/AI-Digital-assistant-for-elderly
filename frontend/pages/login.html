@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In / Register | Carewise</title>
+  <meta name="description" content="Sign in or register to Carewise — AI companion for elderly care." />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-cream);
+      position: relative;
+    }
+
+    .auth-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .auth-card {
+      background: #FFFDF9;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      max-width: 480px;
+      width: 100%;
+      padding: 2.25rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+
+    .auth-header h1 {
+      font-size: 1.85rem;
+      color: var(--terra-main);
+      margin-bottom: 0.35rem;
+    }
+
+    .auth-header p {
+      font-size: 0.92rem;
+      color: var(--text-sub);
+    }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex;
+      background: var(--bg-subtle);
+      padding: 0.25rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-light);
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-sub);
+      font-weight: 700;
+      font-size: 0.9rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .auth-tab-btn.active {
+      background: #FFF;
+      color: var(--terra-main);
+      box-shadow: 0 2px 8px rgba(130, 56, 44, 0.1);
+    }
+
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .auth-form.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 1.25rem 0 0.75rem;
+      position: relative;
+    }
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border-light);
+    }
+    .divider span {
+      background: #FFFDF9;
+      padding: 0 0.8rem;
+      position: relative;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-quick-demo {
+      width: 100%;
+      background: var(--sage-badge);
+      color: var(--sage-dark);
+      border: 1px solid var(--sage-light);
+      padding: 0.65rem;
+      font-size: 0.85rem;
+    }
+    .btn-quick-demo:hover {
+      background: var(--sage-light);
+      color: #000;
+    }
+  </style>
+</head>
+<body class="auth-page">
+
+  <!-- Header -->
+  <header class="app-nav">
+    <a class="nav-brand" href="index.html">
+      <div class="brand-icon">
+        <img src="../assets/aistudio/central_brain.png" alt="Carewise logo" />
+      </div>
+      <span class="brand-title">carewise</span>
+      <span class="brand-leaf">🌿</span>
+    </a>
+    <div>
+      <a href="index.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Home
+      </a>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 id="auth-title">Welcome to Carewise</h1>
+        <p id="auth-subtitle">Sign in or create your family care profile</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="auth-tab-btn" id="tab-register" onclick="switchAuthTab('register')">Register Profile</button>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="auth-alert" class="alert alert-danger" style="display: none;" role="alert"></div>
+
+      <!-- SIGN IN FORM -->
+      <form id="form-login" class="auth-form active" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="login-user-id">Profile ID or Registered Phone</label>
+          <input type="text" id="login-user-id" class="form-input" placeholder="e.g. your User ID or Phone" required autocomplete="username" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%;">
+          Sign In to Dashboard
+        </button>
+
+        <div class="divider"><span>Or Instant Testing</span></div>
+
+        <button type="button" class="btn btn-quick-demo" onclick="useDemoAccount()">
+          ⚡ Quick 1-Click Demo Login
+        </button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="form-register" class="auth-form" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Elderly Loved One's Full Name *</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="e.g. Arthur Pendelton" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-phone">Elderly's Phone Number *</label>
+          <input type="tel" id="reg-phone" class="form-input" placeholder="e.g. +1234567890" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-age">Age (Optional)</label>
+          <input type="number" id="reg-age" class="form-input" placeholder="e.g. 74" min="1" max="120" />
+        </div>
+
+        <div style="background: var(--bg-subtle); padding: 0.9rem; border-radius: var(--radius-md); margin-bottom: 0.5rem; border: 1px solid var(--border-light);">
+          <span style="font-size: 0.8rem; font-weight: 800; color: var(--terra-main); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">
+            Primary Emergency Contact
+          </span>
+          <div class="form-group" style="margin-bottom: 0.6rem;">
+            <label class="form-label" for="reg-contact-name" style="font-size: 0.8rem;">Contact Name</label>
+            <input type="text" id="reg-contact-name" class="form-input" placeholder="e.g. Sarah (Daughter)" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="reg-contact-phone" style="font-size: 0.8rem;">Contact Phone (for SMS Alerts)</label>
+            <input type="tel" id="reg-contact-phone" class="form-input" placeholder="e.g. +1987654321" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-reg-submit" style="width: 100%;">
+          Create Profile &amp; Go to Dashboard
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script src="../js/api.js"></script>
+  <script>
+    'use strict';
+
+    function showAlert(msg, isSuccess = false) {
+      const box = document.getElementById('auth-alert');
+      box.textContent = msg;
+      box.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+      box.style.display = 'flex';
+    }
+
+    function hideAlert() {
+      document.getElementById('auth-alert').style.display = 'none';
+    }
+
+    function switchAuthTab(mode) {
+      hideAlert();
+      const tabL = document.getElementById('tab-login');
+      const tabR = document.getElementById('tab-register');
+      const formL = document.getElementById('form-login');
+      const formR = document.getElementById('form-register');
+      const title = document.getElementById('auth-title');
+      const sub = document.getElementById('auth-subtitle');
+
+      if (mode === 'login') {
+        tabL.classList.add('active');
+        tabR.classList.remove('active');
+        formL.classList.add('active');
+        formR.classList.remove('active');
+        title.textContent = 'Welcome Back';
+        sub.textContent = 'Sign in to access your companion dashboard';
+      } else {
+        tabL.classList.remove('active');
+        tabR.classList.add('active');
+        formL.classList.remove('active');
+        formR.classList.add('active');
+        title.textContent = 'Register New Profile';
+        sub.textContent = 'Set up a caring companion for your loved one';
+      }
+    }
+
+    // Handle Login
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideAlert();
+      const input = document.getElementById('login-user-id').value.trim();
+      if (!input) {
+        showAlert('Please enter your User ID or Phone Number.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-login-submit');
+      btn.textContent = 'Signing in...';
+      btn.disabled = true;
+
+      try {
+        // Profile IDs are looked up by document ID; phone sign-in resolves an
+        // existing profile and stores the Firestore document ID it returns.
+        const isPhone = /^[+()\d][\d\s().-]{6,}$/.test(input);
+        const res = isPhone
+          ? await window.CareMateAPI.getUserProfileByPhone(input)
+          : await window.CareMateAPI.getUserProfile(input);
+        if (res.success && res.data && res.data.userId) {
+          window.CareMateAPI.setCurrentUser({
+            userId: res.data.userId,
+            name: res.data.name || 'User',
+            phone: res.data.phone || '',
+            age: res.data.age || '',
+          });
+          showAlert('Signed in successfully! Loading dashboard...', true);
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 400);
+        } else {
+          showAlert(res.status === 404 ? 'No Carewise profile was found for that ID or phone number. Check it and try again.' : (res.error || 'Could not verify this profile. Please try again.'));
+        }
+      } catch (err) {
+        showAlert(err.name === 'AbortError' ? 'The server took too long to respond. Please try again.' : 'Could not reach Carewise. Check your connection and try again.');
+      } finally {
+        btn.textContent = 'Sign In to Dashboard';
+        btn.disabled = false;
+      }
+    }
+
+    // Handle Registration
+    async function handleRegister(e) {
+      e.preventDefault();
+      hideAlert();
+
+      const name = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const age = document.getElementById('reg-age').value.trim();
+      const contactName = document.getElementById('reg-contact-name').value.trim();
+      const contactPhone = document.getElementById('reg-contact-phone').value.trim();
+
+      if (!name || !phone) {
+        showAlert('Name and Phone number are required by the backend.');
+        return;
+      }
+
+      const emergencyContacts = [];
+      if (contactName && contactPhone) {
+        emergencyContacts.push({
+          name: contactName,
+          phone: contactPhone,
+          relation: 'Emergency Family Contact'
+        });
+      }
+
+      const btn = document.getElementById('btn-reg-submit');
+      btn.textContent = 'Creating Profile...';
+      btn.disabled = true;
+
+      try {
+        const res = await window.CareMateAPI.registerUser({
+          name,
+          phone,
+          age,
+          emergencyContacts
+        });
+
+        if (res.success && res.data && res.data.userId) {
+          showAlert('Profile registered successfully! Redirecting to Dashboard...', true);
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+        } else {
+          showAlert(res.error || 'Could not register profile. Please try again.');
+          btn.textContent = 'Create Profile & Go to Dashboard';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        showAlert('Connection error. Please ensure the backend is running.');
+        btn.textContent = 'Create Profile & Go to Dashboard';
+        btn.disabled = false;
+      }
+    }
+
+    // 1-Click Demo Account for Evaluators. Resolve the existing profile by its
+    // registered phone; never create a new demo user or invent a document ID.
+    async function useDemoAccount() {
+      hideAlert();
+      const btn = document.querySelector('.btn-quick-demo');
+      btn.textContent = 'Opening demo...';
+      btn.disabled = true;
+      try {
+        const result = await window.CareMateAPI.getUserProfileByPhone('+15550192834');
+        if (!result.success || !result.data || !result.data.userId) {
+          showAlert(result.error || 'The demo profile could not be verified.');
+          btn.textContent = '⚡ Quick 1-Click Demo Login';
+          btn.disabled = false;
+          return;
+        }
+        window.CareMateAPI.setCurrentUser({
+          userId: result.data.userId,
+          name: result.data.name || 'Grandpa Arthur',
+          phone: result.data.phone || '+15550192834',
+          age: result.data.age || 76,
+        });
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        showAlert('Could not verify the demo profile. Check your connection and try again.');
+        btn.textContent = '⚡ Quick 1-Click Demo Login';
+        btn.disabled = false;
+      }
+    }
+
+    // Pre-fill if already in localStorage
+    const savedId = localStorage.getItem('caremate_user_id');
+    if (savedId) {
+      document.getElementById('login-user-id').value = savedId;
+    }
+  </script>
+</body>
+</html>

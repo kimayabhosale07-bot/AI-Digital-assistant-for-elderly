@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medicine Reminders | Carewise</title>
+  <meta name="description" content="Manage daily medication schedule and reminders with Carewise." />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .schedule-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.4rem;
+      background: var(--bg-subtle);
+      padding: 0.25rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-light);
+    }
+
+    .filter-tab {
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .filter-tab.active {
+      background: #FFF;
+      color: var(--terra-main);
+      box-shadow: 0 1px 4px rgba(130,56,44,0.1);
+    }
+
+    .meds-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 680px) {
+      .meds-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .med-card {
+      background: #FFF;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+    }
+    .med-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-focus);
+    }
+
+    .med-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.8rem;
+    }
+
+    .med-card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--terra-main);
+      margin-bottom: 0.2rem;
+    }
+
+    .med-card-dosage {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .med-card-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--terra-main);
+    }
+
+    .med-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      border-top: 1px solid var(--border-light);
+      padding-top: 0.8rem;
+    }
+
+    .btn-status-toggle {
+      flex: 1;
+      padding: 0.45rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-light);
+      background: #FFF;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      font-family: inherit;
+    }
+    .btn-status-toggle.active-taken { background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7; }
+    .btn-status-toggle.active-missed { background: #FFEBEE; color: #C62828; border-color: #FFCDD2; }
+    .btn-status-toggle.active-pending { background: #FFF3E0; color: #E65100; border-color: #FFE0B2; }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-nav">
+    <a class="nav-brand" href="dashboard.html">
+      <div class="brand-icon">
+        <img src="../assets/aistudio/central_brain.png" alt="Carewise logo" />
+      </div>
+      <span class="brand-title">carewise</span>
+      <span class="brand-leaf">🌿</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="reminders.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+        Medicines
+      </a>
+      <a href="appointments.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments
+      </a>
+      <a href="health.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Health Vitals
+      </a>
+      <a href="sos.html" class="nav-link" style="color:#D32F2F;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Emergency SOS
+      </a>
+    </nav>
+
+    <div class="nav-user">
+      <div class="user-badge" id="nav-user-badge">
+        <span>👤</span>
+        <span id="user-display-name">User</span>
+      </div>
+      <button class="btn-nav-logout" onclick="window.CareMateAPI.logoutUser()">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Page Container -->
+  <main class="page-container">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h1 class="page-title">Daily Medicine Reminders</h1>
+        <p class="page-subtitle">Track prescriptions and manage dosages with gentle audio reminders.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openAddModal()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Prescription
+      </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="schedule-toolbar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all', this)">All Medicines</button>
+        <button class="filter-tab" onclick="setFilter('pending', this)">Pending ⏳</button>
+        <button class="filter-tab" onclick="setFilter('taken', this)">Taken ✓</button>
+        <button class="filter-tab" onclick="setFilter('missed', this)">Missed ✕</button>
+      </div>
+
+      <div style="font-size:0.88rem; color:var(--text-muted); font-weight:700;" id="stats-summary">
+        Loading schedule...
+      </div>
+    </div>
+
+    <!-- Medicines Grid -->
+    <div id="meds-list" class="meds-grid">
+      <div style="grid-column: 1 / -1; text-align:center; padding:3rem; color:var(--text-muted);">
+        Loading your medicines...
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD MEDICINE MODAL -->
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAddModal()">&times;</button>
+      <h2 style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.4rem;">Add Medicine Schedule</h2>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.5rem;">Configure prescription details for automated voice alerts.</p>
+
+      <div id="modal-alert" class="alert alert-danger" style="display:none;"></div>
+
+      <form onsubmit="handleAddMedicine(event)">
+        <div class="form-group">
+          <label class="form-label" for="med-name">Medicine Name *</label>
+          <input type="text" id="med-name" class="form-input" placeholder="e.g. Lisinopril, Metformin" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="med-dosage">Dosage *</label>
+          <input type="text" id="med-dosage" class="form-input" placeholder="e.g. 10mg tablet, 1 spoon with food" required />
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="med-time">Time (24h HH:MM) *</label>
+            <input type="text" id="med-time" class="form-input" placeholder="08:30" pattern="^([01]\d|2[0-3]):([0-5]\d)$" title="Format: HH:MM e.g. 08:30 or 19:00" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="med-freq">Frequency *</label>
+            <select id="med-freq" class="form-select" required>
+              <option value="Daily">Daily</option>
+              <option value="Twice daily">Twice daily</option>
+              <option value="Three times daily">Three times daily</option>
+              <option value="Every morning">Every morning</option>
+              <option value="Before bed">Before bed</option>
+              <option value="As needed">As needed</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-save-med" style="width:100%; margin-top:0.5rem;">
+          Save Medicine Schedule
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    'use strict';
+
+    const userId = window.CareMateAPI.getCurrentUserId();
+    if (!userId) window.location.href = 'login.html';
+
+    const userName = localStorage.getItem('caremate_user_name') || 'User';
+    document.getElementById('user-display-name').textContent = userName;
+
+    let allMedicines = [];
+    let activeFilter = 'all';
+
+    async function loadMedicines() {
+      try {
+        const res = await window.CareMateAPI.getMedicines(userId);
+        if (res.success && Array.isArray(res.data)) {
+          allMedicines = res.data;
+          renderMedicines();
+        } else {
+          allMedicines = [];
+          renderMedicines();
+        }
+      } catch (e) {
+        allMedicines = [];
+        renderMedicines();
+      }
+    }
+
+    function renderMedicines() {
+      const container = document.getElementById('meds-list');
+      const filtered = activeFilter === 'all' 
+        ? allMedicines 
+        : allMedicines.filter(m => (m.status || 'pending') === activeFilter);
+
+      const takenCount = allMedicines.filter(m => m.status === 'taken').length;
+      document.getElementById('stats-summary').textContent = `${takenCount} of ${allMedicines.length} taken today`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align:center; padding:3rem 1rem; background:#FFF; border-radius:var(--radius-lg); border:1px solid var(--border-card);">
+            <div style="font-size:2.5rem; margin-bottom:0.5rem;">💊</div>
+            <h3 style="font-size:1.3rem; color:var(--terra-main); margin-bottom:0.3rem;">No medicines found</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem;">
+              ${activeFilter === 'all' ? 'You have no medicines scheduled yet.' : `No medicines with status '${activeFilter}'.`}
+            </p>
+            <button class="btn btn-primary" onclick="openAddModal()">Add Your First Prescription</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(m => {
+        const status = m.status || 'pending';
+        return `
+          <div class="med-card" id="card-${m.medId}">
+            <div>
+              <div class="med-card-top">
+                <div>
+                  <h3 class="med-card-title">${escapeHtml(m.medicineName)}</h3>
+                  <div class="med-card-dosage">Dosage: ${escapeHtml(m.dosage)}</div>
+                </div>
+                <div class="med-card-time">⏰ ${escapeHtml(m.time)}</div>
+              </div>
+              <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.4rem;">
+                Frequency: <strong>${escapeHtml(m.frequency)}</strong>
+              </div>
+            </div>
+
+            <div class="med-actions">
+              <button class="btn-status-toggle ${status === 'pending' ? 'active-pending' : ''}" onclick="updateStatus('${m.medId}', 'pending')">
+                ⏳ Pending
+              </button>
+              <button class="btn-status-toggle ${status === 'taken' ? 'active-taken' : ''}" onclick="updateStatus('${m.medId}', 'taken')">
+                ✓ Taken
+              </button>
+              <button class="btn-status-toggle ${status === 'missed' ? 'active-missed' : ''}" onclick="updateStatus('${m.medId}', 'missed')">
+                ✕ Missed
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setFilter(f, el) {
+      activeFilter = f;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      renderMedicines();
+    }
+
+    async function updateStatus(medId, newStatus) {
+      const res = await window.CareMateAPI.updateMedicineStatus(medId, newStatus);
+      if (res.success) {
+        if ('speechSynthesis' in window && newStatus === 'taken') {
+          const u = new SpeechSynthesisUtterance('Medicine marked as taken. Well done!');
+          u.rate = 0.95;
+          window.speechSynthesis.speak(u);
+        }
+        loadMedicines();
+      } else {
+        alert('Could not update status: ' + (res.error || 'Server error'));
+      }
+    }
+
+    function openAddModal() {
+      document.getElementById('modal-alert').style.display = 'none';
+      document.getElementById('add-modal').classList.add('open');
+      document.getElementById('med-name').focus();
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-modal').classList.remove('open');
+    }
+
+    async function handleAddMedicine(e) {
+      e.preventDefault();
+      const name = document.getElementById('med-name').value.trim();
+      const dosage = document.getElementById('med-dosage').value.trim();
+      const time = document.getElementById('med-time').value.trim();
+      const frequency = document.getElementById('med-freq').value;
+
+      const alertBox = document.getElementById('modal-alert');
+      alertBox.style.display = 'none';
+
+      // Validate time HH:MM format matching backend
+      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+      if (!timeRegex.test(time)) {
+        alertBox.textContent = 'Please enter time in 24-hour format HH:MM (e.g. 08:30 or 14:00).';
+        alertBox.style.display = 'block';
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-med');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      try {
+        const res = await window.CareMateAPI.addMedicine({
+          userId,
+          medicineName: name,
+          dosage,
+          time,
+          frequency
+        });
+
+        if (res.success) {
+          closeAddModal();
+          // Reset form
+          document.getElementById('med-name').value = '';
+          document.getElementById('med-dosage').value = '';
+          document.getElementById('med-time').value = '';
+          loadMedicines();
+        } else {
+          alertBox.textContent = res.error || 'Could not save medicine.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.textContent = 'Connection error while saving medicine.';
+        alertBox.style.display = 'block';
+      } finally {
+        btn.textContent = 'Save Medicine Schedule';
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    loadMedicines();
+  </script>
+</body>
+</html>

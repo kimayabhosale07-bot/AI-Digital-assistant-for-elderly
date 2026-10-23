@@ -1,0 +1,13 @@
+{
+  "name": "ai-digital-assistant-for-elderly",
+  "version": "1.0.0",
+  "description": "CareMate — AI Digital Personal Assistant for Elderly",
+  "scripts": {
+    "dev": "live-server frontend --open=pages/index.html --port=3000",
+    "start": "live-server frontend --open=pages/index.html --port=3000"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

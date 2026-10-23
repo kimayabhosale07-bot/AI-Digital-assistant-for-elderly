@@ -15,7 +15,7 @@ backend/
 ├── src/
 │   ├── config/          # Service configurations (Firebase DB & Twilio SMS)
 │   │   ├── firebase.js  # Firebase Admin SDK initialization & DB connection helper
-│   │   └── twilio.js    # Twilio SMS initialization with Simulation fallback mode
+│   │   └── twilio.js    # Twilio SMS initialization with Twilio configuration and send results
 │   ├── controllers/     # Business logic per feature (contains logic for requests/responses)
 │   │   ├── userController.js         # User registration & profile retrieval
 │   │   ├── medicineController.js     # Adding schedules, getting schedules & updates
@@ -78,8 +78,8 @@ Fill in the values inside `.env` as explained below.
 * **`MEDICINE_GRACE_PERIOD_MIN`**: The number of minutes before a pending medicine is marked as "missed" (default is `30`).
 
 > [!NOTE]
-> **Developer-Friendly Twilio Simulation Fallback**:
-> If you do not have Twilio credentials or they are left as placeholders, the server will load in **Simulation Mode**. Instead of crashing or failing, it will print simulated SMS notifications directly into your server command terminal.
+> **Twilio delivery status:**
+> Without valid credentials, the server stays available but SMS sends return a failure state; messages are not printed or reported as delivered.
 
 ---
 
@@ -96,19 +96,47 @@ To start the server, you have two commands available in your package scripts:
   npm start
   ```
 
+* **Read-only Firestore connectivity diagnostic** (checks configuration without printing credentials or document data):
+  ```bash
+  npm run diagnose:firestore
+  ```
+  The check reads at most one document from `users` and reports only the document count or a redacted Firestore error. If a system proxy is interfering, configure `FIRESTORE_NO_PROXY_HOSTS=firestore.googleapis.com` and `GOOGLE_API_NO_PROXY_HOSTS=googleapis.com` in `.env`.
+
 ---
 
 ## 📊 Database Collections (Firestore Schema)
 
-The server stores and updates five distinct collections in Firebase Firestore:
+The server stores and updates the following collections in Firebase Firestore:
 
 | Collection | Schema / Fields | Description |
 | :--- | :--- | :--- |
 | **`users`** | `userId`, `name`, `age`, `phone`, `emergencyContacts[]` | Stores user profiles. `emergencyContacts` contains objects with `{ name, relation, phone }`. |
 | **`medicines`** | `medId`, `userId`, `medicineName`, `dosage`, `time`, `frequency`, `status` | Stores medicine schedules. `status` can be `"pending"`, `"taken"`, or `"missed"`. |
+| **`medicine_doses`** | `doseId`, `userId`, `medId`, `medicineName`, `dosage`, `scheduledTime`, `scheduledDate`, `status`, `updatedAt` | Stores per-day completed dose history separately from recurring schedules. |
 | **`appointments`** | `apptId`, `userId`, `doctorName`, `date`, `time`, `location`, `reminderSent` | Stores upcoming doctor consultations. |
 | **`healthLogs`** | `logId`, `userId`, `heartRate`, `steps`, `timestamp`, `flagged` | Health tracks. `flagged` becomes `true` if heartRate falls outside 60-100 bpm. |
 | **`alerts`** | `alertId`, `userId`, `type`, `timestamp`, `notifiedContacts[]` | Stores history of all SOS triggers, medicine misses, or health alarms. |
+| **`notificationAccess`** | `email`, `emailHash`, `patientId`, `role`, `status`, `authUid` | Server-managed grants connecting verified email-link identities to a patient profile or an invited family relationship. Existing `users` documents are not modified. |
+| **`notificationInvitations`** | `emailHash`, `patientId`, `displayName`, `status`, `expiresAt`, `acceptedByUid` | Server-managed, hashed, single-use family invitations. The raw invitation code is sent only in the verified email link and expires after seven days. |
+| **`notificationTokens`** | `token`, `principalUid`, `patientIds[]`, `preferences`, `platform`, `createdAt`, `updatedAt` | Server-managed FCM web registrations. Registration and delivery require a verified Firebase ID token and a current `notificationAccess` grant. |
+
+## Web Push Notification Setup
+
+The existing Carewise profile-ID/phone lookup remains the dashboard login, but it is not used as proof of identity for push registration. Notification access uses Firebase Authentication email-link sign-in; SMS and Phone Authentication are not used by this flow.
+
+Before enabling it, enable **Email/Password** and **Email link (passwordless sign-in)** in Firebase Authentication, and authorize the app's actual development/deployment hostname. The frontend already has the public Firebase web config, VAPID public key, service worker, and user-initiated browser permission flow. Deployed sites must use HTTPS; `localhost` is suitable for local development.
+
+Each existing patient needs a one-time access grant provisioned only after an operator confirms that the email belongs to that patient. This is needed because the existing local Profile ID/phone login does not prove ownership of a profile to Firebase Authentication. The script checks the existing profile and performs a dry run unless `--apply` is supplied:
+
+```bash
+cd backend
+node src/scripts/provisionNotificationAccess.js <existing-profile-id> <verified-email>
+node src/scripts/provisionNotificationAccess.js <existing-profile-id> <verified-email> --apply
+```
+
+The grant is written to `notificationAccess`; the script does not alter `users`. Once a patient has a verified notification identity, they can invite a family member by name and email from the dashboard. The family member signs in with the invited verified email and explicitly accepts a single-use invitation that expires after seven days. Patients can review and revoke pending or accepted invitations. Family members see their authorized profiles and profile-scoped alert history on the Browser Notifications page. Browser alert preferences are stored per registration. Push delivery selects recipients from active server-side grants; the browser never chooses a patient profile as proof of authority.
+
+The existing Twilio SMS reminder and emergency-alert behavior remains unchanged. FCM web push support is prepared for due and missed medicine reminders, health alerts, and SOS alerts, but automated pushes are disabled by default. Only an explicit test-push request can send a push until an operator verifies receipt of that test; then set `FCM_AUTOMATED_NOTIFICATIONS_ENABLED=true` in the backend environment to enable scheduled and event-driven pushes. No push is sent during sign-in or token registration.
 
 ---
 
@@ -166,3 +194,9 @@ The background job (`node-cron`) acts as an automated scheduler running every si
   2. Dispatches warning SMS alerts to the user's emergency contacts: *"Medicines missed!"*
   3. Records a `"MEDICINE_MISSED"` alert document in the database.
 * **Daily Status Reset**: Everyday at midnight (`00:00`), a second cron job automatically resets all active medicine statuses back to `"pending"` so they are ready for the new day's tracking sequence.
+
+## Daily dose tracking and SMS test
+
+Recurring schedules stay in `medicines` with their existing schema. The dashboard stores each completed dose in `medicine_doses` using a stable per-user, medicine, and scheduled-date document ID. Fields are `doseId`, `userId`, `medId`, `medicineName`, `dosage`, `scheduledTime`, `scheduledDate`, `status`, and `updatedAt`. Undo removes that date's dose record; it does not alter the recurring medicine schedule. `GET /medicine/:userId?date=YYYY-MM-DD` includes `todayStatus` and `doseId`; `POST /medicine/:medId/dose` accepts `{ userId, scheduledDate, status: "taken" | "pending" }` and verifies schedule ownership.
+
+`GET /sms/status` reports Twilio setup status and variable names without returning secret values. `POST /sms/test` requires explicit confirmation and only sends to the user's own registered phone, never emergency contacts. It rejects invalid or unavailable configuration and does not simulate success. Configure valid `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_PHONE_NUMBER` values in the backend `.env`, restart the backend, and verify `/api/sms/status`.

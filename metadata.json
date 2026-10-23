@@ -1,0 +1,6 @@
+{
+  "name": "Care For Them",
+  "description": "An AI companion that helps your elderly stay connected, independent and supported — one word at a time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

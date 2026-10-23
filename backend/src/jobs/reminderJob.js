@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const { getDb } = require('../config/firebase');
 const { sendSMS } = require('../config/twilio');
+const { sendToPatient } = require('../services/pushNotifications');
 require('dotenv').config();
 
 const MEDICINE_GRACE_PERIOD_MIN = parseInt(process.env.MEDICINE_GRACE_PERIOD_MIN || '30', 10);
@@ -43,6 +44,27 @@ const startReminderJob = () => {
         // A. Log if the current time matches the scheduled time
         if (time === currentTimeStr) {
           console.log(`⏰ [Reminder Due] Medicine: "${medicineName}" (${dosage}) is scheduled now at ${time} for User ID: ${userId}.`);
+          const scheduledDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+          const dueAlertId = `${medId}_${scheduledDate}_MEDICINE_DUE`;
+          try {
+            await db.collection('alerts').doc(dueAlertId).create({
+              alertId: dueAlertId,
+              userId,
+              type: 'MEDICINE_DUE',
+              timestamp: now.toISOString(),
+            });
+          } catch (alertError) {
+            if (![6, '6', 'already-exists'].includes(alertError.code)) throw alertError;
+          }
+          try {
+            await sendToPatient(userId, {
+              type: 'medicine-reminder',
+              title: 'Medicine reminder',
+              body: 'A scheduled medicine is due. Open Carewise to review it.',
+            }, ['patient']);
+          } catch (pushError) {
+            console.error('[Medicine Reminder] Web push failed:', pushError.code || 'unknown');
+          }
         }
 
         // B. Check if medicine is overdue by more than grace period
@@ -91,12 +113,25 @@ const startReminderJob = () => {
                 });
               }
 
+              let pushSummary = { sent: 0, failed: 0, removed: 0 };
+              try {
+                pushSummary = await sendToPatient(userId, {
+                  type: 'medicine-missed',
+                  title: 'Missed medicine alert',
+                  body: 'A scheduled medicine is overdue. Open Carewise to review the alert.',
+                  urgency: 'high',
+                });
+              } catch (pushError) {
+                console.error('[Medicine Overdue] Web push failed:', pushError.code || 'unknown');
+              }
+
               // 3. Log the alert event
               const alertData = {
                 userId,
                 type: 'MEDICINE_MISSED',
                 timestamp: new Date().toISOString(),
                 notifiedContacts: notificationSummary,
+                pushNotifications: pushSummary,
                 details: {
                   medicineName,
                   dosage,

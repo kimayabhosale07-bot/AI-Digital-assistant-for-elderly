@@ -77,8 +77,8 @@ const getUserProfile = async (req, res) => {
     }
 
     return res.status(200).json({
+      ...userDoc.data(),
       userId: userDoc.id,
-      ...userDoc.data()
     });
   } catch (error) {
     console.error('Error in getUserProfile:', error);
@@ -86,7 +86,38 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+/**
+ * GET /user/by-phone/:phone
+ * Resolves an existing profile to its Firestore document ID. Older demo
+ * sessions may have duplicate documents for the same phone and name; in that
+ * case use the most recently registered copy, without creating another user.
+ */
+const getUserProfileByPhone = async (req, res) => {
+  try {
+    const db = getDb();
+    const phone = String(req.params.phone || '').trim();
+    if (!phone) return res.status(400).json({ error: 'Phone number is required.' });
+
+    const snapshot = await db.collection('users').where('phone', '==', phone).get();
+    if (snapshot.empty) return res.status(404).json({ error: 'No Carewise profile was found for that phone number.' });
+
+    const profiles = snapshot.docs.map(doc => ({ id: doc.id, profile: doc.data() }));
+    const names = new Set(profiles.map(item => String(item.profile.name || '').trim().toLowerCase()));
+    if (names.size > 1) {
+      return res.status(409).json({ error: 'More than one profile uses this phone number. Sign in with your Profile ID.' });
+    }
+
+    profiles.sort((a, b) => String(b.profile.createdAt || '').localeCompare(String(a.profile.createdAt || '')));
+    const selected = profiles[0];
+    return res.status(200).json({ ...selected.profile, userId: selected.id });
+  } catch (error) {
+    console.error('Error in getUserProfileByPhone:', error.message);
+    return res.status(500).json({ error: 'Could not look up this profile. Please try again.' });
+  }
+};
+
 module.exports = {
   registerUser,
   getUserProfile,
+  getUserProfileByPhone,
 };

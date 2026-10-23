@@ -1,5 +1,7 @@
 const { getDb } = require('../config/firebase');
 const { sendSMS } = require('../config/twilio');
+const { sendToPatient } = require('../services/pushNotifications');
+const { hasPatientPushAuthorization } = require('../services/notificationAuthorization');
 
 /**
  * POST /health-log
@@ -47,6 +49,7 @@ const logHealthReading = async (req, res) => {
     await logDocRef.update({ logId: logDocRef.id });
 
     let notificationSummary = [];
+    let pushSummary = { sent: 0, failed: 0, removed: 0 };
 
     // Send emergency alert SMS if reading is flagged
     if (isFlagged) {
@@ -78,25 +81,42 @@ const logHealthReading = async (req, res) => {
         }
       }
 
+      if (await hasPatientPushAuthorization(req, userId)) {
+        try {
+          pushSummary = await sendToPatient(userId, {
+            type: 'health-alert',
+            title: 'Carewise health alert',
+            body: 'A health reading needs attention. Open Carewise to review it.',
+            urgency: 'high',
+          });
+        } catch (pushError) {
+          console.error('[Health Alert] Web push failed:', pushError.code || 'unknown');
+        }
+      }
+
       // Log alert details in database
       const alertData = {
         userId,
         type: 'HEART_RATE_ANOMALY',
         timestamp: new Date().toISOString(),
-        notifiedContacts: notificationSummary
+        notifiedContacts: notificationSummary,
+        pushNotifications: pushSummary
       };
       const alertDocRef = await db.collection('alerts').add(alertData);
       await alertDocRef.update({ alertId: alertDocRef.id });
     }
 
     return res.status(201).json({
-      message: isFlagged 
-        ? 'Health reading logged and flagged! Emergency contacts notified.' 
+      message: isFlagged
+        ? (notificationSummary.length > 0 && notificationSummary.every(item => item.success)
+          ? 'Health reading logged and flagged. Emergency contacts were notified.'
+          : 'Health reading logged and flagged. SMS notification could not be confirmed; see notification status.')
         : 'Health reading logged successfully.',
       logId: logDocRef.id,
       data: { logId: logDocRef.id, ...healthLogData },
       flagged: isFlagged,
-      notificationsSent: notificationSummary
+      notificationsSent: notificationSummary,
+      pushNotifications: isFlagged ? pushSummary : { sent: 0, failed: 0, removed: 0 }
     });
   } catch (error) {
     console.error('Error in logHealthReading:', error);
@@ -126,12 +146,6 @@ const triggerSOS = async (req, res) => {
     const userData = userDoc.data();
     const contacts = userData.emergencyContacts || [];
 
-    if (contacts.length === 0) {
-      return res.status(400).json({ 
-        error: `User has no emergency contacts configured. Cannot broadcast SOS SMS alerts.` 
-      });
-    }
-
     const smsBody = `🚨 EMERGENCY SOS: ${userData.name} (Phone: ${userData.phone}) has triggered an emergency SOS panic button. Please contact or assist them immediately!`;
     const notificationSummary = [];
 
@@ -157,21 +171,45 @@ const triggerSOS = async (req, res) => {
       }
     }
 
+    let pushSummary = { sent: 0, failed: 0, removed: 0 };
+    if (await hasPatientPushAuthorization(req, userId)) {
+      try {
+        pushSummary = await sendToPatient(userId, {
+          type: 'emergency-sos',
+          title: 'Carewise emergency alert',
+          body: 'An emergency alert needs attention. Open Carewise now.',
+          urgency: 'high',
+        });
+      } catch (pushError) {
+        console.error('[SOS] Web push failed:', pushError.code || 'unknown');
+      }
+    }
+    if (contacts.length === 0 && pushSummary.sent === 0) {
+      return res.status(400).json({
+        error: 'No emergency contacts or notification-enabled browsers are available for this profile.',
+        pushNotifications: pushSummary,
+      });
+    }
+
     // Log the SOS emergency alert in the database
     const alertData = {
       userId,
       type: 'SOS',
       timestamp: new Date().toISOString(),
-      notifiedContacts: notificationSummary
+      notifiedContacts: notificationSummary,
+      pushNotifications: pushSummary
     };
     const alertDocRef = await db.collection('alerts').add(alertData);
     await alertDocRef.update({ alertId: alertDocRef.id });
 
     return res.status(200).json({
-      message: 'Emergency SOS triggered successfully! Alerts sent to emergency contacts.',
+      message: notificationSummary.length > 0 && notificationSummary.every(item => item.success)
+        ? 'Emergency SOS recorded and Twilio accepted messages for all emergency contacts.'
+        : 'Emergency SOS recorded, but SMS delivery was not confirmed. See notification status.',
       alertId: alertDocRef.id,
       userId,
-      notificationsSent: notificationSummary
+      notificationsSent: notificationSummary,
+      pushNotifications: pushSummary
     });
   } catch (error) {
     console.error('Error in triggerSOS:', error);

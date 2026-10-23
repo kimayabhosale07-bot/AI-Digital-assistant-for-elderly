@@ -1,0 +1,19 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Local environment files and backups
+.env.*
+!.env.example
+*.bak
+
+# Temporary browser testing profiles
+.aistudio/
+.carewise-*/
+.chrome-check-profile/
+current_1440.png

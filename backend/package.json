@@ -5,7 +5,9 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "test": "node test/run.js",
+    "diagnose:firestore": "node src/scripts/checkFirestore.js"
   },
   "keywords": [
     "express",

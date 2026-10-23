@@ -1,0 +1,483 @@
+/* ============================================================
+   LAYOUT.CSS — CareMate Dashboard Layout System
+   ============================================================
+   Desktop: Left sidebar (240px) + scrollable main content
+   Mobile (<1024px): Full-width content + bottom tab bar
+   Sidebar contains: Logo, SOS, Navigation, User Profile
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  padding-bottom: var(--nav-height);
+}
+
+/* ── Accessibility Skip Link ── */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-16);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-8);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  z-index: 1000;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: var(--space-16);
+}
+
+/* ── App Shell — Flex Container ── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ── App Header (hidden on desktop — sidebar replaces it) ── */
+.app-header {
+  display: none;
+}
+
+/* ── Sidebar Navigation ── */
+.sidebar {
+  display: none;
+}
+
+/* ── Main Content Area ── */
+.app-main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-24) var(--space-20);
+}
+
+/* ── Page Header ── */
+.page-header-block {
+  margin-bottom: var(--space-24);
+}
+
+.page-title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.3px;
+}
+
+.page-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
+/* ── Page Header with Action Button ── */
+.page-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-16);
+  margin-bottom: var(--space-24);
+  flex-wrap: wrap;
+}
+
+/* ── Greeting Header (Dashboard) ── */
+.greeting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  margin-bottom: var(--space-24);
+}
+
+.greeting-header__left h2 {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.3px;
+}
+
+.greeting-header__left .greeting-leaf {
+  display: inline-block;
+  margin-left: var(--space-4);
+}
+
+.greeting-header__left p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+}
+
+.greeting-header__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+}
+
+/* ── Mobile Bottom Navigation ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 400;
+  padding: 0 var(--space-4);
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  min-width: 52px;
+  min-height: var(--tap-min);
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-8);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  gap: 3px;
+}
+
+.bottom-nav__item:hover,
+.bottom-nav__item:focus-visible {
+  color: var(--color-primary);
+  background: var(--color-primary-50);
+}
+
+.bottom-nav__item--active {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bottom-nav__item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.bottom-nav__icon {
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.bottom-nav__icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+}
+
+.bottom-nav__label {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* ── Sidebar Nav Items (used inside sidebar on desktop) ── */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-nav__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-10) var(--space-16);
+  border-radius: var(--radius-10);
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+}
+
+.sidebar-nav__item:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-text);
+}
+
+.sidebar-nav__item--active {
+  background: var(--color-sidebar-active);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sidebar-nav__item--active svg {
+  stroke: var(--color-primary);
+}
+
+.sidebar-nav__icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-nav__icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+}
+
+/* ── Sidebar Emergency SOS Button ── */
+.sidebar-sos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  width: 100%;
+  padding: var(--space-10) var(--space-16);
+  background: var(--color-danger);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-10);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.sidebar-sos:hover {
+  background: var(--color-danger-dark);
+}
+
+.sidebar-sos svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Sidebar User Profile ── */
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  padding: var(--space-12) var(--space-16);
+  border-top: 1px solid var(--color-sidebar-border);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.sidebar-profile__name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.sidebar-profile__role {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* ── Footer ── */
+.app-footer {
+  text-align: center;
+  padding: var(--space-24);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  border-top: 1px solid var(--color-border-light);
+  margin-top: var(--space-48);
+}
+
+/* ── Toast / Feedback ── */
+.feedback-toast {
+  position: fixed;
+  top: var(--space-24);
+  right: var(--space-24);
+  left: auto;
+  max-width: 380px;
+  width: calc(100% - 48px);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-12);
+  padding: var(--space-16) var(--space-20);
+  z-index: 1000;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-150%);
+  transition: transform var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.feedback-toast--visible {
+  transform: translateY(0);
+}
+
+.feedback-toast--success { border-left: 4px solid var(--color-success); background: var(--color-success-bg); }
+.feedback-toast--warning { border-left: 4px solid var(--color-warning); background: var(--color-warning-bg); }
+.feedback-toast--error   { border-left: 4px solid var(--color-danger);  background: var(--color-danger-bg); }
+.feedback-toast--info    { border-left: 4px solid var(--color-primary); background: var(--color-primary-bg); }
+.feedback-toast--voice   { border-left: 4px solid var(--color-secondary); background: var(--color-secondary-bg); }
+
+.feedback-toast__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.feedback-toast__message {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.feedback-toast__spoken {
+  font-size: var(--font-size-xs);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   DESKTOP LAYOUT (>= 1024px)
+   ============================================================ */
+@media (min-width: 1024px) {
+  body {
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+
+  .app-shell {
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  /* Hide mobile header */
+  .app-header {
+    display: none;
+  }
+
+  /* Show Sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--color-sidebar-bg);
+    border-right: 1px solid var(--color-sidebar-border);
+    padding: var(--space-20) var(--space-12);
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar__logo {
+    padding: 0 var(--space-4);
+    margin-bottom: var(--space-20);
+  }
+
+  .sidebar__sos {
+    padding: 0 var(--space-4);
+    margin-bottom: var(--space-20);
+  }
+
+  .sidebar__nav {
+    flex: 1;
+    padding: 0 var(--space-4);
+  }
+
+  .sidebar__profile {
+    margin-top: auto;
+  }
+
+  .sidebar__botanical {
+    padding: var(--space-20) var(--space-16);
+    opacity: 0.06;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Hide bottom nav on desktop */
+  .bottom-nav {
+    display: none;
+  }
+
+  /* Main scrollable area */
+  .app-main-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    height: 100vh;
+  }
+
+  .main-content {
+    padding: var(--space-32) var(--space-40);
+    max-width: var(--content-max-width);
+  }
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Print ── */
+@media print {
+  .sidebar,
+  .bottom-nav,
+  .sidebar-sos,
+  .feedback-toast {
+    display: none !important;
+  }
+}

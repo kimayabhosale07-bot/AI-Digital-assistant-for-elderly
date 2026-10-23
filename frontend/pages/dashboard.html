@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Carewise Digital Assistant</title>
+  <meta name="description" content="Carewise senior companion dashboard — medicine reminders, doctor visits, and emergency support." />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* Dashboard specific layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .notification-first-visit { 
+      width: min(90vw, 420px);
+      padding: 1.5rem;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      color: var(--text-main);
+      background: linear-gradient(135deg, #FFFDF9, #F4F5ED);
+      box-shadow: var(--shadow-md);
+    }
+    .notification-first-visit::backdrop { background: rgba(48, 37, 31, .36); }
+    .notification-first-visit p { margin: .55rem 0 1rem; color: var(--text-sub); line-height: 1.5; }
+    .notification-first-visit-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .6rem; }
+    #notification-status[data-state="error"] { color: #A83227; }
+    @media (min-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1.25fr 1fr;
+      }
+    }
+
+    /* Voice Assistant Card */
+    .voice-companion-card {
+      background: linear-gradient(135deg, #FFFDF9 0%, #FAF0E6 100%);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .voice-mascot-wrap {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: #FFF;
+      border: 3px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .voice-mascot-wrap img {
+      width: 85%;
+      height: auto;
+      display: block;
+    }
+
+    .voice-mascot-wrap.speaking {
+      animation: brainPulse 1.8s infinite;
+      border-color: var(--terra-btn);
+    }
+
+    .voice-mascot-wrap.listening {
+      animation: sosPulse 1.4s infinite;
+      border-color: var(--sage-main);
+    }
+
+    .voice-status-badge {
+      display: inline-block;
+      padding: 0.35rem 1rem;
+      border-radius: var(--radius-full);
+      background: var(--sage-badge);
+      color: var(--sage-dark);
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+
+    .voice-transcript {
+      min-height: 48px;
+      font-size: 1rem;
+      color: var(--text-main);
+      font-weight: 600;
+      margin: 0.5rem 0 1.25rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(220, 205, 192, 0.4);
+    }
+
+    .voice-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-mic {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: var(--radius-full);
+      background: var(--terra-btn);
+      color: #FFF;
+      font-weight: 800;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(158, 69, 54, 0.3);
+      transition: var(--transition);
+    }
+
+    .btn-mic:hover {
+      background: var(--terra-btn-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-mic.active {
+      background: #D32F2F;
+      animation: sosPulse 1.5s infinite;
+    }
+
+    /* Section Cards */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      color: var(--terra-main);
+    }
+
+    /* Medicine item */
+    .med-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .med-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1.1rem;
+      background: #FFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+    }
+
+    .med-item:hover {
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .med-info h4 {
+      font-size: 1.05rem;
+      color: var(--text-main);
+      margin-bottom: 0.2rem;
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .med-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+    }
+
+    .status-pill.pending { background: #FFF3E0; color: #E65100; }
+    .status-pill.taken { background: #E8F5E9; color: #2E7D32; }
+    .status-pill.missed { background: #FFEBEE; color: #C62828; }
+
+    /* SOS Section */
+    .sos-panel {
+      background: linear-gradient(135deg, #FFF5F5 0%, #FED7D7 100%);
+      border: 2px solid #FEB2B2;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(229, 62, 62, 0.15);
+    }
+
+    .sos-panel h3 {
+      color: #C53030;
+      font-size: 1.4rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .sos-panel p {
+      font-size: 0.92rem;
+      color: #742A2A;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn-big-sos {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #E53E3E;
+      color: #FFF;
+      font-size: 1.15rem;
+      font-weight: 900;
+      padding: 1rem 2.5rem;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(229, 62, 62, 0.45);
+      transition: var(--transition);
+    }
+
+    .btn-big-sos:hover {
+      background: #C53030;
+      transform: scale(1.03);
+    }
+
+    /* ============================================================
+       MODAL & DRAWER SYSTEM (Carewise Design Preserved)
+    ============================================================ */
+    /* ── Modal overlay: use flex always, animate with opacity/visibility ── */
+    .dash-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(30, 20, 16, 0.52);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.22s ease-out, visibility 0s linear 0.22s;
+    }
+    .dash-modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.22s ease-out, visibility 0s linear 0s;
+    }
+
+    .dash-modal-box {
+      background: #FFFDF9;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      max-width: 580px;
+      width: 100%;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      max-height: 88vh;
+      overflow-y: auto;
+      transform: scale(0.94) translateY(8px);
+      transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .dash-modal-overlay.open .dash-modal-box {
+      transform: scale(1) translateY(0);
+    }
+
+    .dash-modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .dash-modal-close:hover {
+      background: var(--bg-subtle);
+      color: var(--terra-main);
+    }
+
+    /* Modal Sub-Tabs */
+    .modal-tab-group {
+      display: flex;
+      background: var(--bg-subtle);
+      padding: 0.25rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border-light);
+    }
+    .modal-tab-btn {
+      flex: 1;
+      padding: 0.45rem;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .modal-tab-btn.active {
+      background: #FFF;
+      color: var(--terra-main);
+      box-shadow: 0 1px 4px rgba(130,56,44,0.1);
+    }
+
+    /* ── Right-side drawer: voice assistant ── */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(30, 20, 16, 0.45);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+    }
+    .drawer-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.25s ease, visibility 0s linear 0s;
+    }
+    .drawer-box {
+      width: min(calc(100vw - 2rem), 680px);
+      max-width: 100%;
+      min-width: 0;
+      max-height: min(90vh, 800px);
+      background: #FFFDF9;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transform: scale(0.96) translateY(8px);
+      transition: transform 0.22s ease;
+    }
+    .drawer-overlay.open .drawer-box {
+      transform: scale(1) translateY(0);
+    }
+    .assistant-transcript { width: 100%; min-height: 88px; resize: vertical; font: inherit; color: var(--text-main); background: #FFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: .8rem; }
+    .assistant-response { width: 100%; min-height: 52px; height: auto; flex: 0 0 auto; line-height: 1.45; overflow-wrap: anywhere; padding: .75rem; margin: .5rem 0; color: var(--text-sub); background: rgba(255,255,255,.7); border: 1px solid var(--border-light); border-radius: var(--radius-md); }
+    .sms-test-card { margin-top: 1.5rem; }
+    .sms-test-card input { width: 100%; margin: .5rem 0; }
+    @media (max-width: 600px) {
+      .drawer-overlay { padding: .65rem; }
+      .drawer-box { padding: 1.25rem; max-height: 94vh; }
+      .drawer-box > div:first-of-type { margin-top: 1.6rem !important; margin-bottom: .8rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <dialog class="notification-first-visit" id="notification-first-visit" aria-labelledby="notification-first-visit-title">
+    <h2 class="section-title" id="notification-first-visit-title">Browser notifications</h2>
+    <p id="notification-first-visit-message">Would you like to set up browser notifications for Carewise on this device? You can change this later.</p>
+    <p id="notification-status" role="status" aria-live="polite" hidden></p>
+    <div class="notification-first-visit-actions">
+      <button type="button" class="btn btn-secondary" id="notification-first-visit-dismiss">Not now</button>
+      <button type="button" class="btn btn-primary" id="notification-first-visit-enable">Enable notifications</button>
+    </div>
+    <a id="notification-first-visit-retry" href="notifications.html" hidden style="margin-top:.8rem;color:var(--terra-main);font-weight:700;">Open Notifications to retry or manage settings</a>
+  </dialog>
+
+  <!-- Top App Navigation -->
+  <header class="app-nav">
+    <a class="nav-brand" href="dashboard.html">
+      <div class="brand-icon">
+        <img src="../assets/aistudio/central_brain.png" alt="Carewise logo" />
+      </div>
+      <span class="brand-title">carewise</span>
+      <span class="brand-leaf">🌿</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="dashboard.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="javascript:void(0)" class="nav-link" id="nav-medicines" onclick="openMedicinesModal('list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+        Medicines
+      </a>
+      <a href="javascript:void(0)" class="nav-link" id="nav-appointments" onclick="openAppointmentsModal('list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments
+      </a>
+      <a href="javascript:void(0)" class="nav-link" id="nav-health" onclick="openVitalsModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Health Vitals
+      </a>
+      <a href="javascript:void(0)" class="nav-link" id="nav-sos" style="color:#D32F2F;" onclick="openSosModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Emergency SOS
+      </a>
+    </nav>
+
+    <div class="nav-user">
+      <div class="user-badge" id="nav-user-badge">
+        <span>👤</span>
+        <span id="user-display-name">Arthur</span>
+      </div>
+      <button class="btn-nav-logout" onclick="window.CareMateAPI.logoutUser()" title="Sign out">
+        Sign out
+      </button>
+    </div>
+  </header>
+
+  <!-- Page Main Content -->
+  <main class="page-container">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h1 class="page-title" id="greeting-text">Good morning, Arthur!</h1>
+        <p class="page-subtitle" id="date-text">Wednesday, October 22 · Everything is calm and on schedule.</p>
+      </div>
+      <div style="display:flex; gap:0.6rem;">
+        <button type="button" class="btn btn-secondary" style="font-size:0.85rem;" onclick="openMedicinesModal('add')">+ Add Medicine</button>
+        <button type="button" class="btn btn-sage" style="font-size:0.85rem;" onclick="openAppointmentsModal('add')">+ New Visit</button>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+
+      <!-- LEFT COLUMN: Voice Companion + Medicines -->
+      <div style="display:flex; flex-direction:column; gap:1.5rem;">
+
+        <!-- Interactive Voice Companion Card -->
+        <div class="voice-companion-card">
+          <div class="voice-mascot-wrap" id="mascot-orb">
+            <img src="../assets/aistudio/central_brain.png" alt="Carewise Companion Mascot" />
+          </div>
+
+          <span class="voice-status-badge" id="voice-badge">Ready to assist</span>
+
+          <h3 style="font-size:1.45rem; color:var(--terra-main); margin-bottom:0.25rem;">
+            Your Voice Companion
+          </h3>
+          <p style="font-size:0.88rem; color:var(--text-muted); max-width:28rem; margin:0 auto;">
+            Speak naturally to check reminders, appointments, or notify family.
+          </p>
+
+          <div class="voice-transcript" id="voice-transcript">
+            "Tap the microphone and ask: 'What medicines do I have today?'"
+          </div>
+
+          <div class="voice-controls">
+            <button type="button" class="btn-mic" id="btn-toggle-mic" onclick="openVoiceDrawer(true)">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              <span id="btn-mic-text">Speak to Companion</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="openVoiceDrawerSummary()" title="Listen to today's schedule summary">
+              🔊 Read Summary
+            </button>
+          </div>
+        </div>
+
+        <!-- Today's Medicines Card -->
+        <div class="card">
+          <div class="section-header">
+            <h2 class="section-title">Today's Medicines</h2>
+            <a href="javascript:void(0)" onclick="openMedicinesModal('list')" style="font-size:0.85rem; font-weight:700; color:var(--terra-btn);">View All →</a>
+          </div>
+
+          <div id="medicines-container" class="med-list">
+            <div style="text-align:center; padding:1.5rem; color:var(--text-muted); font-size:0.9rem;">
+              Loading medicine schedule...
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Appointments + Health + Emergency SOS -->
+      <div style="display:flex; flex-direction:column; gap:1.5rem;">
+
+        <!-- Upcoming Appointment Preview Card -->
+        <div class="card">
+          <div class="section-header">
+            <h2 class="section-title">Upcoming Doctor Visit</h2>
+            <a href="javascript:void(0)" onclick="openAppointmentsModal('list')" style="font-size:0.85rem; font-weight:700; color:var(--terra-btn);">Calendar →</a>
+          </div>
+
+          <div id="next-appointment-box" style="padding:1rem; background:var(--bg-subtle); border-radius:var(--radius-md); border:1px solid var(--border-light);">
+            <div style="display:flex; align-items:flex-start; gap:0.8rem;">
+              <div style="font-size:1.8rem;">🩺</div>
+              <div>
+                <h4 id="next-appt-doctor" style="font-size:1.1rem; color:var(--terra-main); font-family:inherit; font-weight:700;">Loading appointments...</h4>
+                <p id="next-appt-time" style="font-size:0.88rem; color:var(--text-sub); margin:0.2rem 0;">Checking clinic schedule...</p>
+                <p id="next-appt-loc" style="font-size:0.82rem; color:var(--text-muted);">Clinic location</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Health Vitals Quick Card -->
+        <div class="card">
+          <div class="section-header">
+            <h2 class="section-title">Health Vitals</h2>
+            <a href="javascript:void(0)" onclick="openVitalsModal()" style="font-size:0.85rem; font-weight:700; color:var(--terra-btn);">Log Vitals →</a>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <!-- Heart Rate -->
+            <div style="background:#FFF; padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-light); text-align:center;">
+              <span style="font-size:1.4rem;">❤️</span>
+              <div id="display-hr" style="font-size:1.6rem; font-weight:900; color:var(--terra-main); margin:0.2rem 0;">72 <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">bpm</span></div>
+              <span style="font-size:0.75rem; font-weight:800; background:var(--success-bg); color:var(--success-main); padding:0.2rem 0.6rem; border-radius:var(--radius-full);">Normal (60-100)</span>
+            </div>
+
+            <!-- Steps -->
+            <div style="background:#FFF; padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-light); text-align:center;">
+              <span style="font-size:1.4rem;">👟</span>
+              <div id="display-steps" style="font-size:1.6rem; font-weight:900; color:var(--sage-main); margin:0.2rem 0;">3,420 <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">steps</span></div>
+              <span style="font-size:0.75rem; font-weight:800; background:var(--sage-badge); color:var(--sage-dark); padding:0.2rem 0.6rem; border-radius:var(--radius-full);">Daily Goal: 5,000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency SOS Panel -->
+        <div class="sos-panel">
+          <h3>🚨 Emergency Assistance</h3>
+          <p>Instantly notify emergency family contacts via automated Twilio SMS alert.</p>
+          <button type="button" class="btn-big-sos" id="btn-dashboard-sos" onclick="openSosModal()">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Send SOS Family Alert
+          </button>
+        </div>
+
+        <div class="card sms-test-card">
+          <h3 class="section-title">SMS test</h3>
+          <p id="sms-provider-status" style="font-size:.88rem;color:var(--text-muted);margin:.4rem 0;">Checking Twilio configuration…</p>
+          <label for="sms-test-recipient" style="font-size:.85rem;font-weight:700;">Account phone number</label>
+          <input class="form-input" id="sms-test-recipient" type="tel" autocomplete="tel" placeholder="Your registered phone number">
+          <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.8rem;color:var(--text-sub);"><input type="checkbox" id="sms-test-confirm"> Send one test message to my account phone only. This does not contact emergency contacts.</label>
+          <button type="button" class="btn btn-secondary" id="btn-sms-test" onclick="runSmsTest()" style="margin-top:.75rem;">Send test SMS</button>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ============================================================
+       1. MEDICINES MODAL
+  ============================================================ -->
+  <div class="dash-modal-overlay" id="modal-medicines" role="dialog" aria-modal="true" aria-labelledby="med-modal-title">
+    <div class="dash-modal-box">
+      <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
+      <h2 id="med-modal-title" style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.25rem;">Medicines &amp; Prescriptions</h2>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Manage your scheduled doses and track medication intake.</p>
+
+      <!-- Tabs -->
+      <div class="modal-tab-group">
+        <button type="button" class="modal-tab-btn active" id="tab-med-list" onclick="switchMedTab('list')">All Medicines</button>
+        <button type="button" class="modal-tab-btn" id="tab-med-add" onclick="switchMedTab('add')">+ Add Prescription</button>
+      </div>
+
+      <!-- Tab Content: List -->
+      <div id="pane-med-list">
+        <div id="modal-meds-container" class="med-list" style="margin-bottom:1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab Content: Add Form -->
+      <div id="pane-med-add" style="display:none;">
+        <div id="modal-med-alert" class="alert alert-danger" style="display:none;"></div>
+        <form onsubmit="handleModalAddMedicine(event)">
+          <div class="form-group">
+            <label class="form-label" for="m-med-name">Medicine Name *</label>
+            <input type="text" id="m-med-name" class="form-input" placeholder="e.g. Lisinopril, Metformin" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="m-med-dosage">Dosage *</label>
+            <input type="text" id="m-med-dosage" class="form-input" placeholder="e.g. 500mg, 1 tablet with water" required />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="m-med-time">Time (24h HH:MM) *</label>
+              <input type="text" id="m-med-time" class="form-input" placeholder="08:30" pattern="^([01]\d|2[0-3]):([0-5]\d)$" title="Format: HH:MM e.g. 08:30 or 19:00" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="m-med-freq">Frequency *</label>
+              <select id="m-med-freq" class="form-select" required>
+                <option value="Daily">Daily</option>
+                <option value="Twice daily">Twice daily</option>
+                <option value="Every morning">Every morning</option>
+                <option value="Before bed">Before bed</option>
+                <option value="As needed">As needed</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="btn-modal-save-med" style="width:100%; margin-top:0.4rem;">
+            Save Prescription Schedule
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       2. APPOINTMENTS MODAL
+  ============================================================ -->
+  <div class="dash-modal-overlay" id="modal-appointments" role="dialog" aria-modal="true" aria-labelledby="appt-modal-title">
+    <div class="dash-modal-box">
+      <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
+      <h2 id="appt-modal-title" style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.25rem;">Doctor Appointments</h2>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Upcoming checkups, clinic visits, and scheduled specialists.</p>
+
+      <!-- Tabs -->
+      <div class="modal-tab-group">
+        <button type="button" class="modal-tab-btn active" id="tab-appt-list" onclick="switchApptTab('list')">Upcoming Visits</button>
+        <button type="button" class="modal-tab-btn" id="tab-appt-add" onclick="switchApptTab('add')">+ Schedule Visit</button>
+      </div>
+
+      <!-- Tab Content: List -->
+      <div id="pane-appt-list">
+        <div id="modal-appts-container" style="display:flex; flex-direction:column; gap:0.9rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab Content: Add Form -->
+      <div id="pane-appt-add" style="display:none;">
+        <div id="modal-appt-alert" class="alert alert-danger" style="display:none;"></div>
+        <form onsubmit="handleModalAddAppointment(event)">
+          <div class="form-group">
+            <label class="form-label" for="m-doc-name">Doctor or Clinic Name *</label>
+            <input type="text" id="m-doc-name" class="form-input" placeholder="e.g. Dr. Michael Chen (Cardiology)" required />
+          </div>
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="m-doc-date">Date (YYYY-MM-DD) *</label>
+              <input type="date" id="m-doc-date" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="m-doc-time">Time (HH:MM 24h) *</label>
+              <input type="text" id="m-doc-time" class="form-input" placeholder="10:30" pattern="^([01]\d|2[0-3]):([0-5]\d)$" title="Format: HH:MM e.g. 10:30 or 15:00" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="m-doc-loc">Location or Clinic Address *</label>
+            <input type="text" id="m-doc-loc" class="form-input" placeholder="e.g. St. Jude Wellness Center, Suite 402" required />
+          </div>
+          <button type="submit" class="btn btn-sage" id="btn-modal-save-appt" style="width:100%; margin-top:0.4rem;">
+            Confirm &amp; Schedule Visit
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       3. HEALTH VITALS MODAL
+  ============================================================ -->
+  <div class="dash-modal-overlay" id="modal-vitals" role="dialog" aria-modal="true" aria-labelledby="vitals-modal-title">
+    <div class="dash-modal-box">
+      <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
+      <h2 id="vitals-modal-title" style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.25rem;">Record Health Vitals</h2>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Log heart rate and steps. Readings outside 60-100 bpm automatically notify family contacts.</p>
+
+      <div id="modal-vitals-alert" class="alert alert-danger" style="display:none;"></div>
+
+      <form onsubmit="handleModalLogHealth(event)">
+        <div class="form-group">
+          <label class="form-label" for="m-input-hr">Heart Rate (bpm) *</label>
+          <input type="number" id="m-input-hr" class="form-input" placeholder="e.g. 74" min="30" max="250" required />
+          <span style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem; display:block;">Normal resting range: 60 – 100 bpm.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="m-input-steps">Daily Steps Walked *</label>
+          <input type="number" id="m-input-steps" class="form-input" placeholder="e.g. 4200" min="0" max="100000" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-modal-save-vitals" style="width:100%; margin-top:0.4rem;">
+          Save &amp; Check Vitals
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       4. EMERGENCY SOS CONFIRMATION MODAL
+  ============================================================ -->
+  <div class="dash-modal-overlay" id="modal-sos-dialog" role="dialog" aria-modal="true" aria-labelledby="sos-dialog-title">
+    <div class="dash-modal-box" style="text-align:center; max-width:480px;">
+      <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
+      <div style="font-size:2.8rem; margin-bottom:0.3rem;">🚨</div>
+      <h2 id="sos-dialog-title" style="font-size:1.6rem; color:#C53030; margin-bottom:0.4rem;">Broadcast Emergency SOS?</h2>
+      <p style="font-size:0.92rem; color:var(--text-sub); margin-bottom:1.25rem;">
+        This will immediately dispatch automated Twilio SMS text alerts with your name and emergency details to all configured family members.
+      </p>
+
+      <div id="sos-dialog-contacts" style="background:var(--bg-subtle); border-radius:var(--radius-md); padding:0.85rem; font-size:0.85rem; color:var(--text-main); margin-bottom:1.25rem; text-align:left;">
+        Loading family contacts...
+      </div>
+
+      <div id="sos-dialog-result" class="alert alert-success" style="display:none; text-align:left; margin-bottom:1rem;"></div>
+
+      <div style="display:flex; gap:0.75rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeAllModals()" style="flex:1;">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-sos-dispatch" onclick="executeModalDispatchSOS()" style="flex:1.5;">
+          🚨 Send SOS Alert Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       5. RIGHT-SIDE DRAWER: VOICE COMPANION ASSISTANT
+  ============================================================ -->
+  <div class="drawer-overlay" id="drawer-voice" role="dialog" aria-modal="true" aria-labelledby="drawer-voice-title">
+    <div class="drawer-box">
+      <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close" style="top:1.5rem; right:1.5rem;">&times;</button>
+
+      <div style="text-align:center; margin-top:1rem; margin-bottom:1.5rem;">
+        <div class="voice-mascot-wrap" id="drawer-mascot-orb">
+          <img src="../assets/aistudio/central_brain.png" alt="Carewise Mascot" />
+        </div>
+        <span class="voice-status-badge" id="drawer-voice-badge">Ready to assist</span>
+        <h2 id="drawer-voice-title" style="font-size:1.5rem; color:var(--terra-main); margin-top:0.3rem;">Carewise Assistant</h2>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem;">Hands-free voice assistant for daily reminders &amp; health.</p>
+      </div>
+
+      <label for="drawer-voice-transcript" style="font-size:.85rem;font-weight:700;margin:.25rem 0;">Your transcript (editable)</label>
+      <textarea class="assistant-transcript" id="drawer-voice-transcript" aria-label="Editable voice transcript" placeholder="Tap to Speak, or type a request here."></textarea>
+      <div class="assistant-response" id="drawer-voice-response" role="status" aria-live="polite">Assistant response will appear here.</div>
+      <p id="voice-flow-status" role="status" aria-live="polite" style="font-size:.82rem;color:var(--text-muted);margin:.35rem 0;">Ready</p>
+
+      <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;">
+        <button type="button" class="btn-mic" id="btn-drawer-mic" onclick="toggleSpeech()" style="width:100%;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          <span id="drawer-mic-text">Start Listening</span>
+        </button>
+        <button type="button" class="btn btn-secondary" id="btn-stop-listening" onclick="stopSpeech()" style="width:100%;" disabled>Stop Listening</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-voice" onclick="submitVoiceTranscript()" style="width:100%;">Submit request</button>
+
+        <button type="button" class="btn btn-secondary" onclick="speakSummary()" style="width:100%;">
+          🔊 Read Daily Summary Aloud
+        </button>
+      </div>
+
+      <!-- Quick Command Buttons -->
+      <div style="margin-top:2rem; padding-top:1.25rem; border-top:1px solid var(--border-light);">
+        <span style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:0.75rem;">
+          Quick Commands
+        </span>
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="handleVoiceCommand('check medicine')" style="justify-content:flex-start; font-size:0.84rem; padding:0.55rem 0.9rem;">
+            💊 "What medicines are pending today?"
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="handleVoiceCommand('check appointment')" style="justify-content:flex-start; font-size:0.84rem; padding:0.55rem 0.9rem;">
+            🩺 "When is my next doctor appointment?"
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="handleVoiceCommand('check vitals')" style="justify-content:flex-start; font-size:0.84rem; padding:0.55rem 0.9rem;">
+            ❤️ "What is my latest heart rate reading?"
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script type="module" src="../js/notifications.js"></script>
+  <script>
+    'use strict';
+
+    // Verify authentication
+    const userId = window.CareMateAPI.getCurrentUserId();
+    if (!userId) {
+      window.location.href = 'login.html';
+    }
+
+    const userName = localStorage.getItem('caremate_user_name') || 'Arthur';
+    document.getElementById('user-display-name').textContent = userName;
+    document.getElementById('greeting-text').textContent = `Good day, ${userName}!`;
+
+    // Format current date
+    const now = new Date();
+    const options = { weekday: 'long', month: 'long', day: 'numeric' };
+    document.getElementById('date-text').textContent = `${now.toLocaleDateString('en-US', options)} · Everything is calm and on schedule.`;
+
+    let userMedicines = [];
+    let userAppointments = [];
+    let userProfile = null;
+    let medicineDataState = 'loading';
+    let appointmentDataState = 'loading';
+    let modalOpener = null;
+    const pendingDoseUpdates = new Set();
+    const todayKey = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+
+    // ============================================================
+    // MODAL & DRAWER CONTROLLERS
+    // ============================================================
+
+    function openModalOverlay(modalId) {
+      closeAllModals(false);
+      const m = document.getElementById(modalId);
+      if (m) {
+        modalOpener = document.activeElement;
+        // Use rAF so the browser registers the element as visible
+        // before applying .open — this ensures transitions fire
+        requestAnimationFrame(() => {
+          m.classList.add('open');
+          document.body.style.overflow = 'hidden';
+          const first = m.querySelector('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex="0"]');
+          if (first) first.focus();
+        });
+      }
+    }
+
+    function closeAllModals(restoreScroll = true) {
+      document.querySelectorAll('.dash-modal-overlay, .drawer-overlay').forEach(el => {
+        el.classList.remove('open');
+      });
+      if (restoreScroll) {
+        document.body.style.overflow = '';
+        if (modalOpener && modalOpener.isConnected) modalOpener.focus();
+      }
+    }
+
+    // Close when clicking the backdrop
+    document.querySelectorAll('.dash-modal-overlay, .drawer-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closeAllModals();
+        }
+      });
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAllModals();
+        stopSpeech();
+      } else if (e.key === 'Tab') {
+        const modal = document.querySelector('.dash-modal-overlay.open, .drawer-overlay.open');
+        if (!modal) return;
+        const focusable = [...modal.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href]')].filter(el => el.offsetParent !== null);
+        if (!focusable.length) return;
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+
+    // 1. Medicines Modal Triggers
+    function openMedicinesModal(tab = 'list') {
+      openModalOverlay('modal-medicines');
+      switchMedTab(tab);
+      renderModalMedicines();
+    }
+
+    function switchMedTab(tab) {
+      document.getElementById('modal-med-alert').style.display = 'none';
+      if (tab === 'list') {
+        document.getElementById('tab-med-list').classList.add('active');
+        document.getElementById('tab-med-add').classList.remove('active');
+        document.getElementById('pane-med-list').style.display = 'block';
+        document.getElementById('pane-med-add').style.display = 'none';
+      } else {
+        document.getElementById('tab-med-list').classList.remove('active');
+        document.getElementById('tab-med-add').classList.add('active');
+        document.getElementById('pane-med-list').style.display = 'none';
+        document.getElementById('pane-med-add').style.display = 'block';
+        setTimeout(() => { document.getElementById('m-med-name').focus(); }, 150);
+      }
+    }
+
+    function renderModalMedicines() {
+      const box = document.getElementById('modal-meds-container');
+      if (medicineDataState !== 'loaded') {
+        box.innerHTML = medicineDataState === 'loading'
+          ? '<p role="status" style="padding:1.5rem;color:var(--text-muted);text-align:center;">Loading medicine schedule…</p>'
+          : '<p role="status" style="padding:1.5rem;color:var(--text-muted);text-align:center;">Medicine schedule could not be loaded. Check your connection and try again.</p>';
+        return;
+      }
+      if (userMedicines.length === 0) {
+        box.innerHTML = `
+          <div style="text-align:center; padding:1.5rem; background:var(--bg-subtle); border-radius:var(--radius-md);">
+            <p style="font-weight:700; color:var(--terra-main); margin-bottom:0.3rem;">No medicines currently scheduled</p>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">Add your daily prescriptions to receive timely reminders.</p>
+            <button type="button" class="btn btn-primary" onclick="switchMedTab('add')" style="font-size:0.82rem; padding:0.4rem 1rem;">+ Add Prescription</button>
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = userMedicines.map(m => {
+        const status = m.todayStatus || 'pending';
+        return `
+          <div class="med-item" id="m-med-${m.medId}">
+            <div class="med-info">
+              <h4>${escapeHtml(m.medicineName)}</h4>
+              <div class="med-meta">
+                <span>💊 ${escapeHtml(m.dosage)}</span>
+                <span>⏰ ${escapeHtml(m.time)}</span>
+                <span>(${escapeHtml(m.frequency)})</span>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="status-pill ${status}" data-dose="${m.medId}" onclick="cycleStatus('${m.medId}', '${status}')" title="${status === 'taken' ? 'Undo taken status' : 'Mark as taken'}">
+                ${status === 'taken' ? 'Taken / Undo' : status === 'missed' ? 'Missed' : 'Mark as taken'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function handleModalAddMedicine(e) {
+      e.preventDefault();
+      const name = document.getElementById('m-med-name').value.trim();
+      const dosage = document.getElementById('m-med-dosage').value.trim();
+      const time = document.getElementById('m-med-time').value.trim();
+      const frequency = document.getElementById('m-med-freq').value;
+
+      const alertBox = document.getElementById('modal-med-alert');
+      alertBox.style.display = 'none';
+
+      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+      if (!timeRegex.test(time)) {
+        alertBox.textContent = 'Please enter time in 24-hour format HH:MM (e.g. 08:30 or 14:00).';
+        alertBox.style.display = 'block';
+        return;
+      }
+
+      const btn = document.getElementById('btn-modal-save-med');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      try {
+        const res = await window.CareMateAPI.addMedicine({
+          userId,
+          medicineName: name,
+          dosage,
+          time,
+          frequency
+        });
+
+        if (res.success) {
+          document.getElementById('m-med-name').value = '';
+          document.getElementById('m-med-dosage').value = '';
+          document.getElementById('m-med-time').value = '';
+          await loadDashboard();
+          switchMedTab('list');
+        } else {
+          alertBox.textContent = res.error || 'Could not save medicine.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.textContent = 'Connection error while saving medicine.';
+        alertBox.style.display = 'block';
+      } finally {
+        btn.textContent = 'Save Prescription Schedule';
+        btn.disabled = false;
+      }
+    }
+
+    // 2. Appointments Modal Triggers
+    function openAppointmentsModal(tab = 'list') {
+      openModalOverlay('modal-appointments');
+      switchApptTab(tab);
+      renderModalAppointments();
+    }
+
+    function switchApptTab(tab) {
+      document.getElementById('modal-appt-alert').style.display = 'none';
+      if (tab === 'list') {
+        document.getElementById('tab-appt-list').classList.add('active');
+        document.getElementById('tab-appt-add').classList.remove('active');
+        document.getElementById('pane-appt-list').style.display = 'block';
+        document.getElementById('pane-appt-add').style.display = 'none';
+      } else {
+        document.getElementById('tab-appt-list').classList.remove('active');
+        document.getElementById('tab-appt-add').classList.add('active');
+        document.getElementById('pane-appt-list').style.display = 'none';
+        document.getElementById('pane-appt-add').style.display = 'block';
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('m-doc-date').value = tomorrow.toISOString().split('T')[0];
+        setTimeout(() => { document.getElementById('m-doc-name').focus(); }, 150);
+      }
+    }
+
+    function renderModalAppointments() {
+      const box = document.getElementById('modal-appts-container');
+      if (userAppointments.length === 0) {
+        box.innerHTML = `
+          <div style="text-align:center; padding:1.5rem; background:var(--bg-subtle); border-radius:var(--radius-md);">
+            <p style="font-weight:700; color:var(--terra-main); margin-bottom:0.3rem;">No upcoming appointments</p>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">You are all caught up on clinic visits.</p>
+            <button type="button" class="btn btn-sage" onclick="switchApptTab('add')" style="font-size:0.82rem; padding:0.4rem 1rem;">+ Schedule Visit</button>
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = userAppointments.map(a => `
+        <div style="background:#FFF; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h4 style="font-size:1.05rem; color:var(--terra-main); margin-bottom:0.2rem; font-family:inherit; font-weight:700;">${escapeHtml(a.doctorName)}</h4>
+            <div style="font-size:0.85rem; color:var(--text-sub);">📅 ${escapeHtml(a.date)} at ⏰ ${escapeHtml(a.time)}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.15rem;">📍 ${escapeHtml(a.location)}</div>
+          </div>
+          <button type="button" class="btn btn-secondary" onclick="speakAppt('${escapeHtml(a.doctorName)}', '${a.date}', '${a.time}', '${escapeHtml(a.location)}')" style="font-size:0.8rem; padding:0.4rem 0.8rem;">
+            🔊 Read
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function speakAppt(doc, date, time, loc) {
+      speak(`Your appointment with ${doc} is on ${date} at ${time}, located at ${loc}.`);
+    }
+
+    async function handleModalAddAppointment(e) {
+      e.preventDefault();
+      const docName = document.getElementById('m-doc-name').value.trim();
+      const date = document.getElementById('m-doc-date').value.trim();
+      const time = document.getElementById('m-doc-time').value.trim();
+      const location = document.getElementById('m-doc-loc').value.trim();
+
+      const alertBox = document.getElementById('modal-appt-alert');
+      alertBox.style.display = 'none';
+
+      const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+      if (!dateRegex.test(date) || !timeRegex.test(time)) {
+        alertBox.textContent = 'Invalid date (YYYY-MM-DD) or time (HH:MM 24h format).';
+        alertBox.style.display = 'block';
+        return;
+      }
+
+      const btn = document.getElementById('btn-modal-save-appt');
+      btn.textContent = 'Scheduling...';
+      btn.disabled = true;
+
+      try {
+        const res = await window.CareMateAPI.addAppointment({
+          userId,
+          doctorName: docName,
+          date,
+          time,
+          location
+        });
+
+        if (res.success) {
+          document.getElementById('m-doc-name').value = '';
+          document.getElementById('m-doc-loc').value = '';
+          await loadDashboard();
+          switchApptTab('list');
+        } else {
+          alertBox.textContent = res.error || 'Could not schedule appointment.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.textContent = 'Connection error while scheduling appointment.';
+        alertBox.style.display = 'block';
+      } finally {
+        btn.textContent = 'Confirm & Schedule Visit';
+        btn.disabled = false;
+      }
+    }
+
+    // 3. Health Vitals Modal Triggers
+    function openVitalsModal() {
+      openModalOverlay('modal-vitals');
+      document.getElementById('modal-vitals-alert').style.display = 'none';
+      setTimeout(() => { document.getElementById('m-input-hr').focus(); }, 150);
+    }
+
+    async function handleModalLogHealth(e) {
+      e.preventDefault();
+      const hr = Number(document.getElementById('m-input-hr').value);
+      const steps = Number(document.getElementById('m-input-steps').value);
+
+      const alertBox = document.getElementById('modal-vitals-alert');
+      alertBox.style.display = 'none';
+
+      const btn = document.getElementById('btn-modal-save-vitals');
+      btn.textContent = 'Logging & Analyzing...';
+      btn.disabled = true;
+
+      try {
+        const res = await window.CareMateAPI.logHealthReading({
+          userId,
+          heartRate: hr,
+          steps: steps
+        });
+
+        if (res.success) {
+          // Update dashboard UI
+          document.getElementById('display-hr').innerHTML = `${hr} <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">bpm</span>`;
+          document.getElementById('display-steps').innerHTML = `${steps.toLocaleString()} <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">steps</span>`;
+
+          const isFlagged = res.data && res.data.flagged !== undefined ? res.data.flagged : (hr < 60 || hr > 100);
+          if (isFlagged) {
+            speak(`Warning: Heart rate of ${hr} beats per minute is outside normal range. Emergency contacts have been notified.`);
+            alert(`⚠️ Health Alert: Heart rate reading of ${hr} bpm is abnormal. An alert SMS has been dispatched to emergency contacts.`);
+          } else {
+            speak(`Vitals recorded successfully. Heart rate is normal.`);
+          }
+
+          closeAllModals();
+        } else {
+          alertBox.textContent = res.error || 'Could not log vitals.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.textContent = 'Connection error with backend.';
+        alertBox.style.display = 'block';
+      } finally {
+        btn.textContent = 'Save & Check Vitals';
+        btn.disabled = false;
+      }
+    }
+
+    // 4. Emergency SOS Modal Triggers
+    function openSosModal() {
+      openModalOverlay('modal-sos-dialog');
+      document.getElementById('sos-dialog-result').style.display = 'none';
+
+      const contactsBox = document.getElementById('sos-dialog-contacts');
+      if (userProfile && Array.isArray(userProfile.emergencyContacts) && userProfile.emergencyContacts.length > 0) {
+        contactsBox.innerHTML = `
+          <strong>Notified Contacts:</strong><br>
+          ${userProfile.emergencyContacts.map(c => `• ${escapeHtml(c.name)} (${escapeHtml(c.phone)})`).join('<br>')}
+        `;
+      } else {
+        contactsBox.innerHTML = `<strong>Recipients:</strong> Family emergency contacts registered on profile.`;
+      }
+    }
+
+    async function executeModalDispatchSOS() {
+      const btn = document.getElementById('btn-confirm-sos-dispatch');
+      btn.textContent = '🚨 Dispatching Alert...';
+      btn.disabled = true;
+      const resBox = document.getElementById('sos-dialog-result');
+      resBox.style.display = 'none';
+
+      try {
+        const res = await window.CareMateAPI.triggerEmergencySOS(userId);
+        if (res.success) {
+          resBox.className = 'alert alert-success';
+          resBox.innerHTML = `<strong>🚨 EMERGENCY SOS DISPATCHED!</strong><br>${res.data && res.data.message ? res.data.message : 'Automated Twilio SMS alerts have been broadcasted to emergency contacts.'}`;
+          resBox.style.display = 'block';
+          speak('Emergency alert has been sent. Help is on the way.');
+        } else {
+          resBox.className = 'alert alert-danger';
+          resBox.textContent = res.error || 'Could not dispatch SOS alert.';
+          resBox.style.display = 'block';
+        }
+      } catch (e) {
+        resBox.className = 'alert alert-danger';
+        resBox.textContent = 'Network error while contacting server.';
+        resBox.style.display = 'block';
+      } finally {
+        btn.textContent = '🚨 Send SOS Alert Now';
+        btn.disabled = false;
+      }
+    }
+
+    // 5. Voice Companion Drawer Triggers
+    function openVoiceDrawer(autoListen = false) {
+      openModalOverlay('drawer-voice');
+      if (autoListen) {
+        // Start inside the original button gesture. SpeechRecognition can be
+        // rejected as not-allowed when start() is deferred to a timer.
+        toggleSpeech();
+      }
+    }
+
+    function openVoiceDrawerSummary() {
+      openModalOverlay('drawer-voice');
+      speakSummary();
+    }
+
+    // ============================================================
+    // DATA LOADING & DASHBOARD RENDERING
+    // ============================================================
+
+    async function loadDashboard() {
+      // These are independent reads; don't make profile latency hold up the
+      // medicine and appointment panels (or make one panel wait for the other).
+      window.CareMateAPI.getUserProfile(userId).then(profRes => {
+        if (profRes.success && profRes.data) userProfile = profRes.data;
+      });
+      const [medRes, apptRes] = await Promise.all([
+        window.CareMateAPI.getMedicines(userId),
+        window.CareMateAPI.getAppointments(userId),
+      ]);
+
+      if (medRes.success && Array.isArray(medRes.data)) {
+        medicineDataState = 'loaded';
+        userMedicines = medRes.data;
+        renderMedicines(userMedicines);
+      } else {
+        medicineDataState = 'error';
+        renderMedicinesUnavailable();
+      }
+
+      if (apptRes.success && Array.isArray(apptRes.data) && apptRes.data.length > 0) {
+        appointmentDataState = 'loaded';
+        userAppointments = apptRes.data;
+        renderNextAppointment(userAppointments[0]);
+      } else if (apptRes.success && Array.isArray(apptRes.data)) {
+        appointmentDataState = 'loaded';
+        userAppointments = [];
+        renderNoAppointments();
+      } else {
+        appointmentDataState = 'error';
+        renderAppointmentsUnavailable();
+      }
+    }
+
+    function renderMedicines(list) {
+      const box = document.getElementById('medicines-container');
+      if (!list || list.length === 0) {
+        renderEmptyMedicines();
+        return;
+      }
+
+      box.innerHTML = list.map(m => {
+        const status = m.todayStatus || 'pending';
+        return `
+          <div class="med-item" id="med-${m.medId}">
+            <div class="med-info">
+              <h4>${escapeHtml(m.medicineName)}</h4>
+              <div class="med-meta">
+                <span>💊 ${escapeHtml(m.dosage)}</span>
+                <span>⏰ ${escapeHtml(m.time)}</span>
+                <span>(${escapeHtml(m.frequency)})</span>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="status-pill ${status}" data-dose="${m.medId}" onclick="cycleStatus('${m.medId}', '${status}')" title="${status === 'taken' ? 'Undo taken status' : 'Mark as taken'}">
+                ${status === 'taken' ? 'Taken / Undo' : status === 'missed' ? 'Missed' : 'Mark as taken'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderEmptyMedicines() {
+      document.getElementById('medicines-container').innerHTML = `
+        <div style="text-align:center; padding:1.75rem; background:var(--bg-subtle); border-radius:var(--radius-md);">
+          <p style="font-weight:700; color:var(--terra-main); margin-bottom:0.4rem;">No medicines scheduled yet</p>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">Add your daily prescriptions to receive timely voice reminders.</p>
+          <button type="button" class="btn btn-primary" onclick="openMedicinesModal('add')" style="font-size:0.82rem; padding:0.4rem 1rem;">Add First Medicine</button>
+        </div>
+      `;
+    }
+
+    function renderMedicinesUnavailable() {
+      document.getElementById('medicines-container').innerHTML = '<p role="status" style="padding:1.5rem;color:var(--text-muted);text-align:center;">Medicine schedule could not be loaded. Check your connection and try again.</p>';
+    }
+
+    function renderNextAppointment(appt) {
+      document.getElementById('next-appt-doctor').textContent = appt.doctorName || 'Doctor Appointment';
+      document.getElementById('next-appt-time').textContent = `📅 ${appt.date} at ${appt.time}`;
+      document.getElementById('next-appt-loc').textContent = `📍 ${appt.location || 'Clinic'}`;
+    }
+
+    function renderNoAppointments() {
+      document.getElementById('next-appt-doctor').textContent = 'No upcoming visits';
+      document.getElementById('next-appt-time').textContent = 'You are all caught up on clinic visits.';
+      document.getElementById('next-appt-loc').textContent = 'Schedule a visit anytime.';
+    }
+
+    function renderAppointmentsUnavailable() {
+      document.getElementById('next-appt-doctor').textContent = 'Appointments unavailable';
+      document.getElementById('next-appt-time').textContent = 'The schedule could not be loaded. Check your connection and try again.';
+      document.getElementById('next-appt-loc').textContent = '';
+    }
+
+    async function cycleStatus(medId, currentStatus) {
+      if (pendingDoseUpdates.has(medId)) return;
+      pendingDoseUpdates.add(medId);
+      const buttons = document.querySelectorAll('[data-dose="' + CSS.escape(medId) + '"]');
+      buttons.forEach(button => { button.disabled = true; button.textContent = 'Saving?'; });
+      const nextStatus = currentStatus === 'taken' ? 'pending' : 'taken';
+      const res = await window.CareMateAPI.updateMedicineDose(medId, nextStatus, todayKey);
+      pendingDoseUpdates.delete(medId);
+      if (res.success) {
+        await loadDashboard();
+        renderModalMedicines();
+        if (nextStatus === 'taken') speak('Dose marked as taken.');
+      } else {
+        buttons.forEach(button => { button.disabled = false; button.textContent = currentStatus === 'taken' ? 'Taken / Undo' : 'Mark as taken'; });
+        alert(res.error || 'Could not update this dose. Please try again.');
+      }
+    }
+
+    // Voice Speech Synthesis Helper
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.93;
+        u.pitch = 1.05;
+
+        // Animate both dashboard and drawer orbs
+        const orbs = [document.getElementById('mascot-orb'), document.getElementById('drawer-mascot-orb')];
+        const badges = [document.getElementById('voice-badge'), document.getElementById('drawer-voice-badge')];
+
+        orbs.forEach(o => { if (o) o.classList.add('speaking'); });
+        badges.forEach(b => {
+          if (b) {
+            b.textContent = 'Speaking...';
+            b.style.background = '#F3D6CF';
+            b.style.color = '#82382C';
+          }
+        });
+
+        u.onend = () => {
+          orbs.forEach(o => { if (o) o.classList.remove('speaking'); });
+          badges.forEach(b => {
+            if (b) {
+              b.textContent = 'Ready to assist';
+              b.style.background = 'var(--sage-badge)';
+              b.style.color = 'var(--sage-dark)';
+            }
+          });
+        };
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function speakSummary() {
+      if (medicineDataState !== 'loaded' || appointmentDataState !== 'loaded') {
+        const error = 'I could not load your daily summary. Check your connection and try again.';
+        setAssistantResponse(error);
+        setVoiceState('Error', error);
+        return;
+      }
+      const pendingCount = userMedicines.filter(m => (m.todayStatus || 'pending') === 'pending').length;
+      let text = `Hello ${userName}. `;
+      if (userMedicines.length > 0) text += `You have ${userMedicines.length} medicines scheduled today, and ${pendingCount} are pending. `;
+      else text += `You have no medicines scheduled for today. `;
+      if (userAppointments.length > 0) text += `Your next appointment is with ${userAppointments[0].doctorName} on ${userAppointments[0].date} at ${userAppointments[0].time}.`;
+      else text += 'You have no upcoming appointments listed.';
+      setAssistantResponse(text);
+      speak(text);
+    }
+
+    // Speech Recognition
+    let recognition = null;
+    let isListening = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        const orbs = [document.getElementById('mascot-orb'), document.getElementById('drawer-mascot-orb')];
+        const badges = [document.getElementById('voice-badge'), document.getElementById('drawer-voice-badge')];
+        orbs.forEach(o => { if (o) o.classList.add('listening'); });
+        badges.forEach(b => { if (b) b.textContent = 'Listening'; });
+        const stopButton = document.getElementById('btn-stop-listening'); if (stopButton) stopButton.disabled = false;
+
+        document.getElementById('btn-mic-text').textContent = 'Listening... Speak now';
+        const dmt = document.getElementById('drawer-mic-text');
+        if (dmt) dmt.textContent = 'Listening... Speak now';
+        document.getElementById('btn-toggle-mic').classList.add('active');
+        const bdm = document.getElementById('btn-drawer-mic');
+        if (bdm) bdm.classList.add('active');
+
+        document.getElementById('voice-transcript').textContent = 'Listening for your command...';
+        const dt = document.getElementById('drawer-voice-transcript');
+        if (dt) dt.value = '';
+      };
+
+      recognition.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        const dt = document.getElementById('drawer-voice-transcript');
+        if (dt) dt.value = transcript;
+        const cardText = document.getElementById('voice-transcript');
+        if (cardText) cardText.textContent = `Transcript ready: ${transcript}`;
+        setVoiceState('Success', 'Transcript ready. Review or edit it, then submit.');
+      };
+
+      recognition.onerror = (event) => {
+        resetMic();
+        const messages = {
+          'not-allowed': 'Chrome blocked speech input. Check the site and device microphone settings, then try again.',
+          'service-not-allowed': "Chrome's speech recognition service is blocked or unavailable. Check browser policy and try again.",
+          'audio-capture': 'No usable microphone was found. Connect or enable a microphone, then try again.',
+          network: 'Speech recognition could not reach its service. Check your internet connection and try again.',
+          'no-speech': 'No speech was detected. Try again in a quiet place.',
+          aborted: 'Speech recognition stopped before hearing a request. Tap the microphone to try again.',
+          'language-not-supported': 'Speech recognition does not support the selected language in this browser.',
+        };
+        const message = messages[event.error] || 'Speech recognition failed. Please try again.';
+        setAssistantResponse(message);
+        setVoiceState('Error', message);
+        document.getElementById('voice-transcript').textContent = message;
+
+        const logDetails = (microphonePermission) => console.warn('[Carewise Voice] SpeechRecognition.onerror', {
+          operation: 'SpeechRecognition.start',
+          name: event.name || 'SpeechRecognitionErrorEvent',
+          error: event.error || 'unknown',
+          message: event.message || '',
+          microphonePermission,
+          origin: location.origin,
+          secureContext: window.isSecureContext,
+        });
+        if (navigator.permissions && navigator.permissions.query) {
+          navigator.permissions.query({ name: 'microphone' })
+            .then(permission => logDetails(permission.state))
+            .catch(() => logDetails('unavailable'));
+        } else {
+          logDetails('unavailable');
+        }
+      };
+
+      recognition.onend = () => {
+        resetMic();
+      };
+    }
+
+    function toggleSpeech() {
+      if (!recognition) {
+        const error = 'Speech recognition is not supported in this browser. Try a browser with Web Speech API support.';
+        setAssistantResponse(error); setVoiceState('Error', error);
+        return;
+      }
+      if (isListening) {
+        recognition.stop();
+      } else {
+        setVoiceState('Listening', 'Listening. Speak now; your transcript stays here until you submit.');
+        try {
+          recognition.start();
+        } catch (e) {
+          console.warn('[Carewise Voice] SpeechRecognition.start threw', {
+            operation: 'SpeechRecognition.start',
+            name: e.name,
+            message: e.message,
+            origin: location.origin,
+            secureContext: window.isSecureContext,
+          });
+          const startErrorMessages = {
+            NotAllowedError: 'Chrome blocked speech input. Check the site and device microphone settings, then try again.',
+            NotFoundError: 'No microphone is available. Connect or enable a microphone, then try again.',
+            NotReadableError: 'The microphone is busy or unavailable. Close other apps using it, then try again.',
+            SecurityError: 'Chrome blocked speech input for this page. Open Carewise from its local development address or a secure site.',
+            InvalidStateError: 'Speech recognition is already starting. Wait a moment and try again.',
+          };
+          const message = startErrorMessages[e.name] || 'Speech recognition could not start. Check your microphone and try again.';
+          setAssistantResponse(message);
+          setVoiceState('Error', message);
+        }
+      }
+    }
+
+    function stopSpeech() { if (recognition && isListening) recognition.stop(); }
+
+    function setVoiceState(state, message) {
+      const badge = document.getElementById('drawer-voice-badge');
+      const status = document.getElementById('voice-flow-status');
+      if (badge) badge.textContent = state;
+      if (status) status.textContent = state === 'Error' ? 'Error' : message || state;
+    }
+
+    function setAssistantResponse(text) {
+      const response = document.getElementById('drawer-voice-response');
+      if (response) response.textContent = text;
+      const card = document.getElementById('voice-transcript');
+      if (card) card.textContent = text;
+    }
+
+    function submitVoiceTranscript() {
+      const transcript = document.getElementById('drawer-voice-transcript').value.trim();
+      if (!transcript) { const error = 'Enter or dictate a request before submitting.'; setAssistantResponse(error); setVoiceState('Error', error); return; }
+      setVoiceState('Processing', 'Processing your request...');
+      handleVoiceCommand(transcript);
+    }
+
+    function resetMic() {
+      isListening = false;
+      const orbs = [document.getElementById('mascot-orb'), document.getElementById('drawer-mascot-orb')];
+      const badges = [document.getElementById('voice-badge'), document.getElementById('drawer-voice-badge')];
+      orbs.forEach(o => { if (o) o.classList.remove('listening'); });
+      const flow = document.getElementById('voice-flow-status');
+      const state = flow && flow.textContent.startsWith('Error') ? 'Error' : flow && flow.textContent.startsWith('Transcript ready') ? 'Success' : 'Ready';
+      badges.forEach(b => { if (b) b.textContent = state; });
+      const stopButton = document.getElementById('btn-stop-listening'); if (stopButton) stopButton.disabled = true;
+      if (flow && flow.textContent.startsWith('Listening')) setVoiceState('Ready', 'Ready');
+
+      document.getElementById('btn-mic-text').textContent = 'Speak to Companion';
+      const dmt = document.getElementById('drawer-mic-text');
+      if (dmt) dmt.textContent = 'Tap to Speak';
+      document.getElementById('btn-toggle-mic').classList.remove('active');
+      const bdm = document.getElementById('btn-drawer-mic');
+      if (bdm) bdm.classList.remove('active');
+    }
+
+    async function handleVoiceCommand(cmd) {
+      const request = String(cmd || '').toLowerCase();
+      let answer;
+      if (request.includes('medicine') || request.includes('pill') || request.includes('medication')) {
+        if (medicineDataState !== 'loaded') {
+          const error = 'The medicine schedule could not be loaded. Check your connection and try again.';
+          setAssistantResponse(error); setVoiceState('Error', error);
+          return;
+        }
+        const pending = userMedicines.filter(m => (m.todayStatus || 'pending') === 'pending');
+        answer = pending.length ? `You have ${pending.length} medicine dose${pending.length === 1 ? '' : 's'} pending: ${pending.map(m => `${m.medicineName} at ${m.time}`).join(', ')}.` : userMedicines.length ? 'All scheduled medicine doses are marked taken today.' : 'You have no medicines scheduled today.';
+      } else if (request.includes('appointment') || request.includes('doctor') || request.includes('visit')) {
+        if (appointmentDataState !== 'loaded') {
+          const error = 'The appointment schedule could not be loaded. Check your connection and try again.';
+          setAssistantResponse(error); setVoiceState('Error', error);
+          return;
+        }
+        answer = userAppointments.length ? `Your next visit is with ${userAppointments[0].doctorName} on ${userAppointments[0].date} at ${userAppointments[0].time}.` : 'You have no upcoming doctor appointments listed.';
+      } else if (request.includes('emergency') || request.includes('help') || request.includes('sos')) {
+        answer = 'Opening emergency SOS confirmation.';
+        setAssistantResponse(answer); setVoiceState('Success', answer); speak(answer); openSosModal(); return;
+      } else if (request.includes('heart') || request.includes('pulse') || request.includes('vitals') || request.includes('steps')) {
+        answer = 'No current health reading is available to report.';
+      } else {
+        const error = 'I could not match that request to available dashboard information. Try a medicine or appointment question.';
+        setAssistantResponse(error); setVoiceState('Error', error);
+        return;
+      }
+      setAssistantResponse(answer);
+      setVoiceState('Success', 'Request processed using your current dashboard data.');
+      speak(answer);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    async function runSmsTest() {
+      const status = document.getElementById('sms-provider-status');
+      const button = document.getElementById('btn-sms-test');
+      const recipient = document.getElementById('sms-test-recipient').value.trim();
+      const confirmed = document.getElementById('sms-test-confirm').checked;
+      if (!recipient || !confirmed) { status.textContent = 'Enter the account phone and confirm the one-message test.'; return; }
+      button.disabled = true; button.textContent = 'Sending?'; status.textContent = 'Sending test SMS to the account phone?';
+      const result = await window.CareMateAPI.sendTestSms(recipient, true);
+      button.disabled = false; button.textContent = 'Send test SMS';
+      if (result.success) status.textContent = `Twilio accepted the test message. Reference: ${result.data.referenceId} (delivery: ${result.data.deliveryStatus || 'pending'}).`;
+      else status.textContent = result.error || 'SMS send failed.';
+    }
+
+    async function loadSmsConfiguration() {
+      const status = document.getElementById('sms-provider-status');
+      const phoneInput = document.getElementById('sms-test-recipient');
+      phoneInput.value = localStorage.getItem('caremate_user_phone') || '';
+      const result = await window.CareMateAPI.getSmsStatus();
+      if (!result.success) { status.textContent = 'Cannot read SMS provider status. Ensure the backend is running.'; return; }
+      const config = result.data;
+      status.textContent = config.configured ? 'Twilio is configured. Test messages go only to your account phone.' : `Provider not configured. ${config.error || ('Twilio requires: ' + (config.missing || []).join(', ') + '. Set these on the backend.')}`;
+    }
+
+    // Initialize
+    loadDashboard();
+    loadSmsConfiguration();
+  </script>
+</body>
+</html>

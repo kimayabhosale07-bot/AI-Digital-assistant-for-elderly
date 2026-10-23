@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor Appointments | Carewise</title>
+  <meta name="description" content="Manage and schedule doctor appointments with automated reminders." />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .appt-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .appt-card {
+      background: #FFF;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      transition: var(--transition);
+    }
+    .appt-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-focus);
+    }
+
+    .appt-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    .appt-calendar-badge {
+      min-width: 68px;
+      text-align: center;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 0.6rem 0.4rem;
+    }
+
+    .appt-cal-month {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--terra-btn);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .appt-cal-day {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--terra-main);
+      line-height: 1.1;
+      margin: 0.15rem 0;
+    }
+
+    .appt-details h3 {
+      font-size: 1.25rem;
+      color: var(--terra-main);
+      margin-bottom: 0.3rem;
+      font-family: inherit;
+      font-weight: 800;
+    }
+
+    .appt-meta {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .appt-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .appt-actions {
+      display: flex;
+      gap: 0.6rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Nav -->
+  <header class="app-nav">
+    <a class="nav-brand" href="dashboard.html">
+      <div class="brand-icon">
+        <img src="../assets/aistudio/central_brain.png" alt="Carewise logo" />
+      </div>
+      <span class="brand-title">carewise</span>
+      <span class="brand-leaf">🌿</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="reminders.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+        Medicines
+      </a>
+      <a href="appointments.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments
+      </a>
+      <a href="health.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Health Vitals
+      </a>
+      <a href="sos.html" class="nav-link" style="color:#D32F2F;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Emergency SOS
+      </a>
+    </nav>
+
+    <div class="nav-user">
+      <div class="user-badge">
+        <span>👤</span>
+        <span id="user-display-name">User</span>
+      </div>
+      <button class="btn-nav-logout" onclick="window.CareMateAPI.logoutUser()">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page-container">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h1 class="page-title">Doctor Appointments</h1>
+        <p class="page-subtitle">Schedule and stay prepared for upcoming clinic visits and checkups.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openApptModal()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Schedule Visit
+      </button>
+    </div>
+
+    <!-- Timeline of Appointments -->
+    <div id="appointments-list" class="appt-timeline">
+      <div style="text-align:center; padding:3rem; color:var(--text-muted);">
+        Loading your appointments...
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD APPOINTMENT MODAL -->
+  <div class="modal-overlay" id="appt-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeApptModal()">&times;</button>
+      <h2 style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.4rem;">Schedule Doctor Visit</h2>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.5rem;">Enter appointment details for automated calendar sync.</p>
+
+      <div id="appt-alert" class="alert alert-danger" style="display:none;"></div>
+
+      <form onsubmit="handleScheduleAppt(event)">
+        <div class="form-group">
+          <label class="form-label" for="doc-name">Doctor or Clinic Name *</label>
+          <input type="text" id="doc-name" class="form-input" placeholder="e.g. Dr. Emily Hayes (Cardiologist)" required />
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="doc-date">Date (YYYY-MM-DD) *</label>
+            <input type="date" id="doc-date" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-time">Time (HH:MM 24h) *</label>
+            <input type="text" id="doc-time" class="form-input" placeholder="10:30" pattern="^([01]\d|2[0-3]):([0-5]\d)$" title="Format: HH:MM e.g. 10:30 or 15:45" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="doc-location">Clinic Address or Location *</label>
+          <input type="text" id="doc-location" class="form-input" placeholder="e.g. St. Jude Wellness Center, Suite 402" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-save-appt" style="width:100%; margin-top:0.5rem;">
+          Confirm &amp; Schedule Visit
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    'use strict';
+
+    const userId = window.CareMateAPI.getCurrentUserId();
+    if (!userId) window.location.href = 'login.html';
+
+    const userName = localStorage.getItem('caremate_user_name') || 'User';
+    document.getElementById('user-display-name').textContent = userName;
+
+    let appointments = [];
+
+    async function loadAppointments() {
+      try {
+        const res = await window.CareMateAPI.getAppointments(userId);
+        if (res.success && Array.isArray(res.data)) {
+          appointments = res.data;
+          renderAppointments();
+        } else {
+          appointments = [];
+          renderAppointments();
+        }
+      } catch (e) {
+        appointments = [];
+        renderAppointments();
+      }
+    }
+
+    function renderAppointments() {
+      const container = document.getElementById('appointments-list');
+      if (appointments.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:3rem 1rem; background:#FFF; border-radius:var(--radius-lg); border:1px solid var(--border-card);">
+            <div style="font-size:2.5rem; margin-bottom:0.5rem;">🩺</div>
+            <h3 style="font-size:1.3rem; color:var(--terra-main); margin-bottom:0.3rem;">No upcoming appointments</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem;">You are all caught up on clinic visits.</p>
+            <button class="btn btn-primary" onclick="openApptModal()">Schedule Your Next Visit</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = appointments.map(a => {
+        const d = new Date(`${a.date}T${a.time || '00:00'}`);
+        const monthName = isNaN(d) ? 'DATE' : d.toLocaleDateString('en-US', { month: 'short' });
+        const dayNum = isNaN(d) ? a.date : d.getDate();
+
+        return `
+          <div class="appt-card" id="appt-${a.apptId}">
+            <div class="appt-main">
+              <div class="appt-calendar-badge">
+                <div class="appt-cal-month">${monthName}</div>
+                <div class="appt-cal-day">${dayNum}</div>
+              </div>
+              <div class="appt-details">
+                <h3>${escapeHtml(a.doctorName)}</h3>
+                <div class="appt-meta">
+                  <span class="appt-meta-item">⏰ ${escapeHtml(a.time)}</span>
+                  <span class="appt-meta-item">📍 ${escapeHtml(a.location)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="appt-actions">
+              <button class="btn btn-secondary" onclick="speakAppt('${escapeHtml(a.doctorName)}', '${a.date}', '${a.time}', '${escapeHtml(a.location)}')" title="Read aloud">
+                🔊 Read
+              </button>
+              <a href="https://maps.google.com/?q=${encodeURIComponent(a.location)}" target="_blank" rel="noopener" class="btn btn-sage">
+                🗺️ Directions
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function speakAppt(doc, date, time, loc) {
+      if ('speechSynthesis' in window) {
+        const text = `Your appointment with ${doc} is on ${date} at ${time}, located at ${loc}. Remember to bring your prescription card.`;
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function openApptModal() {
+      document.getElementById('appt-alert').style.display = 'none';
+      document.getElementById('appt-modal').classList.add('open');
+      // Set default date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('doc-date').value = tomorrow.toISOString().split('T')[0];
+    }
+
+    function closeApptModal() {
+      document.getElementById('appt-modal').classList.remove('open');
+    }
+
+    async function handleScheduleAppt(e) {
+      e.preventDefault();
+      const docName = document.getElementById('doc-name').value.trim();
+      const date = document.getElementById('doc-date').value.trim();
+      const time = document.getElementById('doc-time').value.trim();
+      const location = document.getElementById('doc-location').value.trim();
+
+      const alertBox = document.getElementById('appt-alert');
+      alertBox.style.display = 'none';
+
+      // Verify date and time format matching backend regex
+      const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+      if (!dateRegex.test(date)) {
+        alertBox.textContent = 'Invalid date format. Use YYYY-MM-DD.';
+        alertBox.style.display = 'block';
+        return;
+      }
+      if (!timeRegex.test(time)) {
+        alertBox.textContent = 'Invalid time format. Use HH:MM 24-hour format (e.g. 10:30 or 15:00).';
+        alertBox.style.display = 'block';
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-appt');
+      btn.textContent = 'Scheduling...';
+      btn.disabled = true;
+
+      try {
+        const res = await window.CareMateAPI.addAppointment({
+          userId,
+          doctorName: docName,
+          date,
+          time,
+          location
+        });
+
+        if (res.success) {
+          closeApptModal();
+          document.getElementById('doc-name').value = '';
+          document.getElementById('doc-location').value = '';
+          loadAppointments();
+        } else {
+          alertBox.textContent = res.error || 'Could not schedule appointment.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.textContent = 'Connection error while scheduling appointment.';
+        alertBox.style.display = 'block';
+      } finally {
+        btn.textContent = 'Confirm & Schedule Visit';
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    loadAppointments();
+  </script>
+</body>
+</html>

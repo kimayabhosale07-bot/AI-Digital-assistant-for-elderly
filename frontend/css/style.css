@@ -1,0 +1,542 @@
+/* ============================================================
+   Carewise — Unified Design System
+   Matches Landing Page Aesthetics with Warm Senior-Friendly UI
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg-cream:        #FAF2E9;
+  --bg-surface:      #FFFFFF;
+  --bg-card:         #FFFFFF;
+  --bg-subtle:       #F5EBE1;
+  --bg-selected:     #F7E9DE;
+  
+  --terra-main:      #82382C;
+  --terra-dark:      #682A20;
+  --terra-btn:       #9E4536;
+  --terra-btn-hover: #7E3427;
+  --terra-light:     #F3D6CF;
+  
+  --sage-main:       #465B4A;
+  --sage-dark:       #314335;
+  --sage-light:      #D8E2D9;
+  --sage-badge:      #E4ECE5;
+  
+  --text-main:       #4A3D36;
+  --text-sub:        #695950;
+  --text-muted:      #85746B;
+  --text-light:      #9E8C83;
+  
+  --border-light:    #EADBCE;
+  --border-card:     #E5D4C5;
+  --border-focus:    #9E4536;
+  
+  --danger-main:     #D32F2F;
+  --danger-bg:       #FDE8E8;
+  --danger-border:   #F8B4B4;
+  
+  --success-main:    #2E7D32;
+  --success-bg:      #EDF7ED;
+  --success-border:  #B7DFB9;
+  
+  --warning-main:    #E65100;
+  --warning-bg:      #FFF3E0;
+  
+  --shadow-sm:       0 2px 8px rgba(130, 56, 44, 0.06);
+  --shadow-md:       0 8px 24px rgba(130, 56, 44, 0.09);
+  --shadow-lg:       0 16px 40px rgba(130, 56, 44, 0.14);
+  --shadow-hover:    0 12px 30px rgba(130, 56, 44, 0.16);
+  
+  --radius-sm:       0.5rem;
+  --radius-md:       1rem;
+  --radius-lg:       1.5rem;
+  --radius-full:     9999px;
+  
+  --transition:      all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  height: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  background-color: var(--bg-cream);
+  color: var(--text-main);
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+h1, h2, h3, h4, .font-serif {
+  font-family: 'Fraunces', Georgia, serif;
+  color: var(--terra-main);
+  line-height: 1.25;
+}
+
+.font-hand {
+  font-family: 'Caveat', cursive;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================================
+   Carewise Top App Navigation Bar
+   ============================================================ */
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  background: rgba(250, 242, 233, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFF;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--sage-dark);
+  letter-spacing: -0.01em;
+}
+
+.brand-leaf {
+  color: var(--sage-main);
+  font-size: 0.95rem;
+  margin-left: 2px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-full);
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  color: var(--terra-main);
+  background: rgba(130, 56, 44, 0.06);
+}
+
+.nav-link.active {
+  color: var(--terra-main);
+  background: var(--bg-selected);
+  box-shadow: 0 1px 3px rgba(130, 56, 44, 0.08);
+}
+
+.nav-link svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #FFF;
+  border: 1px solid var(--border-light);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--terra-main);
+}
+
+.btn-nav-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-nav-logout:hover {
+  background: var(--terra-light);
+  color: var(--terra-dark);
+  border-color: var(--terra-main);
+}
+
+/* ============================================================
+   Page Layout & Container
+   ============================================================ */
+.page-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+  flex: 1;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2.1rem;
+  color: var(--terra-main);
+  margin-bottom: 0.4rem;
+}
+
+.page-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-sub);
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+  text-align: center;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--terra-btn);
+  color: #FFF;
+  box-shadow: 0 4px 14px rgba(130, 56, 44, 0.24);
+}
+
+.btn-primary:hover {
+  background: var(--terra-btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(130, 56, 44, 0.32);
+}
+
+.btn-secondary {
+  background: #FFF;
+  color: var(--text-main);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-focus);
+  color: var(--terra-main);
+}
+
+.btn-sage {
+  background: var(--sage-main);
+  color: #FFF;
+  box-shadow: 0 4px 14px rgba(70, 91, 74, 0.24);
+}
+
+.btn-sage:hover {
+  background: var(--sage-dark);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background: var(--danger-main);
+  color: #FFF;
+  box-shadow: 0 4px 14px rgba(211, 47, 47, 0.28);
+}
+
+.btn-danger:hover {
+  background: #B71C1C;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(211, 47, 47, 0.38);
+}
+
+/* ============================================================
+   Cards & Surfaces
+   ============================================================ */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================
+   Forms & Inputs
+   ============================================================ */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  margin-bottom: 0.4rem;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background: #FFF;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--terra-btn);
+  box-shadow: 0 0 0 4px rgba(158, 69, 54, 0.15);
+}
+
+/* ============================================================
+   Alerts & Notifications
+   ============================================================ */
+.alert {
+  padding: 0.85rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.alert-danger {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-main);
+}
+
+.alert-success {
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  color: var(--success-main);
+}
+
+.alert-warning {
+  background: var(--warning-bg);
+  border: 1px solid #FFE0B2;
+  color: var(--warning-main);
+}
+
+/* ============================================================
+   Modal System
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(30, 20, 16, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay.open {
+  display: flex;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.modal-content {
+  background: #FFFDF9;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  max-width: 520px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-close:hover {
+  background: var(--bg-subtle);
+  color: var(--terra-main);
+}
+
+/* ============================================================
+   Floating Emergency SOS Button
+   ============================================================ */
+.floating-sos-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--radius-full);
+  background: #D32F2F;
+  color: #FFF;
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: 0 6px 24px rgba(211, 47, 47, 0.45);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: var(--transition);
+  animation: sosPulse 2.5s infinite;
+}
+
+.floating-sos-btn:hover {
+  background: #B71C1C;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 30px rgba(211, 47, 47, 0.6);
+}
+
+@keyframes sosPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.5); }
+  50%      { box-shadow: 0 0 0 14px rgba(211, 47, 47, 0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modalScale {
+  from { opacity: 0; transform: scale(0.92) translateY(15px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Responsive mobile adjustments */
+@media (max-width: 768px) {
+  .app-nav {
+    padding: 0.6rem 1rem;
+    flex-wrap: wrap;
+  }
+  .nav-links {
+    order: 3;
+    width: 100%;
+    margin-top: 0.5rem;
+    justify-content: space-around;
+    gap: 0.4rem;
+    overflow-x: auto;
+  }
+  .nav-link {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.65rem;
+  }
+  .page-container {
+    padding: 1.25rem 1rem 5rem;
+  }
+  .floating-sos-btn {
+    bottom: 1.2rem;
+    right: 1.2rem;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,682 @@
+/* ============================================================
+   CAREMATE-THEME.CSS — Brand Assets & Decorative Elements
+   ============================================================
+   SVG botanical illustrations, logo, character avatars,
+   and decorative accents for the CareMate healthcare dashboard.
+   ============================================================ */
+
+/* ── CareMate Logo — SVG Heart + Leaf ── */
+.caremate-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  text-decoration: none;
+  padding: var(--space-4) 0;
+}
+
+.caremate-logo__icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.caremate-logo__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.caremate-logo__name {
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+
+.caremate-logo__subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.3;
+}
+
+/* ── Botanical Leaf Decorations ── */
+.botanical-accent {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.12;
+  z-index: 0;
+}
+
+.botanical-accent--top-right {
+  top: -8px;
+  right: -8px;
+}
+
+.botanical-accent--bottom-left {
+  bottom: -8px;
+  left: -8px;
+}
+
+.botanical-accent--sidebar {
+  position: absolute;
+  bottom: 80px;
+  left: 12px;
+  opacity: 0.08;
+}
+
+/* ── Decorative Leaf Sprig (used on voice card & sidebar) ── */
+.leaf-sprig {
+  display: inline-block;
+}
+
+.leaf-sprig svg {
+  fill: var(--color-primary);
+}
+
+/* ── Voice Card Botanical Frame ── */
+.voice-card-frame {
+  position: relative;
+}
+
+.voice-card-frame::before,
+.voice-card-frame::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  opacity: 0.08;
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.voice-card-frame::before {
+  top: -6px;
+  left: -6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cpath d='M10 70 C20 50 15 30 30 20 C35 17 40 18 38 25 C35 35 25 45 20 60' fill='%233D8B6E' opacity='0.8'/%3E%3Cpath d='M15 65 C25 45 30 25 50 15 C54 13 56 16 52 22 C45 32 30 48 22 58' fill='%233D8B6E' opacity='0.5'/%3E%3Ccircle cx='8' cy='72' r='3' fill='%233D8B6E' opacity='0.4'/%3E%3Ccircle cx='16' cy='68' r='2' fill='%233D8B6E' opacity='0.3'/%3E%3C/svg%3E");
+}
+
+.voice-card-frame::after {
+  bottom: -6px;
+  right: -6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cpath d='M70 10 C60 30 65 50 50 60 C45 63 40 62 42 55 C45 45 55 35 60 20' fill='%233D8B6E' opacity='0.8'/%3E%3Cpath d='M65 15 C55 35 50 55 30 65 C26 67 24 64 28 58 C35 48 50 32 58 22' fill='%233D8B6E' opacity='0.5'/%3E%3Ccircle cx='72' cy='8' r='3' fill='%233D8B6E' opacity='0.4'/%3E%3Ccircle cx='64' cy='12' r='2' fill='%233D8B6E' opacity='0.3'/%3E%3C/svg%3E");
+  transform: rotate(180deg);
+}
+
+/* ── Character Avatar Illustrations ── */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.avatar--lg {
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+}
+
+.avatar--xl {
+  width: 56px;
+  height: 56px;
+  font-size: 26px;
+}
+
+.avatar--elderly {
+  background: linear-gradient(135deg, #F0E6D3, #E8D5BD);
+  color: #8B6F47;
+}
+
+.avatar--caregiver {
+  background: linear-gradient(135deg, #D5E8F0, #BDD5E8);
+  color: #4A7B8F;
+}
+
+.avatar--doctor {
+  background: linear-gradient(135deg, #E0F0E6, #C5E0D0);
+  color: #3D7B5A;
+}
+
+.avatar--contact {
+  background: linear-gradient(135deg, var(--color-primary-bg), var(--color-primary-50));
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── Sidebar Botanical Decoration ── */
+.sidebar-botanical {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.06;
+  pointer-events: none;
+  width: 180px;
+  height: auto;
+}
+
+/* ── Notification Bell ── */
+.notification-bell {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast);
+}
+
+.notification-bell:hover {
+  background: var(--color-surface-hover);
+}
+
+.notification-bell__count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── Ask Assistant Button ── */
+.ask-assistant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.ask-assistant-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-50);
+}
+
+.ask-assistant-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Microphone SVG Icon (Voice Card) ── */
+.mic-icon-wrapper {
+  width: var(--tap-mic);
+  height: var(--tap-mic);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-normal);
+}
+
+.mic-icon-wrapper--idle {
+  background: linear-gradient(135deg, #EBF5F0, #D5EBE2);
+  box-shadow: 0 4px 20px rgba(61, 139, 110, 0.12);
+}
+
+.mic-icon-wrapper--idle:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 28px rgba(61, 139, 110, 0.18);
+}
+
+.mic-icon-wrapper svg {
+  width: 40px;
+  height: 40px;
+  fill: var(--color-primary);
+}
+
+/* ── Microphone listening pulse ── */
+.mic-icon-wrapper--listening {
+  background: linear-gradient(135deg, #D5EBE2, #C0DFD0);
+  animation: mic-glow 2s ease-in-out infinite;
+}
+
+@keyframes mic-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(61, 139, 110, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 20px rgba(61, 139, 110, 0);
+  }
+}
+
+/* ── Overview Stat Cards ── */
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-16);
+  padding: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-8);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.stat-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: var(--space-4);
+}
+
+.stat-card__icon--medicines {
+  background: #EBF5F0;
+  color: var(--color-primary);
+}
+
+.stat-card__icon--appointment {
+  background: #EBF0F5;
+  color: #4A7B8F;
+}
+
+.stat-card__icon--health {
+  background: #F5EBEF;
+  color: #8B4A6B;
+}
+
+.stat-card__value {
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.stat-card__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.stat-card__link {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--space-4);
+}
+
+.stat-card__link:hover {
+  text-decoration: underline;
+}
+
+/* ── Quick Action Cards ── */
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-20);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-16);
+  text-decoration: none;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+}
+
+.quick-action:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-50);
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-action__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--color-surface-subtle);
+}
+
+/* ── Filter Tabs (Medicines Page) ── */
+.filter-tabs {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-24);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0;
+}
+
+.filter-tab {
+  padding: var(--space-8) var(--space-16);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: -1px;
+}
+
+.filter-tab:hover {
+  color: var(--color-text);
+}
+
+.filter-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── Appointment Date Block ── */
+.date-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: var(--space-8) var(--space-10);
+  background: var(--color-primary-50);
+  border-radius: var(--radius-10);
+  flex-shrink: 0;
+}
+
+.date-block__day {
+  font-size: 22px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.date-block__month {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* ── Health Vital Cards ── */
+.vital-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-16);
+  padding: var(--space-24);
+  box-shadow: var(--shadow-card);
+}
+
+.vital-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
+}
+
+.vital-card__icon {
+  font-size: 20px;
+}
+
+.vital-card__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.vital-card__value {
+  font-size: 32px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  line-height: 1.1;
+  margin-bottom: var(--space-4);
+}
+
+.vital-card__unit {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-muted);
+}
+
+/* ── SOS Flow Steps ── */
+.sos-step {
+  background: var(--color-surface);
+  border-radius: var(--radius-24);
+  padding: var(--space-40) var(--space-24);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 400px;
+  box-shadow: var(--shadow-md);
+}
+
+.sos-step__number {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-16);
+}
+
+.sos-step__number--danger {
+  background: var(--color-danger);
+  color: white;
+}
+
+.sos-step__number--warning {
+  background: var(--color-warning);
+  color: white;
+}
+
+.sos-step__number--success {
+  background: var(--color-success);
+  color: white;
+}
+
+.sos-step__title {
+  font-size: var(--font-size-section);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-8);
+}
+
+.sos-step__subtitle {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-24);
+}
+
+/* ── SOS Hold Button (Redesigned) ── */
+.sos-hold-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-full);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all var(--transition-normal);
+}
+
+.sos-hold-circle--danger {
+  background: linear-gradient(135deg, #FEE2E2, #FECACA);
+  color: var(--color-danger);
+}
+
+.sos-hold-circle--danger:hover {
+  background: linear-gradient(135deg, #FECACA, #FCA5A5);
+}
+
+.sos-hold-circle--holding {
+  animation: sos-pulse 500ms ease-in-out infinite alternate;
+}
+
+@keyframes sos-pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.06); }
+}
+
+/* ── SOS Success Check ── */
+.sos-check-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-24);
+}
+
+.sos-check-circle svg {
+  width: 48px;
+  height: 48px;
+  fill: white;
+}
+
+/* ── Contact Card Enhanced ── */
+.contact-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-16);
+  padding: var(--space-20);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--space-16);
+}
+
+.contact-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin-bottom: var(--space-16);
+}
+
+.contact-card__info {
+  flex: 1;
+}
+
+.contact-card__name {
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.contact-card__phone {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.contact-card__badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(46, 139, 87, 0.15);
+}
+
+.contact-card__actions {
+  display: flex;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+
+/* ── Reminder Note Card ── */
+.reminder-note {
+  background: var(--color-warning-bg);
+  border: 1px solid rgba(212, 135, 14, 0.15);
+  border-radius: var(--radius-12);
+  padding: var(--space-16);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.reminder-note__icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Screen reader only utility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

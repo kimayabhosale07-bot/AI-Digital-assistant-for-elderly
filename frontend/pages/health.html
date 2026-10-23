@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Vitals &amp; Activity | Carewise</title>
+  <meta name="description" content="Track heart rate, daily walking steps, and vital anomalies with automatic family alert dispatch." />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .vitals-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    @media (min-width: 680px) {
+      .vitals-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .vital-display-card {
+      background: #FFF;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vital-display-card.pulse-glow {
+      border-color: #F8B4B4;
+    }
+
+    .vital-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .vital-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .vital-badge.normal { background: var(--success-bg); color: var(--success-main); }
+    .vital-badge.flagged { background: var(--danger-bg); color: var(--danger-main); animation: sosPulse 2s infinite; }
+
+    .vital-value {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--terra-main);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .vital-unit {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .vitals-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .vitals-table th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .vitals-table td {
+      padding: 0.9rem 1rem;
+      font-size: 0.92rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-main);
+    }
+
+    .vitals-table tr:hover td {
+      background: var(--bg-subtle);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-nav">
+    <a class="nav-brand" href="dashboard.html">
+      <div class="brand-icon">
+        <img src="../assets/aistudio/central_brain.png" alt="Carewise logo" />
+      </div>
+      <span class="brand-title">carewise</span>
+      <span class="brand-leaf">🌿</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="reminders.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+        Medicines
+      </a>
+      <a href="appointments.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments
+      </a>
+      <a href="health.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Health Vitals
+      </a>
+      <a href="sos.html" class="nav-link" style="color:#D32F2F;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Emergency SOS
+      </a>
+    </nav>
+
+    <div class="nav-user">
+      <div class="user-badge">
+        <span>👤</span>
+        <span id="user-display-name">User</span>
+      </div>
+      <button class="btn-nav-logout" onclick="window.CareMateAPI.logoutUser()">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Page Main Content -->
+  <main class="page-container">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h1 class="page-title">Health Vitals &amp; Activity</h1>
+        <p class="page-subtitle">Continuous heart rate and daily steps monitor with automated anomaly alerts.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openLogModal()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Record New Vitals
+      </button>
+    </div>
+
+    <!-- Alert Banner if reading was flagged -->
+    <div id="vital-anomaly-banner" class="alert alert-danger" style="display:none;"></div>
+
+    <!-- Live Vitals Cards -->
+    <div class="vitals-cards">
+      <!-- Heart Rate Card -->
+      <div class="vital-display-card pulse-glow">
+        <div class="vital-header">
+          <span style="font-weight:700; color:var(--text-sub); display:flex; align-items:center; gap:0.4rem;">
+            ❤️ Resting Heart Rate
+          </span>
+          <span class="vital-badge normal" id="hr-badge">Normal</span>
+        </div>
+        <div class="vital-value" id="current-hr">
+          72 <span class="vital-unit">bpm</span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted);">
+          Healthy resting range: <strong>60 – 100 bpm</strong>. Readings outside this range auto-dispatch Twilio SMS alerts.
+        </p>
+      </div>
+
+      <!-- Steps Counter Card -->
+      <div class="vital-display-card">
+        <div class="vital-header">
+          <span style="font-weight:700; color:var(--text-sub); display:flex; align-items:center; gap:0.4rem;">
+            👟 Today's Steps
+          </span>
+          <span class="vital-badge" style="background:var(--sage-badge); color:var(--sage-dark);">Target: 5,000</span>
+        </div>
+        <div class="vital-value" style="color:var(--sage-main);" id="current-steps">
+          3,420 <span class="vital-unit">steps</span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted);">
+          68% of daily mobility goal completed. Gentle walking keeps the heart vibrant!
+        </p>
+      </div>
+    </div>
+
+    <!-- Recent Vitals History Table -->
+    <div class="card">
+      <h2 style="font-size:1.3rem; color:var(--terra-main); margin-bottom:0.25rem;">Recent Vitals History</h2>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">All readings recorded directly to the backend database.</p>
+
+      <div style="overflow-x:auto;">
+        <table class="vitals-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Heart Rate</th>
+              <th>Steps Logged</th>
+              <th>Status</th>
+              <th>Automated Alert</th>
+            </tr>
+          </thead>
+          <tbody id="vitals-table-body">
+            <!-- Dynamic rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- LOG VITALS MODAL -->
+  <div class="modal-overlay" id="log-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeLogModal()">&times;</button>
+      <h2 style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.4rem;">Log Health Reading</h2>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.5rem;">Enter current vitals. Readings outside 60-100 bpm will automatically notify emergency contacts.</p>
+
+      <div id="modal-alert" class="alert alert-danger" style="display:none;"></div>
+
+      <form onsubmit="handleLogHealth(event)">
+        <div class="form-group">
+          <label class="form-label" for="input-hr">Heart Rate (bpm) *</label>
+          <input type="number" id="input-hr" class="form-input" placeholder="e.g. 74" min="30" max="250" required />
+          <span style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem; display:block;">Normal range is 60 - 100 bpm.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="input-steps">Steps Walked *</label>
+          <input type="number" id="input-steps" class="form-input" placeholder="e.g. 4200" min="0" max="100000" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-save-vitals" style="width:100%; margin-top:0.5rem;">
+          Save &amp; Check Vitals
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/api.js"></script>
+  <script>
+    'use strict';
+
+    const userId = window.CareMateAPI.getCurrentUserId();
+    if (!userId) window.location.href = 'login.html';
+
+    const userName = localStorage.getItem('caremate_user_name') || 'User';
+    document.getElementById('user-display-name').textContent = userName;
+
+    // Local in-memory log list backed by recent submissions
+    let localVitalsHistory = JSON.parse(localStorage.getItem(`caremate_vitals_${userId}`) || '[]');
+    if (localVitalsHistory.length === 0) {
+      localVitalsHistory = [
+        { heartRate: 72, steps: 3420, timestamp: new Date(Date.now() - 3600000*2).toISOString(), flagged: false },
+        { heartRate: 76, steps: 2150, timestamp: new Date(Date.now() - 3600000*8).toISOString(), flagged: false }
+      ];
+    }
+
+    function renderHistory() {
+      const tbody = document.getElementById('vitals-table-body');
+      if (localVitalsHistory.length > 0) {
+        const latest = localVitalsHistory[0];
+        document.getElementById('current-hr').innerHTML = `${latest.heartRate} <span class="vital-unit">bpm</span>`;
+        document.getElementById('current-steps').innerHTML = `${latest.steps.toLocaleString()} <span class="vital-unit">steps</span>`;
+        const badge = document.getElementById('hr-badge');
+        if (latest.flagged) {
+          badge.textContent = '⚠️ Anomaly Flagged';
+          badge.className = 'vital-badge flagged';
+        } else {
+          badge.textContent = 'Normal';
+          badge.className = 'vital-badge normal';
+        }
+      }
+
+      tbody.innerHTML = localVitalsHistory.map(log => {
+        const d = new Date(log.timestamp);
+        const timeStr = d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        return `
+          <tr>
+            <td><strong>${timeStr}</strong></td>
+            <td style="font-weight:700; color:${log.flagged ? '#D32F2F' : 'var(--terra-main)'};">
+              ${log.heartRate} bpm
+            </td>
+            <td>${log.steps.toLocaleString()}</td>
+            <td>
+              <span class="vital-badge ${log.flagged ? 'flagged' : 'normal'}">
+                ${log.flagged ? '⚠️ Abnormal' : '✓ Healthy'}
+              </span>
+            </td>
+            <td>
+              ${log.flagged ? '📲 Twilio SMS Sent' : 'None Needed'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openLogModal() {
+      document.getElementById('modal-alert').style.display = 'none';
+      document.getElementById('log-modal').classList.add('open');
+      document.getElementById('input-hr').focus();
+    }
+
+    function closeLogModal() {
+      document.getElementById('log-modal').classList.remove('open');
+    }
+
+    async function handleLogHealth(e) {
+      e.preventDefault();
+      const hr = Number(document.getElementById('input-hr').value);
+      const steps = Number(document.getElementById('input-steps').value);
+
+      const alertBox = document.getElementById('modal-alert');
+      alertBox.style.display = 'none';
+
+      const btn = document.getElementById('btn-save-vitals');
+      btn.textContent = 'Logging & Analyzing...';
+      btn.disabled = true;
+
+      try {
+        const res = await window.CareMateAPI.logHealthReading({
+          userId,
+          heartRate: hr,
+          steps: steps
+        });
+
+        if (res.success) {
+          closeLogModal();
+          const isFlagged = res.data && res.data.flagged !== undefined ? res.data.flagged : (hr < 60 || hr > 100);
+
+          localVitalsHistory.unshift({
+            heartRate: hr,
+            steps: steps,
+            timestamp: new Date().toISOString(),
+            flagged: isFlagged
+          });
+          localStorage.setItem(`caremate_vitals_${userId}`, JSON.stringify(localVitalsHistory));
+          renderHistory();
+
+          if (isFlagged) {
+            const banner = document.getElementById('vital-anomaly-banner');
+            banner.textContent = `⚠️ Health Alert: Heart rate reading of ${hr} bpm is outside normal range (60-100). Automated alert SMS has been broadcasted to emergency contacts!`;
+            banner.style.display = 'flex';
+
+            if ('speechSynthesis' in window) {
+              const u = new SpeechSynthesisUtterance(`Warning: Your heart rate is ${hr} beats per minute. We have notified your emergency contacts to check on you.`);
+              window.speechSynthesis.speak(u);
+            }
+          }
+        } else {
+          alertBox.textContent = res.error || 'Could not log health reading.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.textContent = 'Connection error with backend.';
+        alertBox.style.display = 'block';
+      } finally {
+        btn.textContent = 'Save & Check Vitals';
+        btn.disabled = false;
+      }
+    }
+
+    renderHistory();
+  </script>
+</body>
+</html>
