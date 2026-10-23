@@ -1,7 +1,5 @@
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const { getAuth } = require('firebase-admin/auth');
-const { getMessaging } = require('firebase-admin/messaging');
 require('dotenv').config({ quiet: true });
 
 // grpc-js does not honor the usual uppercase NO_PROXY variable. Allow a
@@ -74,14 +72,6 @@ try {
 
 module.exports = {
   db,
-  getAuth: () => {
-    if (!db) throw new Error('Firebase Admin is not initialized. Check backend configuration.');
-    return getAuth();
-  },
-  getMessaging: () => {
-    if (!db) throw new Error('Firebase Admin is not initialized. Check backend configuration.');
-    return getMessaging();
-  },
   getDb: () => {
     if (!db) {
       throw new Error('Firestore Database is not initialized. Please check your .env configuration.');

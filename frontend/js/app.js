@@ -3,7 +3,7 @@
  * APP.JS — Shared Core Application Behavior & Navigation
  * ============================================================
  * Handles page initialization, persistent bottom/sidebar navigation,
- * global header SOS shortcut, toast/alert feedback, and family contacts.
+ * shared navigation, toast feedback, and family/caregiver contacts.
  * ============================================================
  */
 
@@ -13,14 +13,12 @@ let mockContacts = [
     name: 'Priya',
     relation: 'Daughter',
     phone: '+91 98765 43210',
-    emergencyAlerts: true,
   },
   {
     id: 'c-2',
     name: 'Robert',
     relation: 'Caregiver / Nurse',
     phone: '+91 91234 56789',
-    emergencyAlerts: true,
   },
 ];
 
@@ -53,7 +51,6 @@ async function initApp(pageConfig = {}) {
   }
 
   initNavigation(activePage);
-  initGlobalSOS();
   initFeedback();
 
   handlePageLoad(activePage);
@@ -169,13 +166,6 @@ function renderSidebar(activePage) {
       </a>
     </div>
 
-    <div class="sidebar__sos">
-      <a href="sos.html" class="sidebar-sos" aria-label="Emergency SOS">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-        <span>Emergency SOS</span>
-      </a>
-    </div>
-
     <div class="sidebar__nav">
       <ul class="sidebar-nav">
         ${NAV_DESTINATIONS.map(dest => `
@@ -209,13 +199,6 @@ function renderSidebar(activePage) {
       </a>
     </div>
   `;
-}
-
-/**
- * Initialize Global Persistent Header SOS Shortcut (No longer used, handled in sidebar)
- */
-function initGlobalSOS() {
-  // SOS button is now part of the sidebar HTML and bottom nav
 }
 
 /**
@@ -259,7 +242,7 @@ function showFeedback(options = {}) {
   toast.innerHTML = `
     <div class="feedback-toast__title">
       <span>${type === 'success' ? '✓' : type === 'warning' ? '⚠️' : type === 'error' ? '🔴' : type === 'voice' ? '🎙️' : 'ℹ️'}</span>
-      <span>${options.title || 'Notification'}</span>
+      <span>${options.title || 'Update'}</span>
     </div>
     <div class="feedback-toast__message">${options.message || ''}</div>
     ${actionsHTML}
@@ -326,8 +309,8 @@ function renderContacts(contacts, container) {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-state__icon">👥</div>
-        <h4 class="empty-state__title">No emergency contacts</h4>
-        <p class="empty-state__description">Add someone who can be notified if you need help.</p>
+        <h4 class="empty-state__title">No contacts yet</h4>
+        <p class="empty-state__description">Add family members, caregivers, or other important contacts.</p>
         <button class="btn btn--primary" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">+ Add Contact</button>
       </div>
     `;
@@ -352,7 +335,6 @@ function renderContacts(contacts, container) {
             ${cnt.phone}
           </div>
         </div>
-        ${cnt.emergencyAlerts ? '<div class="contact-card__badge">Alerts Enabled</div>' : ''}
       </div>
       <div class="contact-card__actions">
         <a href="tel:${cnt.phone}" class="btn btn--sm btn--success">Call</a>
@@ -372,7 +354,6 @@ function addContact(data) {
     name: data.name,
     relation: data.relation || 'Family',
     phone: data.phone,
-    emergencyAlerts: data.emergencyAlerts !== false,
   };
 
   mockContacts.push(newContact);
@@ -394,7 +375,6 @@ function deleteContact(id) {
 window.CareMateApp = {
   initApp,
   initNavigation,
-  initGlobalSOS,
   initFeedback,
   showFeedback,
   loadContacts,

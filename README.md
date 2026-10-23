@@ -1,6 +1,6 @@
 # CareMate — AI Digital Personal Assistant for Elderly
 
-CareMate is a voice-first, accessible digital healthcare companion designed specifically for senior citizens. It simplifies everyday health management including medicine reminders, doctor appointments, health vitals monitoring, emergency SOS alerts, and family notifications.
+CareMate is a voice-first, accessible digital healthcare companion designed specifically for senior citizens. It simplifies everyday health management with medicine schedules, doctor appointments, health vitals monitoring, and family and caregiver contacts.
 
 ## Project Purpose & Vision
 
@@ -10,13 +10,12 @@ The application prioritizes:
 - **Extreme Accessibility**: Atkinson Hyperlegible typography, minimum 18px body font, 56px+ touch targets, and high contrast.
 - **Dual Status Communication**: Status is never communicated using color alone — always paired with prominent icons and clear text labels.
 - **Shallow Navigation**: Persistent navigation with no complex nested menus.
-- **Persistent Emergency SOS**: One-touch or press-and-hold emergency alert access from every screen.
 
 ## Technology Stack
 
 - **Frontend**: Plain HTML5, Vanilla CSS3 (Custom Design System with CSS Variables), Vanilla JavaScript (Modular ES6).
 - **Voice Capabilities**: Web Speech API (`SpeechRecognition` for voice input, `SpeechSynthesis` for spoken output).
-- **Backend *(Future Integration)***: Node.js, Express, Firebase Firestore, Twilio SMS API, node-cron.
+- **Backend**: Node.js, Express, Firebase Firestore, and node-cron for medicine schedule maintenance.
 
 ## Repository & Folder Structure
 
@@ -31,14 +30,13 @@ The application prioritizes:
     │
     ├── css/
     │   ├── variables.css       (Color palette, Atkinson Hyperlegible font scale, 56px+ touch targets)
-    │   ├── layout.css          (Header with SOS, responsive sidebar/bottom nav, toast live region)
-    │   └── components.css      (Cards, 64px+ buttons, mic 5 UI states, press-and-hold SOS button)
+    │   ├── layout.css          (Responsive sidebar/bottom nav and toast live region)
+    │   └── components.css      (Cards, 64px+ buttons, mic 5 UI states)
     │
     ├── js/
-    │   ├── api.js              (API abstraction layer with TODO stubs for Express/Firebase/Twilio)
+    │   ├── api.js              (API abstraction layer for profiles, medicines, appointments, and health logs)
     │   ├── voice.js            (Web Speech API wrapper: idle/listening/processing/speaking/error)
     │   ├── reminders.js        (Medicine & appointment list rendering, mark taken/missed)
-    │   ├── sos.js              (Press-and-hold emergency state machine & confirmation modal)
     │   ├── health.js           (Vitals logger, threshold check, and neutral attention flagging)
     │   └── app.js              (Shared layout initializers, navigation active state, toast feedback)
     │
@@ -47,9 +45,8 @@ The application prioritizes:
     │   ├── dashboard.html      (Home screen: voice assistant mic, schedule summary, quick actions)
     │   ├── reminders.html      (Medicine list & add/edit form with status badges)
     │   ├── appointments.html   (Doctor visits list & schedule form)
-    │   ├── sos.html            (Dedicated emergency SOS page with press-and-hold interaction)
     │   ├── health.html         (Health status cards, vitals logger form, & history log)
-    │   └── contacts.html       (Family & emergency contacts management)
+    │   └── contacts.html       (Family and caregiver contacts)
     │
     └── assets/
         └── icons/
@@ -73,7 +70,7 @@ The application prioritizes:
 
 - **Frontend Prototype**: Complete functional frontend prototype with interactive UI states, mock data, and feedback overlays.
 - **Voice Assistant**: Functional Web Speech API integration with feature detection, clear spoken rate (0.88), and fallback mode.
-- **Backend / API Stubs**: `api.js` provides an abstraction layer containing async placeholder functions with explicit `TODO` comments detailing future Express endpoints (`/api/medicines`, `/api/appointments`, `/api/health`, `/api/sos`).
+- **Backend / API**: `api.js` connects profile, medicine, appointment, and health-log features to the Express backend.
 
 ## License
 

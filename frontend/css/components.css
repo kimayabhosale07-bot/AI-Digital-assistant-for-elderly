@@ -77,7 +77,7 @@
   background: #257A4D;
 }
 
-/* Danger — Red (SOS only) */
+/* Danger — Red */
 .btn--danger {
   background: var(--color-danger);
   color: var(--color-text-inverse);
@@ -294,60 +294,6 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   font-style: italic;
-  min-height: 1.4em;
-}
-
-/* ── SOS Components ── */
-.sos-page-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-32) var(--space-24);
-  text-align: center;
-}
-
-.sos-hold-btn {
-  width: 140px;
-  height: 140px;
-  border-radius: var(--radius-full);
-  border: none;
-  background: linear-gradient(135deg, #FEE2E2, #FECACA);
-  color: var(--color-danger);
-  font-size: 28px;
-  font-weight: var(--font-weight-bold);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  transition: all var(--transition-normal);
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.sos-hold-btn:hover,
-.sos-hold-btn:focus-visible {
-  background: linear-gradient(135deg, #FECACA, #FCA5A5);
-  transform: scale(1.04);
-}
-
-.sos-hold-btn--holding {
-  animation: sos-hold-pulse 500ms ease-in-out infinite alternate;
-  background: linear-gradient(135deg, #FECACA, #FCA5A5);
-}
-
-@keyframes sos-hold-pulse {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.07); }
-}
-
-.sos-progress-ring {
-  margin-top: var(--space-12);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-muted);
   min-height: 1.4em;
 }
 

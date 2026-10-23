@@ -46,7 +46,7 @@ app.use((req, res) => {
   res.status(404).json({ error: `Cannot ${req.method} ${req.originalUrl}. Please check the API documentation.` });
 });
 
-// Start Cron background jobs
+// Start medicine schedule maintenance jobs
 startReminderJob();
 
 // Start the server

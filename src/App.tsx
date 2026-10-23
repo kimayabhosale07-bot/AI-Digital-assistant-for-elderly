@@ -53,8 +53,8 @@ export default function App() {
     {
       id: 6,
       image: '/assets/aistudio/bubble_6.png',
-      badge: 'Emergency Alert',
-      question: 'What if help arrived the moment they asked?',
+      badge: 'Caregiver Support',
+      question: 'How can family stay connected with everyday care?',
     },
   ];
 
@@ -308,7 +308,7 @@ export default function App() {
                     'Daily medication reminders',
                     'Morning & evening check-in calls',
                     'Reminiscing & friendly conversational companion',
-                    'One-word emergency family alerts',
+                    'Family and caregiver contact list',
                     'Hands-free music, stories & trivia',
                   ].map((item) => {
                     const isSelected = selectedNeeds.includes(item);
@@ -437,11 +437,11 @@ export default function App() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#52634E]" />
-                    <span>Family caregiver companion portal active with instant notifications.</span>
+                    <span>Family caregiver companion portal keeps care information organized.</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#52634E]" />
-                    <span>Emergency contacts saved for instant one-word call dispatch.</span>
+                    <span>Family and caregiver contacts are easy to find.</span>
                   </div>
                 </div>
 

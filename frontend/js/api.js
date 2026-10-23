@@ -77,19 +77,6 @@ async function apiFetch(endpoint, options = {}) {
     ...options.headers,
   };
 
-  // Health and SOS actions may dispatch FCM only when the request carries a
-  // verified notification identity. Legacy Carewise behavior remains usable
-  // without that optional identity; the backend then skips push delivery.
-  if (endpoint === '/health-log' || endpoint.startsWith('/emergency/')) {
-    try {
-      const { getNotificationIdToken } = await import('/js/notification-auth.js');
-      const idToken = await getNotificationIdToken();
-      if (idToken) headers.Authorization = `Bearer ${idToken}`;
-    } catch {
-      // Notification sign-in is optional for existing Carewise API usage.
-    }
-  }
-
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), options.timeout || 8000);
   const config = {
@@ -240,12 +227,6 @@ async function updateMedicineDose(medId, status, scheduledDate) {
   return apiFetch(`/medicine/${encodeURIComponent(medId)}/dose`, { method: 'POST', body: { userId: uid, scheduledDate, status } });
 }
 
-async function getSmsStatus() { return apiFetch('/sms/status'); }
-
-async function sendTestSms(recipient, confirmed) {
-  return apiFetch('/sms/test', { method: 'POST', body: { userId: getCurrentUserId(), recipient, confirmed } });
-}
-
 /**
  * Update medicine status
  * Backend: PUT /api/medicine/:medId/status
@@ -302,13 +283,13 @@ async function getAppointments(userId) {
 }
 
 // ────────────────────────────────────────────────────────────
-// Health Log & SOS APIs (matches backend /controllers/healthController.js)
+// Health log API
 // ────────────────────────────────────────────────────────────
 
 /**
  * Log a health reading (heart rate & steps)
  * Backend expects: { userId, heartRate, steps }
- * If heartRate < 60 or > 100, backend flags reading and sends Twilio SMS
+ * If heartRate < 60 or > 100, the backend flags the reading for review.
  */
 async function logHealthReading(healthData) {
   const uid = healthData.userId || getCurrentUserId();
@@ -323,23 +304,6 @@ async function logHealthReading(healthData) {
       heartRate: Number(healthData.heartRate),
       steps: Number(healthData.steps),
     },
-  });
-}
-
-/**
- * Trigger Emergency SOS
- * Backend: POST /api/emergency/:userId
- * Instantly broadcasts SMS to all registered emergency contacts
- */
-async function triggerEmergencySOS(userId) {
-  const uid = userId || getCurrentUserId();
-  if (!uid) {
-    return { success: false, error: 'User is not logged in. Cannot trigger SOS without a profile.' };
-  }
-
-  return apiFetch(`/emergency/${encodeURIComponent(uid)}`, {
-    method: 'POST',
-    body: {},
   });
 }
 
@@ -359,12 +323,9 @@ window.CareMateAPI = {
   getMedicines,
   updateMedicineStatus,
   updateMedicineDose,
-  getSmsStatus,
-  sendTestSms,
   // Appointment
   addAppointment,
   getAppointments,
-  // Health & SOS
+  // Health
   logHealthReading,
-  triggerEmergencySOS,
 };

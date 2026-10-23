@@ -262,7 +262,6 @@ function handleVoiceCommand(transcript) {
   // Future command parser logic will live here:
   // - "Remind me to take my medicine..." -> addMedicine()
   // - "What medicines do I have today?" -> readSchedule()
-  // - "Emergency" -> triggerSOS()
 
   if (typeof CareMateApp !== 'undefined') {
     CareMateApp.showFeedback({

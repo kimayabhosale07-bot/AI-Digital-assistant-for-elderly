@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Health Vitals &amp; Activity | Carewise</title>
-  <meta name="description" content="Track heart rate, daily walking steps, and vital anomalies with automatic family alert dispatch." />
+  <meta name="description" content="Track heart rate, daily walking steps, and vital readings." />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
     .vitals-cards {
@@ -47,7 +47,7 @@
       font-weight: 800;
     }
     .vital-badge.normal { background: var(--success-bg); color: var(--success-main); }
-    .vital-badge.flagged { background: var(--danger-bg); color: var(--danger-main); animation: sosPulse 2s infinite; }
+    .vital-badge.flagged { background: var(--danger-bg); color: var(--danger-main); animation: carewisePulse 2s infinite; }
 
     .vital-value {
       font-size: 2.8rem;
@@ -120,10 +120,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Health Vitals
       </a>
-      <a href="sos.html" class="nav-link" style="color:#D32F2F;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Emergency SOS
-      </a>
     </nav>
 
     <div class="nav-user">
@@ -140,7 +136,7 @@
     <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
       <div>
         <h1 class="page-title">Health Vitals &amp; Activity</h1>
-        <p class="page-subtitle">Continuous heart rate and daily steps monitor with automated anomaly alerts.</p>
+        <p class="page-subtitle">Record and review heart rate and daily steps.</p>
       </div>
       <button class="btn btn-primary" onclick="openLogModal()">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -165,7 +161,7 @@
           72 <span class="vital-unit">bpm</span>
         </div>
         <p style="font-size:0.85rem; color:var(--text-muted);">
-          Healthy resting range: <strong>60 – 100 bpm</strong>. Readings outside this range auto-dispatch Twilio SMS alerts.
+          Healthy resting range: <strong>60 – 100 bpm</strong>. Readings outside this range are flagged for review.
         </p>
       </div>
 
@@ -199,7 +195,7 @@
               <th>Heart Rate</th>
               <th>Steps Logged</th>
               <th>Status</th>
-              <th>Automated Alert</th>
+              <th>Review Status</th>
             </tr>
           </thead>
           <tbody id="vitals-table-body">
@@ -215,7 +211,7 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeLogModal()">&times;</button>
       <h2 style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.4rem;">Log Health Reading</h2>
-      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.5rem;">Enter current vitals. Readings outside 60-100 bpm will automatically notify emergency contacts.</p>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.5rem;">Enter current vitals. Readings outside 60-100 bpm will be flagged for review.</p>
 
       <div id="modal-alert" class="alert alert-danger" style="display:none;"></div>
 
@@ -238,7 +234,6 @@
     </div>
   </div>
 
-  <script src="../js/firebase-config.js"></script>
   <script src="../js/api.js"></script>
   <script>
     'use strict';
@@ -290,7 +285,7 @@
               </span>
             </td>
             <td>
-              ${log.flagged ? '📲 Twilio SMS Sent' : 'None Needed'}
+              ${log.flagged ? '⚠️ Review' : 'No concerns'}
             </td>
           </tr>
         `;
@@ -341,11 +336,11 @@
 
           if (isFlagged) {
             const banner = document.getElementById('vital-anomaly-banner');
-            banner.textContent = `⚠️ Health Alert: Heart rate reading of ${hr} bpm is outside normal range (60-100). Automated alert SMS has been broadcasted to emergency contacts!`;
+            banner.textContent = `⚠️ Heart rate reading of ${hr} bpm is outside the expected range (60-100). Consider reviewing it with your healthcare provider.`;
             banner.style.display = 'flex';
 
             if ('speechSynthesis' in window) {
-              const u = new SpeechSynthesisUtterance(`Warning: Your heart rate is ${hr} beats per minute. We have notified your emergency contacts to check on you.`);
+              const u = new SpeechSynthesisUtterance(`Your heart rate is ${hr} beats per minute, outside the expected range. Consider reviewing this reading with your healthcare provider.`);
               window.speechSynthesis.speak(u);
             }
           }

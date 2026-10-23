@@ -158,10 +158,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Health Vitals
       </a>
-      <a href="sos.html" class="nav-link" style="color:#D32F2F;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Emergency SOS
-      </a>
     </nav>
 
     <div class="nav-user">
@@ -213,19 +209,19 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeAddModal()">&times;</button>
       <h2 style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.4rem;">Add Medicine Schedule</h2>
-      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.5rem;">Configure prescription details for automated voice alerts.</p>
+      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.5rem;">Add and manage your medicine schedule. Browser speech recognition may use browser-vendor services and may require internet; audio handling depends on your browser.</p>
 
       <div id="modal-alert" class="alert alert-danger" style="display:none;"></div>
 
       <form onsubmit="handleAddMedicine(event)">
         <div class="form-group">
           <label class="form-label" for="med-name">Medicine Name *</label>
-          <input type="text" id="med-name" class="form-input" placeholder="e.g. Lisinopril, Metformin" required />
+          <div class="dictation-field"><input type="text" id="med-name" class="form-input" placeholder="e.g. Lisinopril, Metformin" required /><button class="dictation-button" data-dictation-for="med-name" aria-label="Start voice input for medicine name">🎙</button></div><span class="dictation-status" data-dictation-status="med-name" role="status" aria-live="polite"></span>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="med-dosage">Dosage *</label>
-          <input type="text" id="med-dosage" class="form-input" placeholder="e.g. 10mg tablet, 1 spoon with food" required />
+          <div class="dictation-field"><input type="text" id="med-dosage" class="form-input" placeholder="e.g. 10mg tablet, 1 spoon with food" required /><button class="dictation-button" data-dictation-for="med-dosage" aria-label="Start voice input for dosage">🎙</button></div><span class="dictation-status" data-dictation-status="med-dosage" role="status" aria-live="polite"></span>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
@@ -254,6 +250,7 @@
   </div>
 
   <script src="../js/api.js"></script>
+  <script src="../js/dictation.js"></script>
   <script>
     'use strict';
 

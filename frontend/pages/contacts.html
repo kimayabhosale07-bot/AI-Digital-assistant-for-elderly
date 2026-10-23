@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emergency Contacts | Carewise</title>
-  <meta name="description" content="Manage family members, caregivers, and emergency contacts with Carewise." />
+  <meta name="description" content="Find family members, caregivers, and important contacts with Carewise." />
   <link rel="stylesheet" href="../css/style.css" />
 </head>
 <body>
@@ -36,10 +36,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Health Vitals
       </a>
-      <a href="sos.html" class="nav-link" style="color:#D32F2F;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Emergency SOS
-      </a>
     </nav>
 
     <div class="nav-user">
@@ -55,18 +51,15 @@
   <main class="page-container">
     <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
       <div>
-        <h1 class="page-title">Family &amp; Emergency Contacts</h1>
-        <p class="page-subtitle">Caregivers, children, and physicians receiving automatic notifications.</p>
+        <h1 class="page-title">Family &amp; Care Contacts</h1>
+        <p class="page-subtitle">Find and call family members, caregivers, and physicians.</p>
       </div>
-      <a href="sos.html" class="btn btn-danger" style="font-size:0.85rem;">
-        🚨 Emergency SOS Page
-      </a>
     </div>
 
     <!-- Contacts List -->
     <div id="contacts-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.25rem;">
       <div style="grid-column: 1 / -1; text-align:center; padding:3rem; color:var(--text-muted);">
-        Loading emergency contacts...
+        Loading family and care contacts...
       </div>
     </div>
   </main>
@@ -108,7 +101,7 @@
           container.innerHTML = `
             <div class="card" style="grid-column: 1 / -1; text-align:center; padding:3rem 1rem;">
               <p style="font-size:1.2rem; font-weight:700; color:var(--terra-main); margin-bottom:0.4rem;">No contacts registered</p>
-              <p style="font-size:0.9rem; color:var(--text-muted);">When registering your profile, add emergency family numbers for instant SMS dispatch.</p>
+              <p style="font-size:0.9rem; color:var(--text-muted);">Add family members, caregivers, and other important contacts when setting up your profile.</p>
             </div>
           `;
         }

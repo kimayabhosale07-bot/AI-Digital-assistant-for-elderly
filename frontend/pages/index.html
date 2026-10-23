@@ -581,9 +581,9 @@
           <span class="bubble-tip">&#128222; Daily check-ins</span>
         </button>
 
-        <button class="cluster-card" onclick="speakDemo('medication schedule and daily pill alerts')" aria-label="Feature: Medication reminders on time">
+        <button class="cluster-card" onclick="speakDemo('medication schedule and daily pill reminders')" aria-label="Feature: Medication reminders on time">
           <img src="../assets/aistudio/bubble_2.png" alt="Wondering if they've taken their medicine today?" />
-          <span class="bubble-tip">&#128138; Medication alerts</span>
+          <span class="bubble-tip">&#128138; Medication reminders</span>
         </button>
 
         <button class="cluster-card" onclick="speakDemo('patient companion ready to listen and reminisce')" aria-label="Feature: Patient companion conversations">
@@ -601,9 +601,9 @@
           <img src="../assets/aistudio/central_brain.png" alt="Carewise AI companion brain" width="140" height="90" />
         </div>
 
-        <button class="cluster-card" onclick="speakDemo('instant family alerts and doctor schedule sync')" aria-label="Feature: Instant help on demand">
-          <img src="../assets/aistudio/bubble_6.png" alt="What if help arrived the moment they asked?" />
-          <span class="bubble-tip">&#128205; Instant help</span>
+        <button class="cluster-card" onclick="speakDemo('family caregiver support and doctor schedule sync')" aria-label="Feature: Family caregiver support">
+          <img src="../assets/aistudio/bubble_6.png" alt="Family caregiver support for everyday care" />
+          <span class="bubble-tip">&#128205; Family support</span>
         </button>
 
         <!-- Row 3: Centered Bottom Bubble -->
@@ -658,7 +658,7 @@
         <button class="pagination-dot active" aria-label="Slide 1: Daily calls" data-idx="0"></button>
         <button class="pagination-dot" aria-label="Slide 2: Medicine reminders" data-idx="1"></button>
         <button class="pagination-dot" aria-label="Slide 3: Companion" data-idx="2"></button>
-        <button class="pagination-dot" aria-label="Slide 4: Emergency alerts" data-idx="3"></button>
+        <button class="pagination-dot" aria-label="Slide 4: Family support" data-idx="3"></button>
       </div>
       <button class="audio-btn" id="btn-audio-toggle" title="Play companion voice greeting" aria-label="Play companion voice sample" aria-pressed="false">&#9654;</button>
     </div>
@@ -670,7 +670,7 @@
     function speakDemo(topic){if('speechSynthesis' in window){window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance('With Carewise, your loved one receives '+topic+'. We are here for them always.');u.rate=0.92;u.pitch=1.05;window.speechSynthesis.speak(u)}}
     var audioBtn=document.getElementById('btn-audio-toggle'),isPlaying=false;
     if(audioBtn){audioBtn.addEventListener('click',function(){if('speechSynthesis' in window){if(isPlaying){window.speechSynthesis.cancel();audioBtn.textContent='\u25B6';audioBtn.setAttribute('aria-pressed','false');isPlaying=false}else{var u=new SpeechSynthesisUtterance('Hello there! Good morning. Remember, your loved ones are always just a word away. Have a beautiful and peaceful day!');u.rate=0.9;u.pitch=1.05;u.onend=function(){audioBtn.textContent='\u25B6';audioBtn.setAttribute('aria-pressed','false');isPlaying=false};window.speechSynthesis.speak(u);audioBtn.textContent='\u23F8';audioBtn.setAttribute('aria-pressed','true');isPlaying=true}}})}
-    var topics=['daily morning and evening check-in calls','timely medication and pill reminders','friendly companion conversations whenever they wish','instant family notifications and emergency dispatch'];
+    var topics=['daily morning and evening check-in calls','timely medication and pill reminders','friendly companion conversations whenever they wish','family caregiver support and doctor schedule planning'];
     document.querySelectorAll('.pagination-dot').forEach(function(dot){dot.addEventListener('click',function(){document.querySelectorAll('.pagination-dot').forEach(function(d){d.classList.remove('active')});dot.classList.add('active');var idx=parseInt(dot.getAttribute('data-idx')||'0',10);speakDemo(topics[idx]||'gentle assistance')})});
     var uid=localStorage.getItem('caremate_user_id');
     if(uid){['btn-nav-cta','btn-nav-cta-mobile','btn-hero-cta'].forEach(function(id){var el=document.getElementById(id);if(el)el.setAttribute('href','dashboard.html')})}

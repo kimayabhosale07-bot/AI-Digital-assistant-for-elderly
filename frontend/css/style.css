@@ -378,8 +378,57 @@ a {
   box-shadow: 0 0 0 4px rgba(158, 69, 54, 0.15);
 }
 
+.dictation-field {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.dictation-field .form-input {
+  min-width: 0;
+}
+
+.dictation-button {
+  flex: 0 0 auto;
+  min-width: 2.9rem;
+  min-height: 2.9rem;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background: #FFF;
+  color: var(--terra-main);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.1rem;
+}
+
+.dictation-button:hover:not(:disabled),
+.dictation-button:focus-visible {
+  border-color: var(--terra-btn);
+  box-shadow: 0 0 0 3px rgba(158, 69, 54, 0.15);
+}
+
+.dictation-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.dictation-button.is-listening {
+  background: var(--danger-bg);
+  border-color: var(--danger-main);
+  color: var(--danger-main);
+  animation: carewisePulse 1.5s infinite;
+}
+
+.dictation-status {
+  display: block;
+  min-height: 1.1rem;
+  margin-top: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
 /* ============================================================
-   Alerts & Notifications
+   Alerts & Feedback
    ============================================================ */
 .alert {
   padding: 0.85rem 1.2rem;
@@ -467,37 +516,7 @@ a {
   color: var(--terra-main);
 }
 
-/* ============================================================
-   Floating Emergency SOS Button
-   ============================================================ */
-.floating-sos-btn {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 80;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.85rem 1.6rem;
-  border-radius: var(--radius-full);
-  background: #D32F2F;
-  color: #FFF;
-  font-weight: 800;
-  font-size: 1rem;
-  box-shadow: 0 6px 24px rgba(211, 47, 47, 0.45);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  transition: var(--transition);
-  animation: sosPulse 2.5s infinite;
-}
-
-.floating-sos-btn:hover {
-  background: #B71C1C;
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 10px 30px rgba(211, 47, 47, 0.6);
-}
-
-@keyframes sosPulse {
+@keyframes carewisePulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.5); }
   50%      { box-shadow: 0 0 0 14px rgba(211, 47, 47, 0); }
 }
@@ -532,11 +551,5 @@ a {
   }
   .page-container {
     padding: 1.25rem 1rem 5rem;
-  }
-  .floating-sos-btn {
-    bottom: 1.2rem;
-    right: 1.2rem;
-    padding: 0.7rem 1.2rem;
-    font-size: 0.9rem;
   }
 }

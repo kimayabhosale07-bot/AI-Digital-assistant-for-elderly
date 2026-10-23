@@ -3,7 +3,7 @@
    ============================================================
    Desktop: Left sidebar (240px) + scrollable main content
    Mobile (<1024px): Full-width content + bottom tab bar
-   Sidebar contains: Logo, SOS, Navigation, User Profile
+   Sidebar contains: Logo, Navigation, User Profile
    ============================================================ */
 
 *,
@@ -272,34 +272,6 @@ body {
   stroke-width: 1.8;
 }
 
-/* ── Sidebar Emergency SOS Button ── */
-.sidebar-sos {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-8);
-  width: 100%;
-  padding: var(--space-10) var(--space-16);
-  background: var(--color-danger);
-  color: white;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  border-radius: var(--radius-10);
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-
-.sidebar-sos:hover {
-  background: var(--color-danger-dark);
-}
-
-.sidebar-sos svg {
-  width: 18px;
-  height: 18px;
-}
-
 /* ── Sidebar User Profile ── */
 .sidebar-profile {
   display: flex;
@@ -424,11 +396,6 @@ body {
     margin-bottom: var(--space-20);
   }
 
-  .sidebar__sos {
-    padding: 0 var(--space-4);
-    margin-bottom: var(--space-20);
-  }
-
   .sidebar__nav {
     flex: 1;
     padding: 0 var(--space-4);
@@ -476,7 +443,6 @@ body {
 @media print {
   .sidebar,
   .bottom-nav,
-  .sidebar-sos,
   .feedback-toast {
     display: none !important;
   }
