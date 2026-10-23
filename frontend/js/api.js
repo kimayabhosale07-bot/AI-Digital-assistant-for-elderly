@@ -221,10 +221,10 @@ async function getMedicines(userId) {
   return apiFetch(`/medicine/${encodeURIComponent(uid)}?date=${localDate}`);
 }
 
-async function updateMedicineDose(medId, status, scheduledDate) {
+async function updateMedicineDose(medId, status, scheduledDate, scheduledTime) {
   const uid = getCurrentUserId();
-  if (!uid || !medId) return { success: false, error: 'Medicine and user are required.' };
-  return apiFetch(`/medicine/${encodeURIComponent(medId)}/dose`, { method: 'POST', body: { userId: uid, scheduledDate, status } });
+  if (!uid || !medId || !scheduledTime) return { success: false, error: 'Medicine, user, and scheduled dose time are required.' };
+  return apiFetch(`/medicine/${encodeURIComponent(medId)}/dose`, { method: 'POST', body: { userId: uid, scheduledDate, scheduledTime, status } });
 }
 
 /**
@@ -266,6 +266,7 @@ async function addAppointment(apptData) {
       date: apptData.date, // YYYY-MM-DD
       time: apptData.time, // HH:MM
       location: apptData.location,
+      ...(apptData.idempotencyKey ? { idempotencyKey: apptData.idempotencyKey, confirmed: apptData.confirmed === true } : {}),
     },
   });
 }
@@ -282,29 +283,155 @@ async function getAppointments(userId) {
   return apiFetch(`/appointment/${encodeURIComponent(uid)}`);
 }
 
+async function updateAppointmentCompletion(apptId, completed, userId) {
+  const uid = getCurrentUserId();
+  if (userId && userId !== uid) return { success: false, error: 'The selected profile changed. Refresh the page and try again.' };
+  if (!uid || !apptId || typeof completed !== 'boolean') return { success: false, error: 'Appointment, user, and completion status are required.' };
+  return apiFetch(`/appointment/${encodeURIComponent(apptId)}/completion`, { method: 'PUT', body: { userId: uid, completed } });
+}
+
+function filterUpcomingAppointments(appointments, profileId, now = new Date()) {
+  if (!Array.isArray(appointments) || !profileId) return [];
+  const nowTime = now.getTime();
+  return appointments
+    .filter(appointment => {
+      if (!appointment || appointment.userId !== profileId) return false;
+      const status = String(appointment.status || appointment.appointmentStatus || '').trim().toLowerCase();
+      if (appointment.cancelled === true || appointment.isCancelled === true || status === 'cancelled' || status === 'canceled') return false;
+      const timestamp = new Date(`${appointment.date}T${appointment.time || '00:00'}:00`).getTime();
+      return Number.isFinite(timestamp) && timestamp >= nowTime;
+    })
+    .sort((a, b) => new Date(`${a.date}T${a.time || '00:00'}:00`) - new Date(`${b.date}T${b.time || '00:00'}:00`));
+}
+
+function filterProfileAppointments(appointments, profileId) {
+  if (!Array.isArray(appointments) || !profileId) return [];
+  return appointments.filter(appointment => {
+    if (!appointment || appointment.userId !== profileId) return false;
+    const status = String(appointment.status || appointment.appointmentStatus || '').trim().toLowerCase();
+    return appointment.cancelled !== true && appointment.isCancelled !== true && status !== 'cancelled' && status !== 'canceled';
+  }).sort((a, b) => new Date(`${a.date}T${a.time || '00:00'}:00`) - new Date(`${b.date}T${b.time || '00:00'}:00`));
+}
+
+async function chatWithAssistant(payload) {
+  return apiFetch('/assistant/chat', {
+    method: 'POST',
+    body: payload,
+    // The backend provider deadline is 30s; leave a small buffer so the
+    // backend can return its friendly unavailable response after that bound.
+    timeout: 32000,
+  });
+}
+
+async function confirmAssistantMedicine(confirmationToken, userId) {
+  if (!confirmationToken || !userId) {
+    return { success: false, error: 'The medicine confirmation is missing. Review the schedule and try again.' };
+  }
+  return apiFetch('/assistant/medicine/confirm', {
+    method: 'POST',
+    timeout: 12_000,
+    body: { confirmationToken, userId, confirmed: true },
+  });
+}
+
+async function transcribeAssistantAudio(audioBlob) {
+  if (!(audioBlob instanceof Blob) || audioBlob.size === 0) {
+    return { success: false, error: 'The recording was empty. Please try again or type your message.' };
+  }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+  let response;
+  let networkError;
+  for (const baseUrl of [API_BASE_URL, API_BASE_FALLBACK]) {
+    try {
+      response = await fetch(`${baseUrl}/assistant/transcribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': audioBlob.type || 'audio/webm' },
+        body: audioBlob,
+        signal: controller.signal,
+      });
+      break;
+    } catch (error) {
+      networkError = error;
+      if (error.name === 'AbortError') break;
+    }
+  }
+  clearTimeout(timeoutId);
+  if (!response) {
+    return { success: false, error: networkError?.name === 'AbortError'
+      ? 'Speech recognition took too long. Please try a shorter recording or type your message.'
+      : 'Cannot connect to speech recognition. Check that the backend is running on port 5000.' };
+  }
+  let data = null;
+  try { data = await response.json(); } catch (_) { /* handled as a service error below */ }
+  if (!response.ok) return { success: false, error: data?.error || `Speech recognition failed (${response.status}).`, status: response.status };
+  if (typeof data?.text !== 'string' || !data.text.trim()) return { success: false, error: 'No speech was recognized. Try again or type your message.' };
+  return { success: true, data, status: response.status };
+}
+
 // ────────────────────────────────────────────────────────────
 // Health log API
 // ────────────────────────────────────────────────────────────
 
-/**
- * Log a health reading (heart rate & steps)
- * Backend expects: { userId, heartRate, steps }
- * If heartRate < 60 or > 100, the backend flags the reading for review.
- */
+const HEALTH_LOG_UNITS = {
+  blood_pressure: ['mmHg'], heart_rate: ['bpm'], blood_sugar: ['mg/dL', 'mmol/L'],
+  body_temperature: ['°C', '°F'], oxygen_saturation: ['%'], steps: ['steps'],
+};
+
+function validateHealthLogPayload(data) {
+  if (!data || typeof data !== 'object') return 'Enter a health measurement.';
+  if (data.type === undefined) {
+    if (data.heartRate === undefined && data.steps !== undefined) {
+      return typeof data.steps === 'number' && Number.isInteger(data.steps) && data.steps >= 0 && data.steps <= 100000
+        ? null
+        : 'Steps must be a whole number from 0–100,000.';
+    }
+    if (typeof data.heartRate !== 'number' || !Number.isFinite(data.heartRate) || data.heartRate < 20 || data.heartRate > 300
+      || typeof data.steps !== 'number' || !Number.isInteger(data.steps) || data.steps < 0 || data.steps > 100000) {
+      return 'Heart rate must be 20–300 bpm and steps must be a whole number from 0–100,000.';
+    }
+    return null;
+  }
+  if (!HEALTH_LOG_UNITS[data.type] || !HEALTH_LOG_UNITS[data.type].includes(data.unit)) return 'Choose a supported measurement and unit.';
+  if (typeof data.timestamp !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})$/.test(data.timestamp)
+    || !Number.isFinite(Date.parse(data.timestamp)) || Date.parse(data.timestamp) > Date.now() + 5 * 60 * 1000) return 'Enter a valid measurement date and time.';
+  if (data.notes !== undefined && (typeof data.notes !== 'string' || data.notes.length > 1000)) return 'Notes must be 1,000 characters or fewer.';
+  if (data.type === 'blood_pressure') {
+    if (!Number.isFinite(data.systolic) || data.systolic < 30 || data.systolic > 300 || !Number.isFinite(data.diastolic) || data.diastolic < 20 || data.diastolic > 200 || data.systolic <= data.diastolic) return 'Enter valid systolic and diastolic values.';
+    return null;
+  }
+  if (typeof data.value !== 'number' || !Number.isFinite(data.value)) return 'Enter a numeric measurement.';
+  if (data.type === 'steps' && (!Number.isInteger(data.value) || data.value < 0 || data.value > 100000)) return 'Steps must be a whole number from 0–100,000.';
+  const limits = data.type === 'steps' ? [0, 100000]
+    : data.type === 'heart_rate' ? [20, 300]
+    : data.type === 'blood_sugar' ? (data.unit === 'mg/dL' ? [1, 2000] : [0.1, 100])
+      : data.type === 'body_temperature' ? (data.unit === '°C' ? [25, 45] : [77, 113])
+        : [0, 100];
+  if (data.value < limits[0] || data.value > limits[1]) return `The measurement is outside the supported entry range for ${data.unit}.`;
+  if (data.type === 'blood_sugar' && !['fasting', 'before_meal', 'after_meal', 'random'].includes(data.context)) return 'Choose the blood sugar measurement context.';
+  return null;
+}
+
 async function logHealthReading(healthData) {
-  const uid = healthData.userId || getCurrentUserId();
+  const uid = getCurrentUserId();
   if (!uid) {
     return { success: false, error: 'User is not logged in.' };
   }
+  if (healthData.userId && healthData.userId !== uid) return { success: false, error: 'The selected profile changed. Refresh the page and try again.' };
+  const validationError = validateHealthLogPayload(healthData);
+  if (validationError) return { success: false, error: validationError };
 
   return apiFetch('/health-log', {
     method: 'POST',
-    body: {
-      userId: uid,
-      heartRate: Number(healthData.heartRate),
-      steps: Number(healthData.steps),
-    },
+    body: { ...healthData, userId: uid },
   });
+}
+
+async function getHealthLogs(userId) {
+  const uid = getCurrentUserId();
+  if (!uid) return { success: false, error: 'User is not logged in.' };
+  if (userId && userId !== uid) return { success: false, error: 'The selected profile changed. Refresh the page and try again.' };
+  return apiFetch(`/health-log/${encodeURIComponent(uid)}`);
 }
 
 // Export for browser global
@@ -326,6 +453,14 @@ window.CareMateAPI = {
   // Appointment
   addAppointment,
   getAppointments,
+  updateAppointmentCompletion,
+  filterUpcomingAppointments,
+  filterProfileAppointments,
+  chatWithAssistant,
+  confirmAssistantMedicine,
+  transcribeAssistantAudio,
   // Health
   logHealthReading,
+  getHealthLogs,
+  validateHealthLogPayload,
 };

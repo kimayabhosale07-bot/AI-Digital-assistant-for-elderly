@@ -9,19 +9,6 @@
 
 
 
-let mockAppointments = [
-  {
-    id: 'apt-1',
-    doctor: 'Dr. Priya Sharma',
-    specialty: 'General Physician',
-    date: 'Today',
-    time: '03:30 PM',
-    location: 'City Care Hospital',
-    reason: 'Regular Blood Pressure Checkup',
-    notes: 'Bring previous medical reports',
-  },
-];
-
 /**
  * Load & Render Medicine Reminders
  */
@@ -245,121 +232,61 @@ async function markMedicineMissed(id) {
 
 // ── Doctor Appointments Handlers ──
 
-function loadAppointments(containerId = 'appointments-list') {
+async function loadAppointments(containerId = 'appointments-list') {
   const container = document.getElementById(containerId);
   if (!container) return;
+  const userId = window.CareMateAPI.getCurrentUserId();
+  if (!userId) {
+    container.innerHTML = '<p role="alert">Sign in to view appointments.</p>';
+    return;
+  }
+  container.innerHTML = '<p role="status">Loading appointments…</p>';
+  try {
+    const result = await window.CareMateAPI.getAppointments(userId);
+    if (!result.success || !Array.isArray(result.data)) {
+      container.innerHTML = '<div role="alert">Appointments could not be loaded. <button type="button" onclick="Reminders.loadAppointments()">Retry</button></div>';
+      return;
+    }
+    renderAppointments(window.CareMateAPI.filterUpcomingAppointments(result.data, userId), container);
+  } catch (_) {
+    container.innerHTML = '<div role="alert">Appointments could not be loaded. Check your connection and <button type="button" onclick="Reminders.loadAppointments()">retry</button>.</div>';
+  }
+}
 
-  renderAppointments(mockAppointments, container);
+function escapeReminderText(value) {
+  return String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 }
 
 function renderAppointments(appointments, container) {
   if (!container) return;
-
   if (!appointments || appointments.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state__icon">📅</div>
-        <h4 class="empty-state__title">No appointments</h4>
-        <p class="empty-state__description">Schedule your next doctor visit to keep track.</p>
-        <button class="btn btn--primary" onclick="Reminders.showAddAppointmentModal()">+ Add Appointment</button>
-      </div>
-    `;
+    container.innerHTML = '<div class="empty-state"><h4 class="empty-state__title">No appointments</h4><p class="empty-state__description">Schedule your next doctor visit to keep track.</p></div>';
     return;
   }
-
-  container.innerHTML = '';
-
-  // Featured next appointment (first one)
-  const nextApt = appointments[0];
-  if (nextApt) {
-    const featuredCard = document.createElement('div');
-    featuredCard.className = 'card card--featured';
-    featuredCard.innerHTML = `
-      <div class="card__header">
-        <h4 class="text-sm text-muted mb-0">Next Appointment</h4>
-      </div>
-      <div style="display: flex; gap: var(--space-20); align-items: flex-start; margin-top: var(--space-8);">
-        <div class="date-block">
-          <div class="date-block__day">10</div>
-          <div class="date-block__month">AUG</div>
-        </div>
-        <div style="flex: 1;">
-          <div class="badge badge--today" style="margin-bottom: var(--space-8);">Today at ${nextApt.time}</div>
-          <h3 style="font-size: 20px; font-weight: var(--font-weight-bold); margin-bottom: var(--space-4);">${nextApt.doctor}</h3>
-          <div class="text-sm text-secondary" style="margin-bottom: var(--space-4);">${nextApt.specialty}</div>
-          <div class="text-sm text-secondary" style="display: flex; align-items: center; gap: var(--space-4);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            ${nextApt.location}
-          </div>
-          <button class="btn btn--sm btn--primary mt-16" onclick="CareMateApp.showFeedback({ type: 'info', title: 'Visit Details', message: '${nextApt.doctor} at ${nextApt.time}', speakText: 'Your visit with ${nextApt.doctor} is scheduled for ${nextApt.time}.' })">
-            View Details
-          </button>
-        </div>
-      </div>
-    `;
-    container.appendChild(featuredCard);
-  }
-
-  // Upcoming appointments list
-  if (appointments.length > 1) {
-    const listContainer = document.createElement('div');
-    listContainer.className = 'card';
-    listContainer.style.padding = '0';
-    
-    let listHtml = '';
-    for (let i = 1; i < appointments.length; i++) {
-      const apt = appointments[i];
-      // mock dates for the list based on index to look good
-      const day = 10 + i * 3;
-      listHtml += `
-        <div class="appointment-item">
-          <div class="date-block" style="background: transparent;">
-            <div class="date-block__day" style="color: var(--color-text);">${day}</div>
-            <div class="date-block__month" style="color: var(--color-text-muted);">AUG</div>
-          </div>
-          <div class="appointment-item__content">
-            <div class="appointment-item__doctor">${apt.doctor}</div>
-            <div class="appointment-item__detail">${apt.specialty}</div>
-            <div class="appointment-item__detail text-muted">${apt.location}</div>
-          </div>
-          <div class="appointment-item__time">
-            ${apt.time}
-            <div style="margin-top: var(--space-8); display: flex; justify-content: flex-end;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-    listContainer.innerHTML = listHtml;
-    container.appendChild(listContainer);
-  }
+  container.innerHTML = appointments.map(appointment => {
+    const date = new Date(`${appointment.date}T00:00:00`);
+    const dateLabel = Number.isNaN(date.getTime()) ? escapeReminderText(appointment.date) : escapeReminderText(date.toLocaleDateString());
+    return `<article class="appointment-item"><div class="appointment-item__content"><h3 class="appointment-item__doctor">${escapeReminderText(appointment.doctorName)}</h3><div class="appointment-item__detail">${dateLabel} at ${escapeReminderText(appointment.time)}</div><div class="appointment-item__detail text-muted">${escapeReminderText(appointment.location)}</div></div></article>`;
+  }).join('');
 }
 
-function addAppointment(data) {
-  const newApt = {
-    id: 'apt-' + Date.now(),
-    doctor: data.doctor,
-    specialty: data.specialty || 'General Practitioner',
-    date: data.date || 'Upcoming',
+async function addAppointment(data) {
+  const userId = window.CareMateAPI.getCurrentUserId();
+  const result = await window.CareMateAPI.addAppointment({
+    userId,
+    doctorName: data.doctorName || data.doctor,
+    date: data.date,
     time: data.time,
-    location: data.location || 'Clinic',
-    notes: data.notes || '',
-  };
-
-  mockAppointments.unshift(newApt);
-  loadAppointments();
-
-  if (typeof CareMateApp !== 'undefined') {
-    CareMateApp.showFeedback({
-      type: 'success',
-      title: 'Appointment Saved',
-      message: `Appointment scheduled with ${newApt.doctor}.`,
-      speakText: `I've saved your appointment with ${newApt.doctor} for ${newApt.time}.`,
-    });
+    location: data.location,
+  });
+  if (!result.success) {
+    if (typeof CareMateApp !== 'undefined') CareMateApp.showFeedback({ type: 'error', title: 'Could not save appointment', message: result.error || 'Please review the details and try again.' });
+    return false;
   }
+  await loadAppointments();
+  if (typeof CareMateApp !== 'undefined') CareMateApp.showFeedback({ type: 'success', title: 'Appointment Saved', message: 'The appointment was saved successfully.' });
+  return true;
 }
-
 window.Reminders = {
   loadReminders,
   renderMedicineReminders,

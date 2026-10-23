@@ -112,8 +112,26 @@ function initVoiceAssistant(config = {}) {
   };
 
   recognition.onerror = (event) => {
-    console.warn('[Voice.js] Speech error:', event.error);
+    console.warn('[Voice.js] SpeechRecognition error', {
+      operation: 'SpeechRecognition.onerror',
+      error: event.error || 'unknown',
+      message: event.message || '',
+      language: recognition.lang,
+      secureContext: window.isSecureContext,
+    });
     setVoiceState(VOICE_STATES.ERROR);
+    if (subtextElement) {
+      const errors = {
+        'not-allowed': 'Microphone access was blocked. Check browser settings, or type instead.',
+        'service-not-allowed': 'The browser speech service is blocked or unavailable. You can type instead.',
+        'audio-capture': 'No usable microphone was found. Connect or enable one, or type instead.',
+        network: 'Speech recognition could not reach its service. Check your connection, or type instead.',
+        'no-speech': 'No speech was detected. Try speaking closer to the microphone, or type instead.',
+        aborted: 'Voice input stopped. You can type or try again.',
+        'language-not-supported': 'Speech recognition does not support this language. You can type instead.',
+      };
+      subtextElement.textContent = errors[event.error] || 'Voice input failed. You can type instead.';
+    }
   };
 
   recognition.onend = () => {
@@ -257,7 +275,7 @@ function getVoiceState() {
  * Placeholder for future natural language command processing
  */
 function handleVoiceCommand(transcript) {
-  console.log('[Voice Command Received]:', transcript);
+  console.log('[Voice Command Received]', { transcriptLength: String(transcript || '').length });
 
   // Future command parser logic will live here:
   // - "Remind me to take my medicine..." -> addMedicine()

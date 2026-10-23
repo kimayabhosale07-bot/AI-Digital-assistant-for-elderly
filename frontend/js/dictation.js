@@ -116,6 +116,13 @@
           aborted: 'Voice input stopped. You can continue typing or try again.',
           'language-not-supported': 'English recognition is unavailable in this browser. You can type instead.',
         };
+        console.warn('[Carewise Dictation] SpeechRecognition error', {
+          operation: 'SpeechRecognition.onerror',
+          error: event.error || 'unknown',
+          message: event.message || '',
+          language: recognition && recognition.lang,
+          secureContext: window.isSecureContext,
+        });
         status.textContent = errors[event.error] || 'Voice input failed. You can type instead.';
         clearRecognition();
       };

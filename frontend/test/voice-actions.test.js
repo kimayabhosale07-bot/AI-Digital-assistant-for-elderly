@@ -34,6 +34,7 @@ function createSaveHarness({ kind, voiceFlow = true, values, apiResult, apiPromi
   };
   const calls = [];
   let refreshes = 0;
+  let selectedTab = null;
   const messages = [];
   const api = isMedicine
     ? { addMedicine(payload) { calls.push(payload); return apiPromise ? apiPromise.promise : Promise.resolve(apiResult); } }
@@ -55,8 +56,8 @@ function createSaveHarness({ kind, voiceFlow = true, values, apiResult, apiPromi
     userId: 'test-user',
     loadDashboard: async () => { refreshes += 1; },
     finishVoiceAction: message => messages.push(message),
-    switchMedTab: () => assert.fail('Voice medicine save should stay in the Voice Companion'),
-    switchApptTab: () => assert.fail('Voice visit save should stay in the Voice Companion'),
+    switchMedTab: tab => { selectedTab = tab; },
+    switchApptTab: tab => { selectedTab = tab; },
   };
   vm.runInNewContext(`${source}\nglobalThis.saveHandler = ${isMedicine ? 'handleModalAddMedicine' : 'handleModalAddAppointment'};`, context);
 
@@ -64,65 +65,82 @@ function createSaveHarness({ kind, voiceFlow = true, values, apiResult, apiPromi
     run() { return context.saveHandler({ currentTarget: form, preventDefault() {} }); },
     fields, form, alertBox, button, calls, messages,
     get refreshes() { return refreshes; },
+    get selectedTab() { return selectedTab; },
   };
 }
 
-test('Voice Companion actions mount the existing medicine and appointment forms', () => {
-  assert.match(dashboard, /id="voice-action-add-medicine"[^>]*beginVoiceAction\('medicine'\)/);
-  assert.match(dashboard, /id="voice-action-add-visit"[^>]*beginVoiceAction\('visit'\)/);
-  assert.match(dashboard, /paneId: 'pane-med-add'/);
-  assert.match(dashboard, /paneId: 'pane-appt-add'/);
-  assert.match(dashboard, /slot\.appendChild\(pane\)/);
+test('Voice Companion uses chat and retains separate existing record forms', () => {
+  assert.match(dashboard, /id="voice-chat-messages"/);
+  assert.match(dashboard, /id="drawer-voice-transcript"/);
+  assert.match(dashboard, /id="btn-submit-voice"/);
+  assert.match(dashboard, /id="assistant-action-confirm"/);
+  assert.doesNotMatch(dashboard, /voice-action-add-medicine|voice-action-add-visit/);
   assert.match(dashboard, /onsubmit="handleModalAddMedicine\(event\)"/);
   assert.match(dashboard, /onsubmit="handleModalAddAppointment\(event\)"/);
-  assert.match(dashboard, /function returnToVoiceActions\(\)/);
-  assert.match(dashboard, /function cancelVoiceAction\(\)/);
 });
 
-test('Back preserves the draft and Cancel resets it before returning to the action menu', () => {
-  const form = { dataset: { saving: 'false' }, resetCount: 0, reset() { this.resetCount += 1; } };
-  const alertBox = { style: { display: 'block' } };
-  const dictationStatus = { textContent: 'Listening status' };
-  const trigger = { focusCount: 0, focus() { this.focusCount += 1; } };
-  const stateMessages = [];
-  let restored = 0;
-  let stoppedRecognition = 0;
-  const node = {
-    querySelector(selector) { return selector === 'form' ? form : null; },
-    querySelectorAll(selector) { return selector === '.alert' ? [alertBox] : [dictationStatus]; },
-  };
+test('medicine chat confirmation calls the signed backend action and retains its draft when saving fails', () => {
+  const sendFlow = extractFlowFunction('sendAssistantPrompt', 'confirmAssistantAction');
+  const confirmFlow = extractFlowFunction('confirmAssistantAction', 'resetMic');
+  assert.match(sendFlow, /assistantMedicinePendingAction && medicineConfirmation[\s\S]*await confirmAssistantAction\(\)[\s\S]*return/);
+  assert.match(confirmFlow, /CareMateAPI\.confirmAssistantMedicine\(fields\.confirmationToken, userId\)/);
+  assert.doesNotMatch(confirmFlow, /CareMateAPI\.addMedicine/);
+  assert.match(confirmFlow, /if \(medicineSaved[\s\S]*clearAssistantPendingAction\(action\.type\)/);
+  assert.match(confirmFlow, /confirmed draft is still available to retry/);
+  assert.match(sendFlow, /messages: assistantConversation\.slice\(-30\)/);
+  assert.match(sendFlow, /medicineDraftId: assistantMedicineWorkflow\?\.draftId/);
+  assert.match(sendFlow, /appointmentDraftId: assistantAppointmentWorkflow\?\.draftId/);
+  assert.match(confirmFlow, /addAppointment\(\{ userId, \.\.\.fields, confirmed: true \}\)/);
+  assert.doesNotMatch(sendFlow, /assistantPendingAction = null;\s*document\.getElementById\('assistant-action-confirmation'\)\.hidden = true;\s*if \(assistantDemoMode\)/);
+});
 
-  const backContext = {
-    voiceActionFormNode: node,
-    voiceActionKind: 'medicine',
-    restoreVoiceActionForm() { restored += 1; },
-    document: { getElementById() { return trigger; } },
-    setVoiceState: (...args) => stateMessages.push(args),
+test('appointment confirmation phrase dispatches the pending appointment before incomplete medicine state', async () => {
+  const start = dashboard.indexOf('async function sendAssistantPrompt(');
+  const end = dashboard.indexOf('async function confirmAssistantAction(', start);
+  const sendFlow = dashboard.slice(start, end);
+  const appointmentAction = { type: 'add_appointment', fields: { doctorName: 'Dr. Birla', date: '2026-10-24', time: '10:00', location: 'Pune, Maharashtra', idempotencyKey: 'appointment-draft-00000001' } };
+  const calls = [];
+  const context = {
+    assistantRequestInFlight: false,
+    assistantPendingAction: appointmentAction,
+    assistantAppointmentPendingAction: appointmentAction,
+    assistantAppointmentWorkflow: { state: 'awaiting_confirmation', draftId: 'appointment-draft-00000001' },
+    assistantMedicinePendingAction: null,
+    assistantMedicineWorkflow: { state: 'collecting_details', missingFields: ['medicine name', 'strength'] },
+    assistantPendingActionType: 'add_appointment',
+    addConversationMessage: (...args) => calls.push(['message', ...args]),
+    setVoiceState: (...args) => calls.push(['state', ...args]),
+    confirmAssistantAction: async () => calls.push(['confirm', context.assistantPendingAction]),
   };
-  vm.runInNewContext(`${extractFlowFunction('returnToVoiceActions', 'cancelVoiceAction')}\nglobalThis.run = returnToVoiceActions;`, backContext);
-  backContext.run();
-  assert.equal(restored, 1);
-  assert.equal(form.resetCount, 0);
-  assert.equal(trigger.focusCount, 1);
-  assert.match(stateMessages[0][1], /draft is kept/i);
+  vm.runInNewContext(`${sendFlow}\nglobalThis.send = sendAssistantPrompt;`, context);
+  await context.send('Yes, save it in appointment log.');
+  assert.equal(calls.filter(([kind]) => kind === 'confirm').length, 1);
+  assert.equal(calls.find(([kind]) => kind === 'confirm')[1].type, 'add_appointment');
+  assert.equal(calls.some(([kind, , text]) => kind === 'message' && /medicine name|strength/.test(String(text))), false);
+  context.assistantAppointmentWorkflow.state = 'save_failed';
+  await context.send('Yes, save it in appointment log.');
+  assert.equal(calls.filter(([kind]) => kind === 'confirm').length, 2, 'the same appointment draft can be retried after a save failure');
+  const confirmFlow = extractFlowFunction('confirmAssistantAction', 'resetMic');
+  assert.match(confirmFlow, /addAppointment\(\{ userId, \.\.\.fields, confirmed: true \}\)/);
+  assert.match(confirmFlow, /state: 'save_failed'/);
+  assert.match(confirmFlow, /confirmed draft is still available to retry/);
+  assert.ok(sendFlow.indexOf('assistantAppointmentPendingAction &&') < sendFlow.indexOf("assistantMedicineWorkflow?.state === 'collecting_details'"));
+});
 
-  restored = 0;
-  const cancelContext = {
-    voiceActionFormNode: node,
-    voiceActionKind: 'visit',
-    restoreVoiceActionForm(stopRecognition) { restored += 1; assert.equal(stopRecognition, false); },
-    window: { CareWiseDictation: { stopAll() { stoppedRecognition += 1; } } },
-    document: { getElementById() { return trigger; } },
-    setVoiceState: (...args) => stateMessages.push(args),
+test('natural-language appointment date and AM time produce a confirmation summary', () => {
+  const summaryFlow = extractFlowFunction('actionDraftSummary', 'appointmentFieldReply');
+  const context = {
+    assistantConversation: [{ role: 'user', content: 'Add Dr. Visit Dr. Aditya Virna on 24 October 2026, 10am address Pune, Maharashtra' }],
+    userMedicines: [],
+    medicineDataState: 'loaded',
   };
-  vm.runInNewContext(`${extractFlowFunction('cancelVoiceAction', 'finishVoiceAction')}\nglobalThis.run = cancelVoiceAction;`, cancelContext);
-  cancelContext.run();
-  assert.equal(form.resetCount, 1);
-  assert.equal(alertBox.style.display, 'none');
-  assert.equal(dictationStatus.textContent, '');
-  assert.equal(stoppedRecognition, 1);
-  assert.equal(restored, 1);
-  assert.match(stateMessages.at(-1)[1], /cancelled/i);
+  vm.runInNewContext(`${summaryFlow}\nglobalThis.summarize = actionDraftSummary;`, context);
+  const draft = context.summarize({ type: 'add_appointment', fields: {
+    doctorName: 'Dr. Aditya Virna', date: '2026-10-24', time: '10:00', location: 'Pune, Maharashtra', idempotencyKey: 'appointment-draft-00000001',
+  } });
+  assert.match(draft.summary, /Dr\. Aditya Virna/);
+  assert.match(draft.summary, /2026-10-24/);
+  assert.match(draft.summary, /10:00/);
 });
 
 test('dashboard inline JavaScript parses after the Voice Companion integration', () => {
@@ -152,7 +170,7 @@ test('Add Medicine uses the existing save API, refreshes the list, and reports s
   assert.equal(h.calls[0].medicineName, 'Lisinopril');
   assert.equal(h.calls[0].dosage, '10 mg each morning');
   assert.equal(h.refreshes, 1);
-  assert.match(h.messages[0], /Medicine saved/);
+  assert.equal(h.selectedTab, 'list');
 });
 
 test('Add Visit uses the existing save API and rejects invalid date/time before saving', async () => {
@@ -171,7 +189,7 @@ test('Add Visit uses the existing save API and rejects invalid date/time before 
   assert.equal(valid.calls[0].doctorName, 'Dr. Rao');
   assert.equal(valid.calls[0].location, 'Care Clinic');
   assert.equal(valid.refreshes, 1);
-  assert.match(valid.messages[0], /Visit saved/);
+  assert.equal(valid.selectedTab, 'list');
 
   const invalid = createSaveHarness({
     kind: 'visit',

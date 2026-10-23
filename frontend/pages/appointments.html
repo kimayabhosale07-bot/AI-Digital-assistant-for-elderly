@@ -86,8 +86,13 @@
 
     .appt-actions {
       display: flex;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 0.6rem;
     }
+    .visit-completion { display:flex; align-items:center; justify-content:flex-end; flex:1 0 100%; gap:.55rem; min-height:44px; padding-top:.6rem; border-top:1px solid var(--border-light); color:var(--text-sub); font-weight:700; cursor:pointer; }
+    .visit-completion input { width:24px; height:24px; accent-color:var(--sage-dark); }
+    .visit-completion:has(input:disabled) { cursor:not-allowed; opacity:.68; }
   </style>
 </head>
 <body>
@@ -115,7 +120,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Appointments
       </a>
-      <a href="health.html" class="nav-link">
+      <a href="dashboard.html#health-logs" class="nav-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Health Vitals
       </a>
@@ -206,15 +211,13 @@
       try {
         const res = await window.CareMateAPI.getAppointments(userId);
         if (res.success && Array.isArray(res.data)) {
-          appointments = res.data;
+          appointments = window.CareMateAPI.filterProfileAppointments(res.data, userId);
           renderAppointments();
         } else {
-          appointments = [];
-          renderAppointments();
+          document.getElementById('appointments-list').innerHTML = '<div role="alert" style="text-align:center;padding:2rem;color:var(--text-muted);">Appointments could not be loaded. Check your connection and <button type="button" class="btn btn-secondary" onclick="loadAppointments()">retry</button>.</div>';
         }
       } catch (e) {
-        appointments = [];
-        renderAppointments();
+        document.getElementById('appointments-list').innerHTML = '<div role="alert" style="text-align:center;padding:2rem;color:var(--text-muted);">Appointments could not be loaded. Check your connection and <button type="button" class="btn btn-secondary" onclick="loadAppointments()">retry</button>.</div>';
       }
     }
 
@@ -224,8 +227,8 @@
         container.innerHTML = `
           <div style="text-align:center; padding:3rem 1rem; background:#FFF; border-radius:var(--radius-lg); border:1px solid var(--border-card);">
             <div style="font-size:2.5rem; margin-bottom:0.5rem;">🩺</div>
-            <h3 style="font-size:1.3rem; color:var(--terra-main); margin-bottom:0.3rem;">No upcoming appointments</h3>
-            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem;">You are all caught up on clinic visits.</p>
+            <h3 style="font-size:1.3rem; color:var(--terra-main); margin-bottom:0.3rem;">No appointments found</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem;">Scheduled and completed visits will appear here.</p>
             <button class="btn btn-primary" onclick="openApptModal()">Schedule Your Next Visit</button>
           </div>
         `;
@@ -236,6 +239,8 @@
         const d = new Date(`${a.date}T${a.time || '00:00'}`);
         const monthName = isNaN(d) ? 'DATE' : d.toLocaleDateString('en-US', { month: 'short' });
         const dayNum = isNaN(d) ? a.date : d.getDate();
+        const visitAt = new Date(`${a.date}T${a.time || '00:00'}:00`);
+        const canComplete = !Number.isNaN(visitAt.getTime()) && visitAt.getTime() <= Date.now();
 
         return `
           <div class="appt-card" id="appt-${a.apptId}">
@@ -261,9 +266,24 @@
                 🗺️ Directions
               </a>
             </div>
+            <label class="visit-completion"><input type="checkbox" aria-label="Visit completed: ${escapeHtml(a.doctorName)}" title="${canComplete ? '' : 'Available after the scheduled visit time'}" data-appt-id="${escapeHtml(a.apptId)}" ${a.completed === true ? 'checked' : ''} ${canComplete ? '' : 'disabled'} onchange="setAppointmentCompleted(this)"><span>${a.completed === true ? 'Visit completed' : 'Complete'}</span></label>
           </div>
         `;
       }).join('');
+    }
+
+    async function setAppointmentCompleted(checkbox) {
+      const previous = !checkbox.checked;
+      checkbox.disabled = true;
+      try {
+        const result = await window.CareMateAPI.updateAppointmentCompletion(checkbox.dataset.apptId, checkbox.checked, userId);
+        if (!result.success) throw new Error(result.error || 'Could not update this visit. Please try again.');
+        await loadAppointments();
+      } catch (error) {
+        checkbox.checked = previous;
+        checkbox.disabled = false;
+        alert(error.message || 'Could not update this visit. Please try again.');
+      }
     }
 
     function speakAppt(doc, date, time, loc) {

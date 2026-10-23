@@ -32,7 +32,7 @@ function sendFirestoreError(res, operation, error) {
  */
 const addMedicine = async (req, res) => {
   try {
-    const db = getDb();
+    const db = req.app?.locals?.db || getDb();
     const { userId, medicineName, dosage, time, frequency } = req.body;
 
     if (!userId || !medicineName || !dosage || !time || !frequency) {
@@ -84,7 +84,7 @@ const addMedicine = async (req, res) => {
  */
 const getMedicines = async (req, res) => {
   try {
-    const db = getDb();
+    const db = req.app?.locals?.db || getDb();
     const { userId } = req.params;
 
     if (!userId) {
@@ -105,11 +105,19 @@ const getMedicines = async (req, res) => {
       const doseSnapshot = await db.collection('medicine_doses')
         .where('userId', '==', userId).get();
       const doses = new Map();
-      doseSnapshot.forEach(doc => { if (doc.data().scheduledDate === date) doses.set(doc.data().medId, doc.data()); });
+      doseSnapshot.forEach(doc => {
+        const dose = doc.data();
+        if (dose.scheduledDate === date) doses.set(`${dose.medId}:${dose.scheduledTime || ''}`, dose);
+      });
       medicines.forEach(medicine => {
-        const dose = doses.get(medicine.medId);
-        medicine.todayStatus = dose ? dose.status : 'pending';
-        medicine.doseId = dose ? dose.doseId : null;
+        const times = Array.isArray(medicine.times) && medicine.times.length ? medicine.times : [medicine.time];
+        medicine.todayDoses = times.filter(time => typeof time === 'string' && /^([01]\d|2[0-3]):([0-5]\d)$/.test(time)).map(time => {
+          const dose = doses.get(`${medicine.medId}:${time}`);
+          return { scheduledTime: time, status: dose ? dose.status : 'pending', doseId: dose ? dose.doseId : null };
+        });
+        const firstDose = medicine.todayDoses[0];
+        medicine.todayStatus = firstDose ? firstDose.status : 'pending';
+        medicine.doseId = firstDose ? firstDose.doseId : null;
       });
     }
 
@@ -123,20 +131,31 @@ const getMedicines = async (req, res) => {
 const updateDoseStatus = async (req, res) => {
   try {
     const { medId } = req.params;
-    const { userId, scheduledDate, status } = req.body;
-    if (!userId || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDate || '') || !['pending', 'taken'].includes(status)) {
-      return res.status(400).json({ error: 'userId, scheduledDate (YYYY-MM-DD), and status (pending or taken) are required.' });
+    const { userId, scheduledDate, scheduledTime, status } = req.body;
+    if (!userId || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDate || '') || !/^([01]\d|2[0-3]):([0-5]\d)$/.test(scheduledTime || '') || !['pending', 'taken'].includes(status)) {
+      return res.status(400).json({ error: 'userId, scheduledDate, scheduledTime (HH:MM), and status (pending or taken) are required.' });
     }
-    const db = getDb();
+    const db = req.app?.locals?.db || getDb();
     const medicineRef = db.collection('medicines').doc(medId);
     const medicine = await medicineRef.get();
     if (!medicine.exists) return res.status(404).json({ error: 'Medicine schedule not found.' });
     if (medicine.data().userId !== userId) return res.status(403).json({ error: 'Medicine does not belong to this user.' });
-    const doseId = crypto.createHash('sha256').update(`${userId}:${medId}:${scheduledDate}`).digest('hex');
+    const medicineData = medicine.data();
+    const scheduledTimes = Array.isArray(medicineData.times) && medicineData.times.length ? medicineData.times : [medicineData.time];
+    if (!scheduledTimes.includes(scheduledTime)) return res.status(400).json({ error: 'That time is not part of this medicine schedule.' });
+    const doseId = crypto.createHash('sha256').update(`${userId}:${medId}:${scheduledDate}:${scheduledTime}`).digest('hex');
     const doseRef = db.collection('medicine_doses').doc(doseId);
-    if (status === 'pending') await doseRef.delete();
-    else await doseRef.set({ doseId, userId, medId, medicineName: medicine.data().medicineName, dosage: medicine.data().dosage, scheduledTime: medicine.data().time, scheduledDate, status: 'taken', updatedAt: new Date().toISOString() });
-    return res.status(200).json({ doseId, medId, scheduledDate, status });
+    // Remove/migrate the legacy once-per-day key so older checked doses remain reversible.
+    const legacyDoseId = crypto.createHash('sha256').update(`${userId}:${medId}:${scheduledDate}`).digest('hex');
+    const legacyDoseRef = db.collection('medicine_doses').doc(legacyDoseId);
+    if (status === 'pending') {
+      await doseRef.delete();
+      if (legacyDoseId !== doseId) await legacyDoseRef.delete();
+    } else {
+      await doseRef.set({ doseId, userId, medId, medicineName: medicineData.medicineName, dosage: medicineData.dosage, scheduledTime, scheduledDate, status: 'taken', updatedAt: new Date().toISOString() });
+      if (legacyDoseId !== doseId) await legacyDoseRef.delete();
+    }
+    return res.status(200).json({ doseId, medId, scheduledDate, scheduledTime, status });
   } catch (error) {
     return sendFirestoreError(res, 'update medicine dose', error);
   }

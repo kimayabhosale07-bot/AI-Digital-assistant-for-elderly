@@ -27,7 +27,13 @@
     body{min-height:100%;background:var(--bg-cream);font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--text-main);-webkit-font-smoothing:antialiased;overflow-x:hidden}
     ::selection{background:#F3C4BA;color:#753326}
 
-    @keyframes fadeInDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+    .landing-header{position:relative;z-index:2;width:100%;max-width:1760px;min-height:76px;margin:0 auto;padding:.2rem clamp(1rem,2vw,2rem);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .landing-brand{display:inline-flex;align-items:center;text-decoration:none;min-width:0}
+    .landing-brand img{display:block;width:235px;height:70px;object-fit:cover;object-position:center;mix-blend-mode:multiply}
+    .landing-cta{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.65rem 1.35rem;border:0;border-radius:9999px;background:var(--terra-btn);color:#fff;text-decoration:none;font:800 .95rem 'Nunito',sans-serif;box-shadow:0 4px 18px rgba(158,69,54,.2);transition:background .2s,transform .2s;white-space:nowrap}
+    .landing-cta:hover{background:var(--terra-btn-hv);transform:translateY(-1px)}
+    .landing-cta:focus-visible,.landing-brand:focus-visible{outline:3px solid var(--terra-btn);outline-offset:3px}
+
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
     @keyframes fadeInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
@@ -43,34 +49,12 @@
 
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
 
-    /* ---- NAVBAR ---- */
-    .navbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:64px;background:rgba(250,242,233,0.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(232,221,209,0.5);animation:fadeInDown .65s var(--ease-out) .1s both}
-    .nav-logo{display:flex;align-items:center;gap:.55rem;text-decoration:none;flex-shrink:0}
-    .nav-logo-icon{width:36px;height:36px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#FFF;border:1.5px solid rgba(220,205,192,0.6);box-shadow:var(--shadow-sm)}
-    .nav-logo-icon img{width:100%;height:100%;object-fit:cover}
-    .nav-logo-text{font-family:'Fraunces',Georgia,serif;font-size:1.35rem;font-weight:700;color:var(--sage-brand);letter-spacing:-.015em}
-    .nav-leaf{display:inline-block;font-size:.95rem;margin-left:.1rem;animation:leafSway 4.5s ease-in-out infinite;transform-origin:bottom center}
-    .nav-links{display:none;align-items:center;gap:2.5rem;list-style:none}
-    @media(min-width:768px){.nav-links{display:flex}}
-    .nav-links a{font-size:.92rem;font-weight:700;color:var(--sage-nav);text-decoration:none;position:relative;padding:.3rem 0;transition:color .25s var(--ease-out);outline-offset:3px}
-    .nav-links a::after{content:'';position:absolute;bottom:-1px;left:0;width:0;height:2px;background:var(--terra-btn);border-radius:2px;transition:width .3s var(--ease-out)}
-    .nav-links a:hover{color:var(--terra-btn)}
-    .nav-links a:hover::after{width:100%}
-    .nav-links a:focus-visible{outline:2px solid var(--terra-btn);border-radius:4px}
-    .nav-cta{display:inline-flex;align-items:center;gap:.45rem;padding:.6rem 1.5rem;border-radius:9999px;background:var(--terra-btn);color:var(--white);font-size:.92rem;font-weight:800;font-family:'Nunito',sans-serif;border:none;cursor:pointer;box-shadow:0 4px 18px rgba(158,69,54,0.28);transition:background .25s,transform .2s var(--ease-out),box-shadow .25s;text-decoration:none;flex-shrink:0}
-    .nav-cta:hover{background:var(--terra-btn-hv);transform:translateY(-2px);box-shadow:0 7px 24px rgba(158,69,54,0.38)}
-    .nav-cta:active{transform:translateY(0) scale(.96)}
-    .nav-cta:focus-visible{outline:2px solid var(--terra);outline-offset:3px}
-    .nav-cta svg{width:.95rem;height:.95rem;flex-shrink:0}
-    .nav-mobile-cta{display:none}
-    @media(max-width:767px){.navbar{padding:0 1.25rem}.nav-cta{display:none}.nav-cta.nav-mobile-cta{display:flex}}
-
     /* ---- HERO ---- */
     .hero {
       position: relative;
       width: 100%;
-      min-height: 100svh;
-      padding-top: 64px;
+      min-height: calc(100svh - 76px);
+      padding: 0;
       background: var(--bg-cream);
       display: flex;
       flex-direction: column;
@@ -80,12 +64,12 @@
     }
     .hero-container {
       width: 100%;
-      max-width: 1360px;
+      max-width: 1760px;
       margin: 0 auto;
-      padding: 1rem 2.5rem 0.75rem;
+      padding: 0.25rem clamp(1rem, 2vw, 2rem);
       display: grid;
       grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
-      gap: clamp(1.5rem, 3vw, 2.75rem);
+      gap: clamp(1rem, 2.4vw, 2rem);
       align-items: center;
       position: relative;
       z-index: 1;
@@ -99,36 +83,29 @@
       gap: 0.75rem;
       align-items: center;
       justify-items: center;
-      max-width: 520px;
+      max-width: 740px;
       margin: 0 auto;
       width: 100%;
     }
     .cluster-card {
-      background: rgba(255, 250, 245, 0.78);
-      border-radius: 28px;
-      box-shadow: 0 6px 20px rgba(186, 154, 137, 0.10), 0 2px 8px rgba(186, 154, 137, 0.06);
-      border: 1px solid rgba(230, 215, 203, 0.45);
-      padding: 0.35rem;
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      background: transparent;
+      padding: 0;
       position: relative;
       width: 100%;
-      max-width: 170px;
+      max-width: 245px;
       display: flex;
       align-items: center;
       justify-content: center;
       border: none;
     }
-    .cluster-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 24px rgba(150, 95, 78, 0.14);
-      z-index: 10;
-    }
     .cluster-card img {
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 24px;
+      mix-blend-mode: multiply;
+      height: auto;
+      display: block;
+      mix-blend-mode: multiply;
       pointer-events: none;
     }
     .cluster-brain {
@@ -141,7 +118,7 @@
     }
     .cluster-brain img {
       width: 100%;
-      max-width: 140px;
+      max-width: 185px;
       height: auto;
       display: block;
       filter: drop-shadow(0 4px 14px rgba(247, 196, 186, 0.45));
@@ -203,48 +180,7 @@
       color: var(--text-sub);
       line-height: 1.65;
       max-width: 25rem;
-      margin-bottom: 1.75rem;
-    }
-    .hero-cta-row {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      flex-wrap: wrap;
-    }
-    .btn-cta-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.85rem 2.1rem;
-      border-radius: 9999px;
-      background: var(--terra-btn);
-      color: var(--white);
-      font-size: 1rem;
-      font-weight: 800;
-      font-family: 'Nunito', sans-serif;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 6px 22px rgba(158, 69, 54, 0.28);
-      transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
-    }
-    .btn-cta-primary:hover {
-      background: var(--terra-btn-hv);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 26px rgba(158, 69, 54, 0.36);
-    }
-    .btn-cta-primary svg {
-      width: 1rem;
-      height: 1rem;
-      flex-shrink: 0;
-    }
-    .cta-deco-line {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      color: var(--terra-light);
-      font-size: 1.1rem;
-      opacity: 0.75;
+      margin-bottom: 0.85rem;
     }
 
     /* Couple illustration block */
@@ -254,7 +190,7 @@
       align-items: center;
       justify-content: flex-end;
       width: 100%;
-      max-width: 310px;
+      max-width: 440px;
       justify-self: center;
     }
     .hero-quote {
@@ -281,59 +217,7 @@
       height: auto;
       display: block;
       object-fit: contain;
-      filter: drop-shadow(0 12px 18px rgba(111, 78, 60, 0.08));
-    }
-
-    /* Controls */
-    .hero-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.2rem;
-      padding: 0.25rem 0 0.75rem;
-      z-index: 10;
-    }
-    .pagination {
-      display: flex;
-      gap: 0.6rem;
-    }
-    .pagination-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      background: rgba(130, 56, 44, 0.2);
-      transition: background 0.3s, transform 0.3s;
-      padding: 0;
-    }
-    .pagination-dot:hover {
-      background: rgba(130, 56, 44, 0.5);
-      transform: scale(1.3);
-    }
-    .pagination-dot.active {
-      background: var(--terra);
-    }
-    .audio-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(130, 56, 44, 0.18);
-      color: var(--terra);
-      font-size: 0.72rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.22s;
-    }
-    .audio-btn:hover {
-      background: #FFF;
-      transform: scale(1.1);
-      box-shadow: 0 4px 14px rgba(130, 56, 44, 0.16);
+      mix-blend-mode: multiply;
     }
 
     /* Botanical leaves */
@@ -356,31 +240,6 @@
     }
     .svg-leaf {
       display: block;
-    }
-
-    /* Tooltip */
-    .bubble-tip {
-      position: absolute;
-      bottom: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%) translateY(4px);
-      background: #FFFDF9;
-      color: var(--terra);
-      border: 1px solid #E6D4C6;
-      border-radius: 0.75rem;
-      padding: 0.4rem 0.8rem;
-      font-size: 0.74rem;
-      font-weight: 700;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-      transition: opacity 0.2s, transform 0.2s;
-      z-index: 30;
-    }
-    .cluster-card:hover .bubble-tip {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
     }
 
     /* Tablet breakpoint (768px - 1024px) */
@@ -428,16 +287,6 @@
         line-height: 1.5;
         margin-bottom: 1rem;
       }
-      .hero-cta-row {
-        gap: 0;
-      }
-      .cta-deco-line {
-        display: none;
-      }
-      .btn-cta-primary {
-        padding: 0.7rem 1.15rem;
-        font-size: 0.9rem;
-      }
       .hero-quote {
         font-size: 0.95rem;
         margin-bottom: 0.35rem;
@@ -446,14 +295,16 @@
 
     /* Mobile breakpoint (<768px) */
     @media (max-width: 767px) {
+      .landing-brand img{width:175px;height:54px}
+      .landing-cta{padding:.6rem 1rem;font-size:.9rem}
+      .landing-header{min-height:62px;padding:.2rem 1rem}
       .hero {
-        min-height: 100svh;
-        padding-top: 64px;
+        min-height: 0;
       }
       .hero-container {
         grid-template-columns: 1fr;
         gap: 0.75rem;
-        padding: 0.35rem 0.5rem 0.5rem;
+        padding: 0.2rem 0.5rem 0.5rem;
       }
       .hero-left-cluster {
         grid-template-columns: repeat(3, 1fr);
@@ -464,12 +315,7 @@
         box-sizing: border-box;
       }
       .cluster-card {
-        border-radius: 16px;
-        padding: 0.15rem;
-        box-shadow: 0 4px 12px rgba(186, 154, 137, 0.08);
-      }
-      .cluster-card img {
-        border-radius: 14px;
+        padding: 0;
       }
       .cluster-brain img {
         max-width: 80px;
@@ -504,16 +350,6 @@
         font-size: 0.84rem;
         line-height: 1.45;
       }
-      .hero-cta-row {
-        justify-content: flex-start;
-      }
-      .cta-deco-line {
-        display: none;
-      }
-      .btn-cta-primary {
-        padding: 0.65rem 0.95rem;
-        font-size: 0.88rem;
-      }
       .hero-couple-block {
         max-width: 138px;
         margin: 0 auto;
@@ -525,36 +361,16 @@
       }
       .leaf-tr { width: 45px; }
       .leaf-bl { width: 35px; }
-      .hero-controls { padding: 0.25rem 0 1rem; }
     }
-
-    /* Feature sections */
-    .feat-card{background:#FFF;border:1px solid var(--border-warm);border-radius:1.5rem;padding:1.75rem;box-shadow:var(--shadow-sm);text-align:center;transition:transform .25s,box-shadow .25s}
-    .feat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
-    .pill-tag{background:#FFF;border:1px solid var(--border-warm);border-radius:9999px;padding:.45rem 1.1rem;font-size:.82rem;font-weight:700;color:var(--terra)}
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <nav class="navbar" role="navigation" aria-label="Main navigation">
-    <a class="nav-logo" href="index.html" aria-label="Carewise home">
-      <div class="nav-logo-icon">
-        <img src="../assets/aistudio/central_brain.png" alt="Carewise Logo" width="36" height="36" />
-      </div>
-      <span class="nav-logo-text">carewise</span>
-      <span class="nav-leaf" aria-hidden="true">&#127807;</span>
+  <header class="landing-header">
+    <a class="landing-brand" href="index.html" aria-label="Carewise home">
+      <img src="../assets/aistudio/carewise_wordmark.png" alt="Carewise" width="270" height="82" />
     </a>
-    <ul class="nav-links" role="list">
-      <li><a href="#how-it-works" onclick="smoothScroll('how-it-works');return false;">How it works</a></li>
-      <li><a href="#for-families" onclick="smoothScroll('for-families');return false;">For families</a></li>
-      <li><a href="#our-approach" onclick="smoothScroll('our-approach');return false;">Our approach</a></li>
-    </ul>
-    <a href="login.html" class="nav-cta" id="btn-nav-cta" aria-label="Get started">
-      Get started
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-    </a>
-    <a href="login.html" class="nav-cta nav-mobile-cta" id="btn-nav-cta-mobile" aria-label="Get started">Get started</a>
-  </nav>
+    <a href="login.html" class="landing-cta" id="btn-landing-start">Get Started</a>
+  </header>
 
   <!-- HERO -->
   <section class="hero" id="hero" aria-label="Care for them, even when you can't be there">
@@ -574,49 +390,43 @@
 
     <div class="hero-container">
       <!-- LEFT: Cohesive Thought-Bubble Cluster -->
-      <div class="hero-left-cluster" id="how-it-works" aria-label="Thought bubbles showing Carewise features">
+      <div class="hero-left-cluster" aria-label="Thought bubbles showing Carewise features">
         <!-- Row 1: Top 3 bubbles -->
-        <button class="cluster-card" onclick="speakDemo('daily calls and friendly check-ins')" aria-label="Feature: Daily check-in calls and reminders">
+        <div class="cluster-card">
           <img src="../assets/aistudio/bubble_1.png" alt="What if a call, a reminder, or a hello was never out of reach?" />
-          <span class="bubble-tip">&#128222; Daily check-ins</span>
-        </button>
+        </div>
 
-        <button class="cluster-card" onclick="speakDemo('medication schedule and daily pill reminders')" aria-label="Feature: Medication reminders on time">
+        <div class="cluster-card">
           <img src="../assets/aistudio/bubble_2.png" alt="Wondering if they've taken their medicine today?" />
-          <span class="bubble-tip">&#128138; Medication reminders</span>
-        </button>
+        </div>
 
-        <button class="cluster-card" onclick="speakDemo('patient companion ready to listen and reminisce')" aria-label="Feature: Patient companion conversations">
+        <div class="cluster-card">
           <img src="../assets/aistudio/bubble_3.png" alt="Want someone patient looking out for them when you can't be there?" />
-          <span class="bubble-tip">&#10084; Patient companion</span>
-        </button>
+        </div>
 
         <!-- Row 2: Mid Left Bubble, Center Brain, Mid Right Bubble -->
-        <button class="cluster-card" onclick="speakDemo('hands-free voice assistance for independent daily living')" aria-label="Feature: Voice assistant for independent living">
+        <div class="cluster-card">
           <img src="../assets/aistudio/bubble_4.png" alt="What if they could do it themselves, with help just a word away?" />
-          <span class="bubble-tip">&#128172; Hands-free voice</span>
-        </button>
+        </div>
 
         <div class="cluster-brain" aria-label="Carewise AI companion">
           <img src="../assets/aistudio/central_brain.png" alt="Carewise AI companion brain" width="140" height="90" />
         </div>
 
-        <button class="cluster-card" onclick="speakDemo('family caregiver support and doctor schedule sync')" aria-label="Feature: Family caregiver support">
+        <div class="cluster-card">
           <img src="../assets/aistudio/bubble_6.png" alt="Family caregiver support for everyday care" />
-          <span class="bubble-tip">&#128205; Family support</span>
-        </button>
+        </div>
 
         <!-- Row 3: Centered Bottom Bubble -->
-        <button class="cluster-card cluster-card-bottom" onclick="speakDemo('caring for the loved ones who cared for you')" aria-label="Feature: Supporting families and caregivers">
+        <div class="cluster-card cluster-card-bottom">
           <img src="../assets/aistudio/bubble_5.png" alt="Need a helping hand in caring for the people who cared for you?" />
-          <span class="bubble-tip">&#127807; Family caregiver support</span>
-        </button>
+        </div>
       </div>
 
       <!-- RIGHT: Headline + Description + CTA + Blended Elderly Couple -->
       <div class="hero-right-col">
         <!-- Text Block -->
-      <div class="hero-content" id="our-approach">
+      <div class="hero-content">
           <div class="hero-badge" aria-label="Care, just a word away">
             <span aria-hidden="true">\ \</span> Care, Just a Word Away <span aria-hidden="true">/ /</span>
           </div>
@@ -628,18 +438,10 @@
           <p class="hero-sub">
             An AI companion that helps your elderly stay connected, independent and supported &mdash; one word at a time.
           </p>
-          <div class="hero-cta-row">
-            <span class="cta-deco-line" aria-hidden="true">&mdash; &#10022; &mdash;</span>
-            <a href="login.html" class="btn-cta-primary" id="btn-hero-cta" aria-label="Get started with Carewise">
-              Get Started
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-            </a>
-            <span class="cta-deco-line" aria-hidden="true">&mdash; &#10022; &mdash;</span>
-          </div>
         </div>
 
         <!-- Blended Artwork Block -->
-        <div class="hero-couple-block" id="for-families">
+        <div class="hero-couple-block">
           <div class="hero-quote" aria-hidden="true">
             Because they deserve<br>
             the same care they<br>
@@ -652,31 +454,12 @@
       </div>
     </div>
 
-    <!-- Controls: Slide navigation & Audio greeting toggle -->
-    <div class="hero-controls" role="group" aria-label="Hero controls">
-      <div class="pagination" role="group" aria-label="Slide navigation">
-        <button class="pagination-dot active" aria-label="Slide 1: Daily calls" data-idx="0"></button>
-        <button class="pagination-dot" aria-label="Slide 2: Medicine reminders" data-idx="1"></button>
-        <button class="pagination-dot" aria-label="Slide 3: Companion" data-idx="2"></button>
-        <button class="pagination-dot" aria-label="Slide 4: Family support" data-idx="3"></button>
-      </div>
-      <button class="audio-btn" id="btn-audio-toggle" title="Play companion voice greeting" aria-label="Play companion voice sample" aria-pressed="false">&#9654;</button>
-    </div>
   </section>
-
   <script>
     'use strict';
-    function smoothScroll(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
-    function speakDemo(topic){if('speechSynthesis' in window){window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance('With Carewise, your loved one receives '+topic+'. We are here for them always.');u.rate=0.92;u.pitch=1.05;window.speechSynthesis.speak(u)}}
-    var audioBtn=document.getElementById('btn-audio-toggle'),isPlaying=false;
-    if(audioBtn){audioBtn.addEventListener('click',function(){if('speechSynthesis' in window){if(isPlaying){window.speechSynthesis.cancel();audioBtn.textContent='\u25B6';audioBtn.setAttribute('aria-pressed','false');isPlaying=false}else{var u=new SpeechSynthesisUtterance('Hello there! Good morning. Remember, your loved ones are always just a word away. Have a beautiful and peaceful day!');u.rate=0.9;u.pitch=1.05;u.onend=function(){audioBtn.textContent='\u25B6';audioBtn.setAttribute('aria-pressed','false');isPlaying=false};window.speechSynthesis.speak(u);audioBtn.textContent='\u23F8';audioBtn.setAttribute('aria-pressed','true');isPlaying=true}}})}
-    var topics=['daily morning and evening check-in calls','timely medication and pill reminders','friendly companion conversations whenever they wish','family caregiver support and doctor schedule planning'];
-    document.querySelectorAll('.pagination-dot').forEach(function(dot){dot.addEventListener('click',function(){document.querySelectorAll('.pagination-dot').forEach(function(d){d.classList.remove('active')});dot.classList.add('active');var idx=parseInt(dot.getAttribute('data-idx')||'0',10);speakDemo(topics[idx]||'gentle assistance')})});
-    var uid=localStorage.getItem('caremate_user_id');
-    if(uid){['btn-nav-cta','btn-nav-cta-mobile','btn-hero-cta'].forEach(function(id){var el=document.getElementById(id);if(el)el.setAttribute('href','dashboard.html')})}
-    var mq=window.matchMedia('(prefers-reduced-motion:reduce)');
-    if(!mq.matches){var stage=document.querySelector('.bubbles-stage');window.addEventListener('scroll',function(){var sy=window.scrollY;if(stage&&sy<window.innerHeight)stage.style.transform='translateY('+(sy*0.06)+'px)'},{passive:true})}
-    if('IntersectionObserver' in window){var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}})},{threshold:0.15});document.querySelectorAll('#how-it-works,#for-families,#our-approach').forEach(function(s){if(!mq.matches){s.style.opacity='0';s.style.transform='translateY(24px)';s.style.transition='opacity 0.7s ease,transform 0.7s ease'}obs.observe(s)})}
+    if (localStorage.getItem('caremate_user_id')) {
+      document.getElementById('btn-landing-start').setAttribute('href', 'dashboard.html');
+    }
   </script>
 </body>
 </html>

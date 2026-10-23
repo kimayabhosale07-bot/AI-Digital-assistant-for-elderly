@@ -162,6 +162,7 @@
       font-family: inherit;
       font-weight: 700;
     }
+    .med-info { width:100%; min-width:0; }
 
     .med-meta {
       font-size: 0.85rem;
@@ -187,6 +188,40 @@
     .status-pill.pending { background: #FFF3E0; color: #E65100; }
     .status-pill.taken { background: #E8F5E9; color: #2E7D32; }
     .status-pill.missed { background: #FFEBEE; color: #C62828; }
+
+    #modal-vitals .dash-modal-box { max-width: 1080px; max-height: 92vh; }
+    .health-modal-disclaimer { padding: .75rem 1rem; border: 1px solid var(--border-card); border-radius: var(--radius-md); background: #FFFDF9; color: var(--text-sub); font-size: .95rem; line-height: 1.45; margin: .75rem 0 1rem; }
+    .health-modal-layout { display: grid; grid-template-columns: minmax(250px, .8fr) minmax(0, 1.4fr); gap: 1rem; align-items: start; }
+    .health-form-card, .health-chart-card { background: #FFF; border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1rem; box-shadow: var(--shadow-sm); }
+    .health-form-card h3, .health-chart-heading h3 { font-size: 1.12rem; color: var(--terra-main); margin: 0 0 .4rem; }
+    .health-form-card p, .health-chart-heading p { color: var(--text-muted); font-size: .92rem; line-height: 1.4; margin: 0 0 .75rem; }
+    .health-form-card .form-group { margin-bottom: .75rem; }
+    .health-form-card .form-label { display: block; font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+    .health-form-card .form-input, .health-form-card select, .health-form-card textarea { width: 100%; min-height: 46px; font: inherit; font-size: 1rem; padding: .55rem .65rem; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: #fff; color: var(--text-main); }
+    .health-form-card textarea { min-height: 72px; resize: vertical; }
+    .health-pair { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; }
+    .health-modal-status, .health-status { min-height: 1.35rem; margin: .55rem 0; font-size: .95rem; line-height: 1.35; color: var(--text-sub); }
+    .health-modal-status--error, .health-status--error { color: #8B2D25; }.health-modal-status--success, .health-status--success { color: #315E3B; }
+    .health-history-heading { display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap; margin: 0 0 .6rem; }
+    .health-history-heading h3 { color: var(--terra-main); font-size: 1.2rem; margin: 0; }
+    .health-chart-grid { display: grid; grid-template-columns: 1fr; gap: .65rem; max-height: 61vh; overflow-y: auto; padding-right: .2rem; }
+    .health-chart-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; flex-wrap: wrap; }
+    .health-chart-heading p { margin-bottom: .35rem; }
+    .health-range { display: flex; gap: .25rem; flex-wrap: wrap; }
+    .health-range button { min-height: 38px; padding: .25rem .5rem; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: #fff; color: var(--text-main); font: inherit; cursor: pointer; }
+    .health-range button[aria-pressed="true"] { background: var(--sage-badge); border-color: var(--sage-main); font-weight: 700; }
+    .health-chart { width: 100%; min-height: 80px; overflow-x: auto; }
+    .health-chart svg { display: block; width: 100%; min-width: 340px; height: auto; }
+    .health-empty { padding: .8rem; background: var(--bg-subtle); border-radius: var(--radius-md); color: var(--text-muted); font-size: .95rem; }
+    .health-legend { display: flex; gap: .75rem; flex-wrap: wrap; margin: .3rem 0 .5rem; font-size: .85rem; color: var(--text-sub); }
+    .health-legend-item { display: inline-flex; align-items: center; gap: .35rem; }.health-legend-item i { width: 12px; height: 12px; border-radius: 50%; }
+    .health-readings-title { font-size: .98rem; color: var(--text-main); margin: .5rem 0 .3rem; }
+    .health-reading-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .4rem; }
+    .health-reading-list li { padding: .55rem; border: 1px solid var(--border-light); border-radius: var(--radius-md); display: grid; gap: .2rem; font-size: .88rem; color: var(--text-sub); overflow-wrap: anywhere; }
+    .health-reading-list li strong { font-size: 1rem; color: var(--terra-main); }
+    .health-reading-list li p { margin: 0; color: var(--text-muted); }
+    @media (max-width: 760px) { .health-modal-layout { grid-template-columns: 1fr; }.health-chart-grid { max-height: 45vh; } }
+    @media (max-width: 560px) { #modal-vitals .dash-modal-box { padding: 1rem; max-height: 94vh; }.health-pair { grid-template-columns: 1fr; } }
 
     /* ============================================================
        MODAL & DRAWER SYSTEM (Carewise Design Preserved)
@@ -328,10 +363,31 @@
       transform: scale(1) translateY(0);
     }
     .assistant-transcript { width: 100%; min-height: 88px; resize: vertical; font: inherit; color: var(--text-main); background: #FFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: .8rem; }
-    .assistant-response { width: 100%; min-height: 52px; height: auto; flex: 0 0 auto; line-height: 1.45; overflow-wrap: anywhere; padding: .75rem; margin: .5rem 0; color: var(--text-sub); background: rgba(255,255,255,.7); border: 1px solid var(--border-light); border-radius: var(--radius-md); }
+    .voice-chat-messages { display:flex; flex-direction:column; gap:.7rem; min-height:190px; max-height:34vh; overflow:auto; padding:.8rem; background:#F8F2EA; border:1px solid var(--border-light); border-radius:var(--radius-md); }
+    .voice-chat-message { max-width:90%; padding:.75rem .9rem; border-radius:1rem; font-size:1rem; line-height:1.5; overflow-wrap:anywhere; white-space:pre-wrap; }
+    .voice-chat-message--assistant { align-self:flex-start; background:#FFF; color:var(--text-main); border:1px solid var(--border-light); }
+    .voice-chat-message--user { align-self:flex-end; background:var(--sage-badge); color:var(--sage-dark); }
+    .voice-chat-composer { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.6rem; margin-top:.8rem; }
+    .voice-chat-composer textarea { min-height:70px; resize:vertical; font:inherit; font-size:1rem; color:var(--text-main); background:#FFF; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:.8rem; }
+    .voice-chat-buttons { display:flex; flex-wrap:wrap; gap:.55rem; margin-top:.65rem; }
+    .voice-chat-buttons button { min-height:48px; }
+    .assistant-demo-panel { margin-top:.7rem; padding:.75rem .85rem; border:1px solid var(--border-card); border-radius:var(--radius-md); background:#FFFDF9; }
+    .assistant-demo-panel summary { color:var(--terra-main); font-weight:700; cursor:pointer; }
+    .assistant-demo-panel p { margin:.55rem 0; color:var(--text-muted); font-size:.9rem; line-height:1.45; }
+    .assistant-demo-active { margin:.5rem 0; padding:.5rem .7rem; border-radius:var(--radius-sm); background:var(--sage-badge); color:var(--sage-dark); font-size:.9rem; font-weight:700; }
+    .voice-action-confirmation { margin-top:.75rem; padding:.85rem; border:1px solid var(--border-card); border-radius:var(--radius-md); background:#FFFDF9; }
+    .voice-action-confirmation p { margin:.35rem 0 .65rem; line-height:1.45; }
+    .dose-row, .visit-checkbox { display:flex; align-items:center; justify-content:space-between; gap:.75rem; margin-top:.45rem; color:var(--text-sub); font-size:.92rem; }
+    .visit-checkbox { width:100%; justify-content:flex-end; }
+    .dose-row.dose-complete { color:var(--sage-dark); font-weight:700; }
+    .dose-checkbox, .visit-checkbox { min-height:44px; cursor:pointer; }
+    .dose-checkbox input, .visit-checkbox input { width:24px; height:24px; accent-color:var(--sage-dark); }
+    .dose-checkbox:has(input:disabled), .visit-checkbox:has(input:disabled) { cursor:not-allowed; opacity:.68; }
     @media (max-width: 600px) {
       .drawer-overlay { padding: .65rem; }
       .drawer-box { padding: 1.25rem; max-height: 94vh; }
+      .voice-chat-composer { grid-template-columns:1fr; }
+      .voice-chat-messages { max-height:30vh; }
       .drawer-box > div:first-of-type { margin-top: 1.6rem !important; margin-bottom: .8rem !important; }
     }
   </style>
@@ -360,10 +416,6 @@
       <a href="javascript:void(0)" class="nav-link" id="nav-appointments" onclick="openAppointmentsModal('list')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Appointments
-      </a>
-      <a href="javascript:void(0)" class="nav-link" id="nav-health" onclick="openVitalsModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        Health Vitals
       </a>
     </nav>
 
@@ -449,42 +501,39 @@
         <!-- Upcoming Appointment Preview Card -->
         <div class="card">
           <div class="section-header">
-            <h2 class="section-title">Upcoming Doctor Visit</h2>
+            <h2 class="section-title">Upcoming Doctor Visits</h2>
             <a href="javascript:void(0)" onclick="openAppointmentsModal('list')" style="font-size:0.85rem; font-weight:700; color:var(--terra-btn);">Calendar →</a>
           </div>
 
-          <div id="next-appointment-box" style="padding:1rem; background:var(--bg-subtle); border-radius:var(--radius-md); border:1px solid var(--border-light);">
-            <div style="display:flex; align-items:flex-start; gap:0.8rem;">
-              <div style="font-size:1.8rem;">🩺</div>
-              <div>
-                <h4 id="next-appt-doctor" style="font-size:1.1rem; color:var(--terra-main); font-family:inherit; font-weight:700;">Loading appointments...</h4>
-                <p id="next-appt-time" style="font-size:0.88rem; color:var(--text-sub); margin:0.2rem 0;">Checking clinic schedule...</p>
-                <p id="next-appt-loc" style="font-size:0.82rem; color:var(--text-muted);">Clinic location</p>
-              </div>
-            </div>
-          </div>
+          <div id="upcoming-appointments-list" aria-live="polite" style="display:grid; gap:0.7rem; padding:1rem; background:var(--bg-subtle); border-radius:var(--radius-md); border:1px solid var(--border-light);"><p role="status" style="color:var(--text-muted);">Loading upcoming doctor visits…</p></div>
         </div>
 
         <!-- Health Vitals Quick Card -->
         <div class="card">
           <div class="section-header">
             <h2 class="section-title">Health Vitals</h2>
-            <a href="javascript:void(0)" onclick="openVitalsModal()" style="font-size:0.85rem; font-weight:700; color:var(--terra-btn);">Log Vitals →</a>
+            <a href="javascript:void(0)" onclick="openVitalsModal()" style="font-size:0.85rem;font-weight:700;color:var(--terra-btn);">View Health Logs →</a>
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
-            <!-- Heart Rate -->
-            <div style="background:#FFF; padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-light); text-align:center;">
-              <span style="font-size:1.4rem;">❤️</span>
-              <div id="display-hr" style="font-size:1.6rem; font-weight:900; color:var(--terra-main); margin:0.2rem 0;">72 <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">bpm</span></div>
-              <span style="font-size:0.75rem; font-weight:800; background:var(--success-bg); color:var(--success-main); padding:0.2rem 0.6rem; border-radius:var(--radius-full);">Normal (60-100)</span>
+          <p id="dashboard-health-status" role="status" aria-live="polite" style="margin:0 0 .75rem;color:var(--text-muted);font-size:.85rem;">Loading saved readings…</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:0.75rem;">
+            <div style="background:#FFF;padding:.85rem;border-radius:var(--radius-md);border:1px solid var(--border-light);text-align:center;">
+              <strong>Blood pressure</strong><div id="health-summary-blood-pressure" style="font-size:1.15rem;font-weight:800;color:var(--terra-main);margin:.3rem 0;">No reading yet</div><span id="health-summary-blood-pressure-time" style="font-size:.75rem;color:var(--text-muted);">—</span>
             </div>
-
-            <!-- Steps -->
-            <div style="background:#FFF; padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-light); text-align:center;">
-              <span style="font-size:1.4rem;">👟</span>
-              <div id="display-steps" style="font-size:1.6rem; font-weight:900; color:var(--sage-main); margin:0.2rem 0;">3,420 <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">steps</span></div>
-              <span style="font-size:0.75rem; font-weight:800; background:var(--sage-badge); color:var(--sage-dark); padding:0.2rem 0.6rem; border-radius:var(--radius-full);">Daily Goal: 5,000</span>
+            <div style="background:#FFF;padding:.85rem;border-radius:var(--radius-md);border:1px solid var(--border-light);text-align:center;">
+              <strong>Heart rate</strong><div id="health-summary-heart-rate" style="font-size:1.15rem;font-weight:800;color:var(--terra-main);margin:.3rem 0;">No reading yet</div><span id="health-summary-heart-rate-time" style="font-size:.75rem;color:var(--text-muted);">—</span>
+            </div>
+            <div style="background:#FFF;padding:.85rem;border-radius:var(--radius-md);border:1px solid var(--border-light);text-align:center;">
+              <strong>Blood sugar</strong><div id="health-summary-blood-sugar" style="font-size:1.15rem;font-weight:800;color:var(--terra-main);margin:.3rem 0;">No reading yet</div><span id="health-summary-blood-sugar-time" style="font-size:.75rem;color:var(--text-muted);">—</span>
+            </div>
+            <div style="background:#FFF;padding:.85rem;border-radius:var(--radius-md);border:1px solid var(--border-light);text-align:center;">
+              <strong>Body temperature</strong><div id="health-summary-body-temperature" style="font-size:1.15rem;font-weight:800;color:var(--terra-main);margin:.3rem 0;">No reading yet</div><span id="health-summary-body-temperature-time" style="font-size:.75rem;color:var(--text-muted);">—</span>
+            </div>
+            <div style="background:#FFF;padding:.85rem;border-radius:var(--radius-md);border:1px solid var(--border-light);text-align:center;">
+              <strong>Oxygen saturation (SpO₂)</strong><div id="health-summary-oxygen-saturation" style="font-size:1.15rem;font-weight:800;color:var(--terra-main);margin:.3rem 0;">No reading yet</div><span id="health-summary-oxygen-saturation-time" style="font-size:.75rem;color:var(--text-muted);">—</span>
+            </div>
+            <div style="background:#FFF;padding:.85rem;border-radius:var(--radius-md);border:1px solid var(--border-light);text-align:center;">
+              <strong>Steps</strong><div id="health-summary-steps" style="font-size:1.15rem;font-weight:800;color:var(--sage-main);margin:.3rem 0;">No reading yet</div><span id="health-summary-steps-time" style="font-size:.75rem;color:var(--text-muted);">—</span>
             </div>
           </div>
         </div>
@@ -605,32 +654,61 @@
   </div>
 
   <!-- ============================================================
-       3. HEALTH VITALS MODAL
+       3. HEALTH LOGS MODAL (also retains the quick steps form)
   ============================================================ -->
   <div class="dash-modal-overlay" id="modal-vitals" role="dialog" aria-modal="true" aria-labelledby="vitals-modal-title">
     <div class="dash-modal-box">
       <button type="button" class="dash-modal-close" onclick="closeAllModals()" aria-label="Close">&times;</button>
-      <h2 id="vitals-modal-title" style="font-size:1.6rem; color:var(--terra-main); margin-bottom:0.25rem;">Record Health Vitals</h2>
-      <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">Log heart rate and steps. Readings outside 60-100 bpm will be flagged for review.</p>
-
+      <h2 id="vitals-modal-title" style="font-size:1.6rem;color:var(--terra-main);margin-bottom:.25rem;">Health Logs</h2>
+      <p class="health-modal-disclaimer">Record and review measurements to discuss with your care team. These records do not diagnose a condition, and one reading alone may not tell the whole story.</p>
       <div id="modal-vitals-alert" class="alert alert-danger" style="display:none;"></div>
 
-      <form onsubmit="handleModalLogHealth(event)">
-        <div class="form-group">
-          <label class="form-label" for="m-input-hr">Heart Rate (bpm) *</label>
-          <input type="number" id="m-input-hr" class="form-input" placeholder="e.g. 74" min="30" max="250" required />
-          <span style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem; display:block;">Normal resting range: 60 – 100 bpm.</span>
+      <div class="health-modal-layout">
+        <div>
+          <section class="health-form-card" aria-labelledby="health-entry-title">
+            <h3 id="health-entry-title">Record a measurement</h3>
+            <p>Enter the value and unit shown on your device or record.</p>
+            <form id="health-entry-form">
+              <div class="form-group"><label class="form-label" for="health-type">Measurement *</label><select id="health-type" class="form-input" required><option value="blood_pressure">Blood pressure</option><option value="heart_rate">Heart rate</option><option value="blood_sugar">Blood sugar</option><option value="body_temperature">Body temperature</option><option value="oxygen_saturation">Oxygen saturation (SpO₂)</option></select></div>
+              <div id="blood-pressure-fields" class="health-pair"><div class="form-group"><label class="form-label" for="health-systolic">Systolic (mmHg) *</label><input class="form-input" id="health-systolic" type="number" min="30" max="300" step="1" required /></div><div class="form-group"><label class="form-label" for="health-diastolic">Diastolic (mmHg) *</label><input class="form-input" id="health-diastolic" type="number" min="20" max="200" step="1" required /></div></div>
+              <div id="single-measurement-field" class="form-group" hidden><label class="form-label" id="health-value-label" for="health-value">Measurement</label><div class="health-pair"><input class="form-input" id="health-value" type="number" step="any" /><select id="health-unit" class="form-input" aria-label="Measurement unit"></select></div></div>
+              <div class="form-group" id="blood-sugar-context" hidden><label class="form-label" for="sugar-context">Blood sugar context *</label><select class="form-input" id="sugar-context"><option value="">Choose context</option><option value="fasting">Fasting</option><option value="before_meal">Before a meal</option><option value="after_meal">After a meal</option><option value="random">Random / other time</option></select></div>
+              <div class="form-group"><label class="form-label" for="health-timestamp">Measurement date and time *</label><input class="form-input" id="health-timestamp" type="datetime-local" required /></div>
+              <div class="form-group"><label class="form-label" for="health-notes">Notes (optional)</label><textarea id="health-notes" maxlength="1000" placeholder="Add a note if helpful"></textarea></div>
+              <p id="health-form-status" class="health-modal-status" role="status" aria-live="polite"></p>
+              <button id="health-save-button" class="btn btn-primary" type="submit" style="width:100%;min-height:48px;">Save measurement</button>
+            </form>
+          </section>
+
+          <section class="health-form-card" aria-labelledby="quick-vitals-title" style="margin-top:.75rem;">
+            <h3 id="quick-vitals-title">Quick log: steps</h3>
+            <p>Record today's step count.</p>
+            <form id="steps-quick-log-form" onsubmit="handleModalLogHealth(event)">
+              <div class="form-group"><label class="form-label" for="m-input-steps">Daily Steps Walked *</label><input type="number" id="m-input-steps" class="form-input" placeholder="Enter steps" min="0" max="100000" required /></div>
+              <p id="steps-quick-log-status" role="status" aria-live="polite" class="health-modal-status"></p>
+              <button type="submit" class="btn btn-secondary" id="btn-modal-save-vitals" style="width:100%;min-height:48px;">Save steps</button>
+            </form>
+          </section>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="m-input-steps">Daily Steps Walked *</label>
-          <input type="number" id="m-input-steps" class="form-input" placeholder="e.g. 4200" min="0" max="100000" required />
-        </div>
-
-        <button type="submit" class="btn btn-primary" id="btn-modal-save-vitals" style="width:100%; margin-top:0.4rem;">
-          Save &amp; Check Vitals
-        </button>
-      </form>
+        <section aria-labelledby="health-history-title">
+          <div class="health-history-heading"><h3 id="health-history-title">Measurement history</h3><button id="health-history-retry" class="btn btn-secondary" type="button">Refresh</button></div>
+          <p id="health-history-status" class="health-modal-status" role="status" aria-live="polite">Loading saved health records…</p>
+          <div id="health-chart-grid" class="health-chart-grid"></div>
+          <section class="health-chart-card" aria-labelledby="steps-history-title" style="margin-top:.75rem;">
+            <div class="health-chart-heading">
+              <div><h2 id="steps-history-title">Steps history</h2><p>Saved step counts for this profile.</p></div>
+              <div class="health-range" role="group" aria-label="Steps history date range">
+                <button type="button" data-steps-days="7" aria-pressed="false">7 days</button>
+                <button type="button" data-steps-days="30" aria-pressed="true">30 days</button>
+                <button type="button" data-steps-days="90" aria-pressed="false">90 days</button>
+              </div>
+            </div>
+            <p id="steps-history-status" class="health-modal-status" role="status" aria-live="polite">Loading saved steps…</p>
+            <ol id="steps-history-list" class="health-reading-list"></ol>
+          </section>
+        </section>
+      </div>
     </div>
   </div>
 
@@ -650,66 +728,51 @@
         <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem;">Hands-free voice assistant for daily reminders &amp; health.</p>
       </div>
 
-      <section id="voice-action-options" aria-labelledby="voice-action-options-title" style="margin-bottom:1rem;">
-        <h3 id="voice-action-options-title" style="font-size:1rem; color:var(--terra-main); margin-bottom:.65rem;">Create a new record</h3>
-        <div style="display:grid; grid-template-columns:1fr; gap:.65rem;">
-          <button type="button" class="btn btn-secondary" id="voice-action-add-medicine" onclick="beginVoiceAction('medicine')" style="justify-content:center;">💊 Add Medicine</button>
-          <button type="button" class="btn btn-sage" id="voice-action-add-visit" onclick="beginVoiceAction('visit')" style="justify-content:center;">🩺 Add Visit</button>
+            <div id="voice-assistant-controls">
+        <div id="voice-chat-messages" class="voice-chat-messages" role="log" aria-label="Carewise conversation" aria-live="polite" aria-relevant="additions">
+          <div class="voice-chat-message voice-chat-message--assistant">Hello! I'm happy to spend some time with you. How are you doing today?</div>
         </div>
-      </section>
-
-      <section id="voice-action-view" aria-labelledby="voice-action-title" hidden>
-        <h3 id="voice-action-title" style="font-size:1.1rem; color:var(--terra-main); margin-bottom:.35rem;"></h3>
-        <p id="voice-action-guidance" style="font-size:.88rem; color:var(--text-sub); margin-bottom:.75rem;"></p>
-        <div style="display:flex; gap:.6rem; margin-bottom:.75rem;">
-          <button type="button" class="btn btn-secondary" onclick="returnToVoiceActions()">Back to actions</button>
-          <button type="button" class="btn btn-secondary" onclick="cancelVoiceAction()">Cancel</button>
+        <p id="voice-flow-status" role="status" aria-live="polite" style="font-size:.9rem;color:var(--text-muted);margin:.45rem 0;">Ready when you are. You can type or speak.</p>
+        <p id="assistant-demo-active" class="assistant-demo-active" hidden>Demo Mode active — these are prewritten sample answers, not live AI.</p>
+        <label for="drawer-voice-transcript" style="font-size:1rem;font-weight:700;margin:.35rem 0;">Your message</label>
+        <div class="voice-chat-composer">
+          <textarea id="drawer-voice-transcript" aria-label="Type a message to Carewise" placeholder="Type a message or use the microphone."></textarea>
+          <button type="button" class="btn btn-primary" id="btn-submit-voice" onclick="submitVoiceTranscript()" aria-label="Send message">Send</button>
         </div>
-        <div id="voice-action-form-slot"></div>
-      </section>
-
-      <div id="voice-assistant-controls">
-      <label for="drawer-voice-transcript" style="font-size:.85rem;font-weight:700;margin:.25rem 0;">Your transcript (editable)</label>
-      <textarea class="assistant-transcript" id="drawer-voice-transcript" aria-label="Editable voice transcript" placeholder="Tap to Speak, or type a request here."></textarea>
-      <div class="assistant-response" id="drawer-voice-response" role="status" aria-live="polite">Assistant response will appear here.</div>
-      <p id="voice-flow-status" role="status" aria-live="polite" style="font-size:.82rem;color:var(--text-muted);margin:.35rem 0;">Ready</p>
-
-      <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;">
-        <button type="button" class="btn-mic" id="btn-drawer-mic" onclick="toggleSpeech()" style="width:100%;">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-          <span id="drawer-mic-text">Start Listening</span>
-        </button>
-        <button type="button" class="btn btn-secondary" id="btn-stop-listening" onclick="stopSpeech()" style="width:100%;" disabled>Stop Listening</button>
-        <button type="button" class="btn btn-primary" id="btn-submit-voice" onclick="submitVoiceTranscript()" style="width:100%;">Submit request</button>
-
-        <button type="button" class="btn btn-secondary" onclick="speakSummary()" style="width:100%;">
-          🔊 Read Daily Summary Aloud
-        </button>
-      </div>
-
-      <!-- Quick Command Buttons -->
-      <div style="margin-top:2rem; padding-top:1.25rem; border-top:1px solid var(--border-light);">
-        <span style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:0.75rem;">
-          Quick Commands
-        </span>
-        <div style="display:flex; flex-direction:column; gap:0.5rem;">
-          <button type="button" class="btn btn-secondary" onclick="handleVoiceCommand('check medicine')" style="justify-content:flex-start; font-size:0.84rem; padding:0.55rem 0.9rem;">
-            💊 "What medicines are pending today?"
+        <div class="voice-chat-buttons">
+          <button type="button" class="btn-mic" id="btn-drawer-mic" onclick="toggleSpeech()">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            <span id="drawer-mic-text">Speak</span>
           </button>
-          <button type="button" class="btn btn-secondary" onclick="handleVoiceCommand('check appointment')" style="justify-content:flex-start; font-size:0.84rem; padding:0.55rem 0.9rem;">
-            🩺 "When is my next doctor appointment?"
-          </button>
-          <button type="button" class="btn btn-secondary" onclick="handleVoiceCommand('check vitals')" style="justify-content:flex-start; font-size:0.84rem; padding:0.55rem 0.9rem;">
-            ❤️ "What is my latest heart rate reading?"
-          </button>
+          <button type="button" class="btn btn-secondary" id="btn-stop-listening" onclick="stopSpeech()" disabled>Stop listening</button>
+          <button type="button" class="btn btn-secondary" id="assistant-voice-toggle" aria-pressed="false" onclick="toggleAssistantVoice()">Voice replies off</button>
+          <button type="button" class="btn btn-secondary" onclick="sendAssistantPrompt('Please summarize my medicines for today and my next appointment.')">Today's summary</button>
         </div>
-      </div>
+        <details id="assistant-demo-panel" class="assistant-demo-panel">
+          <summary>Demo Mode — sample elderly-care Q&amp;A</summary>
+          <p>Prewritten answers for presentation only. Demo Mode does not use live AI, read health records, or change records.</p>
+          <div class="voice-chat-buttons">
+            <button type="button" class="btn btn-secondary" onclick="useAssistantDemoSample('medicine')">How can I remember my medicines?</button>
+            <button type="button" class="btn btn-secondary" onclick="useAssistantDemoSample('family')">How can family help from afar?</button>
+            <button type="button" class="btn btn-secondary" onclick="useAssistantDemoSample('safety')">How can I make my home safer?</button>
+            <button type="button" class="btn btn-secondary" id="assistant-demo-mode-toggle" onclick="toggleAssistantDemoMode()">Use Demo Mode</button>
+          </div>
+        </details>
+        <section id="assistant-action-confirmation" class="voice-action-confirmation" hidden aria-live="polite">
+          <strong id="assistant-action-summary"></strong>
+          <p>Would you like me to save this?</p>
+          <div class="voice-chat-buttons">
+            <button type="button" class="btn btn-primary" id="assistant-action-confirm">Confirm and save</button>
+            <button type="button" class="btn btn-secondary" id="assistant-action-cancel">Cancel</button>
+          </div>
+        </section>
       </div>
     </div>
   </div>
 
   <script src="../js/api.js"></script>
   <script src="../js/dictation.js"></script>
+  <script src="../js/health.js"></script>
   <script>
     'use strict';
 
@@ -734,9 +797,42 @@
     let medicineDataState = 'loading';
     let appointmentDataState = 'loading';
     let modalOpener = null;
-    let voiceActionFormNode = null;
-    let voiceActionFormPlaceholder = null;
-    let voiceActionKind = null;
+    const assistantConversation = [{ role: 'assistant', content: "Hello! I'm happy to spend some time with you. How are you doing today?" }];
+    let assistantPendingAction = null;
+    let assistantMedicinePendingAction = null;
+    let assistantAppointmentPendingAction = null;
+    let assistantMedicineWorkflow = null;
+    let assistantMedicineMessages = [];
+    let assistantAppointmentWorkflow = null;
+    let assistantAppointmentMessages = [];
+    let assistantConfirmationInFlight = false;
+    let assistantReplyVoiceEnabled = false;
+    let assistantDemoMode = false;
+    const assistantDemoAnswers = {
+      medicine: 'A pill organizer and a regular daily routine can make it easier to remember medicines. Follow the schedule provided by your care team, and use the Medicines section to review your saved schedule.',
+      family: 'Family can agree on a regular check-in time, keep emergency contacts current, and ask what kind of help feels welcome. Small, consistent check-ins can help everyone feel connected.',
+      safety: 'Keep walkways clear, add good lighting, use non-slip mats, and keep frequently used items within easy reach. Ask a trusted care professional to help review any specific safety concerns.',
+      general: 'This is a prewritten Demo Mode answer. Try one of the sample elderly-care questions above, or return to Live AI when the service is available.',
+    };
+
+    function setAssistantPendingAction(action) {
+      if (action.type === 'add_medicine') assistantMedicinePendingAction = action;
+      if (action.type === 'add_appointment') assistantAppointmentPendingAction = action;
+      assistantPendingAction = action;
+      document.getElementById('assistant-action-summary').textContent = action.summary;
+      document.getElementById('assistant-action-confirmation').hidden = false;
+    }
+
+    function clearAssistantPendingAction(type) {
+      if (type === 'add_medicine') assistantMedicinePendingAction = null;
+      if (type === 'add_appointment') assistantAppointmentPendingAction = null;
+      if (assistantPendingAction?.type === type) {
+        assistantPendingAction = assistantAppointmentPendingAction || assistantMedicinePendingAction || null;
+        const section = document.getElementById('assistant-action-confirmation');
+        section.hidden = !assistantPendingAction;
+        if (assistantPendingAction) document.getElementById('assistant-action-summary').textContent = assistantPendingAction.summary;
+      }
+    }
     const pendingDoseUpdates = new Set();
     const todayKey = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
 
@@ -761,7 +857,6 @@
     }
 
     function closeAllModals(restoreScroll = true) {
-      if (voiceActionFormNode) restoreVoiceActionForm();
       stopSpeech();
       document.querySelectorAll('.dash-modal-overlay, .drawer-overlay').forEach(el => {
         el.classList.remove('open');
@@ -839,21 +934,16 @@
       }
 
       box.innerHTML = userMedicines.map(m => {
-        const status = m.todayStatus || 'pending';
+        const doses = Array.isArray(m.todayDoses) && m.todayDoses.length ? m.todayDoses : [{ scheduledTime: m.time, status: m.todayStatus || 'pending' }];
         return `
           <div class="med-item" id="m-med-${m.medId}">
             <div class="med-info">
               <h4>${escapeHtml(m.medicineName)}</h4>
               <div class="med-meta">
                 <span>💊 ${escapeHtml(m.dosage)}</span>
-                <span>⏰ ${escapeHtml(m.time)}</span>
                 <span>(${escapeHtml(m.frequency)})</span>
               </div>
-            </div>
-            <div>
-              <button type="button" class="status-pill ${status}" data-dose="${m.medId}" onclick="cycleStatus('${m.medId}', '${status}')" title="${status === 'taken' ? 'Undo taken status' : 'Mark as taken'}">
-                ${status === 'taken' ? 'Taken / Undo' : status === 'missed' ? 'Missed' : 'Mark as taken'}
-              </button>
+              ${doses.map(dose => `<div class="dose-row ${dose.status === 'taken' ? 'dose-complete' : ''}"><span>⏰ ${escapeHtml(dose.scheduledTime)}</span><label class="dose-checkbox"><input type="checkbox" aria-label="Taken: ${escapeHtml(m.medicineName)} at ${escapeHtml(dose.scheduledTime)}" data-med-id="${escapeHtml(m.medId)}" data-dose-time="${escapeHtml(dose.scheduledTime)}" data-dose-date="${todayKey}" ${dose.status === 'taken' ? 'checked' : ''} onchange="setMedicineDoseTaken(this)"><span>Taken</span></label></div>`).join('')}
             </div>
           </div>
         `;
@@ -865,7 +955,6 @@
       const form = e.currentTarget;
       if (form.dataset.saving === 'true') return;
       form.dataset.saving = 'true';
-      const fromVoiceAction = Boolean(form.closest('#voice-action-form-slot'));
       const name = document.getElementById('m-med-name').value.trim();
       const dosage = document.getElementById('m-med-dosage').value.trim();
       const time = document.getElementById('m-med-time').value.trim();
@@ -900,11 +989,7 @@
           document.getElementById('m-med-dosage').value = '';
           document.getElementById('m-med-time').value = '';
           await loadDashboard();
-          if (fromVoiceAction) {
-            finishVoiceAction('Medicine saved. It is available in your Medicines list.');
-          } else {
-            switchMedTab('list');
-          }
+          switchMedTab('list');
         } else {
           alertBox.textContent = res.error || 'Could not save medicine.';
           alertBox.style.display = 'block';
@@ -981,7 +1066,6 @@
       const form = e.currentTarget;
       if (form.dataset.saving === 'true') return;
       form.dataset.saving = 'true';
-      const fromVoiceAction = Boolean(form.closest('#voice-action-form-slot'));
       const docName = document.getElementById('m-doc-name').value.trim();
       const date = document.getElementById('m-doc-date').value.trim();
       const time = document.getElementById('m-doc-time').value.trim();
@@ -1017,11 +1101,7 @@
           document.getElementById('m-doc-name').value = '';
           document.getElementById('m-doc-loc').value = '';
           await loadDashboard();
-          if (fromVoiceAction) {
-            finishVoiceAction('Visit saved. It is available in your Appointments list.');
-          } else {
-            switchApptTab('list');
-          }
+          switchApptTab('list');
         } else {
           alertBox.textContent = res.error || 'Could not schedule appointment.';
           alertBox.style.display = 'block';
@@ -1040,145 +1120,56 @@
     function openVitalsModal() {
       openModalOverlay('modal-vitals');
       document.getElementById('modal-vitals-alert').style.display = 'none';
-      setTimeout(() => { document.getElementById('m-input-hr').focus(); }, 150);
+      const firstOpen = window.CarewiseHealthLogs && window.CarewiseHealthLogs.init();
+      if (window.CarewiseHealthLogs && !firstOpen) window.CarewiseHealthLogs.loadHealthHistory();
+      setTimeout(() => { document.getElementById('health-type').focus(); }, 150);
     }
 
     async function handleModalLogHealth(e) {
       e.preventDefault();
-      const hr = Number(document.getElementById('m-input-hr').value);
       const steps = Number(document.getElementById('m-input-steps').value);
-
-      const alertBox = document.getElementById('modal-vitals-alert');
-      alertBox.style.display = 'none';
+      const status = document.getElementById('steps-quick-log-status');
+      const timestamp = new Date().toISOString();
+      const validationError = window.CareMateAPI.validateHealthLogPayload({ type: 'steps', value: steps, unit: 'steps', timestamp });
+      if (validationError) {
+        status.textContent = validationError;
+        status.className = 'health-status health-status--error';
+        return;
+      }
 
       const btn = document.getElementById('btn-modal-save-vitals');
-      btn.textContent = 'Logging & Analyzing...';
+      btn.textContent = 'Saving steps…';
       btn.disabled = true;
+      status.textContent = 'Saving your step count…';
+      status.className = 'health-modal-status';
 
       try {
         const res = await window.CareMateAPI.logHealthReading({
           userId,
-          heartRate: hr,
-          steps: steps
+          type: 'steps',
+          value: steps,
+          unit: 'steps',
+          timestamp
         });
 
         if (res.success) {
-          // Update dashboard UI
-          document.getElementById('display-hr').innerHTML = `${hr} <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">bpm</span>`;
-          document.getElementById('display-steps').innerHTML = `${steps.toLocaleString()} <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">steps</span>`;
-
-          const isFlagged = res.data && res.data.flagged !== undefined ? res.data.flagged : (hr < 60 || hr > 100);
-          if (isFlagged) {
-            speak(`Heart rate of ${hr} beats per minute is outside the expected range. Consider reviewing this reading with your healthcare provider.`);
-            alert(`⚠️ Heart rate reading of ${hr} bpm is outside the expected range. Consider reviewing it with your healthcare provider.`);
-          } else {
-            speak(`Vitals recorded successfully. Heart rate is normal.`);
-          }
-
-          closeAllModals();
+          status.textContent = 'Steps saved to your Health Logs.';
+          status.className = 'health-status health-status--success';
+          if (window.CarewiseHealthLogs) await window.CarewiseHealthLogs.loadHealthHistory();
         } else {
-          alertBox.textContent = res.error || 'Could not log vitals.';
-          alertBox.style.display = 'block';
+          status.textContent = res.error || 'Steps could not be saved. Please retry.';
+          status.className = 'health-status health-status--error';
         }
       } catch (err) {
-        alertBox.textContent = 'Connection error with backend.';
-        alertBox.style.display = 'block';
+        status.textContent = 'The health service could not be reached. Steps were not reported as saved; please retry.';
+        status.className = 'health-status health-status--error';
       } finally {
-        btn.textContent = 'Save & Check Vitals';
+        btn.textContent = 'Save steps';
         btn.disabled = false;
       }
     }
 
-    // 4. Voice Companion Drawer Triggers
-    function beginVoiceAction(kind) {
-      const config = {
-        medicine: {
-          paneId: 'pane-med-add',
-          title: 'Add Medicine',
-          guidance: 'Enter the medicine name, dosage, time, and frequency. Use the microphones for the name or dosage, review every field, then save.',
-          focusId: 'm-med-name',
-        },
-        visit: {
-          paneId: 'pane-appt-add',
-          title: 'Add Visit',
-          guidance: 'Enter the doctor or clinic, date, time, and location. Dictate the name and location if helpful, review every field, then confirm.',
-          focusId: 'm-doc-name',
-        },
-      }[kind];
-      if (!config || voiceActionFormNode) return;
-
-      stopSpeech();
-      const pane = document.getElementById(config.paneId);
-      const slot = document.getElementById('voice-action-form-slot');
-      if (!pane || !pane.parentNode || !slot) return;
-
-      voiceActionFormPlaceholder = document.createComment('Voice Companion form return point');
-      pane.parentNode.insertBefore(voiceActionFormPlaceholder, pane);
-      voiceActionFormNode = pane;
-      voiceActionKind = kind;
-      pane.style.display = 'block';
-      slot.appendChild(pane);
-
-      document.getElementById('voice-action-title').textContent = config.title;
-      document.getElementById('voice-action-guidance').textContent = config.guidance;
-      document.getElementById('voice-action-options').hidden = true;
-      document.getElementById('voice-assistant-controls').hidden = true;
-      document.getElementById('voice-action-view').hidden = false;
-
-      if (kind === 'visit') {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('m-doc-date').value = tomorrow.toISOString().split('T')[0];
-      }
-      if (window.CareWiseDictation) window.CareWiseDictation.init();
-      setTimeout(() => document.getElementById(config.focusId).focus(), 0);
-    }
-
-    function restoreVoiceActionForm(stopRecognition = true) {
-      if (!voiceActionFormNode) return;
-      if (stopRecognition && window.CareWiseDictation) window.CareWiseDictation.stopAll();
-      if (voiceActionFormPlaceholder && voiceActionFormPlaceholder.parentNode) {
-        voiceActionFormPlaceholder.parentNode.insertBefore(voiceActionFormNode, voiceActionFormPlaceholder);
-        voiceActionFormPlaceholder.remove();
-      }
-      voiceActionFormNode.style.display = 'none';
-      voiceActionFormNode = null;
-      voiceActionFormPlaceholder = null;
-      voiceActionKind = null;
-      document.getElementById('voice-action-options').hidden = false;
-      document.getElementById('voice-assistant-controls').hidden = false;
-      document.getElementById('voice-action-view').hidden = true;
-    }
-
-    function returnToVoiceActions() {
-      if (voiceActionFormNode && voiceActionFormNode.querySelector('form').dataset.saving === 'true') return;
-      const triggerId = voiceActionKind === 'visit' ? 'voice-action-add-visit' : 'voice-action-add-medicine';
-      restoreVoiceActionForm();
-      document.getElementById(triggerId).focus();
-      setVoiceState('Ready', 'Your form draft is kept. Choose an action or return to continue it.');
-    }
-
-    function cancelVoiceAction() {
-      const triggerId = voiceActionKind === 'visit' ? 'voice-action-add-visit' : 'voice-action-add-medicine';
-      if (voiceActionFormNode) {
-        const form = voiceActionFormNode.querySelector('form');
-        if (form.dataset.saving === 'true') return;
-        if (window.CareWiseDictation) window.CareWiseDictation.stopAll();
-        form.reset();
-        voiceActionFormNode.querySelectorAll('.alert').forEach(alertBox => { alertBox.style.display = 'none'; });
-        voiceActionFormNode.querySelectorAll('.dictation-status').forEach(status => { status.textContent = ''; });
-      }
-      restoreVoiceActionForm(false);
-      document.getElementById(triggerId).focus();
-      setVoiceState('Ready', 'The form was cancelled. Choose another action whenever you are ready.');
-    }
-
-    function finishVoiceAction(message) {
-      restoreVoiceActionForm();
-      setAssistantResponse(message);
-      setVoiceState('Success', message);
-    }
-
+    // 4. Voice Companion Chat
     function openVoiceDrawer(autoListen = false) {
       openModalOverlay('drawer-voice');
       if (autoListen) {
@@ -1190,12 +1181,88 @@
 
     function openVoiceDrawerSummary() {
       openModalOverlay('drawer-voice');
-      speakSummary();
+      sendAssistantPrompt('Please summarize my medicines for today and my next appointment.');
     }
 
     // ============================================================
     // DATA LOADING & DASHBOARD RENDERING
     // ============================================================
+
+    async function refreshDashboardHealthSummary() {
+      const status = document.getElementById('dashboard-health-status');
+      const metricTypes = ['blood_pressure', 'heart_rate', 'blood_sugar', 'body_temperature', 'oxygen_saturation', 'steps'];
+      const setEmpty = message => metricTypes.forEach(type => {
+        const id = type.replaceAll('_', '-');
+        document.getElementById(`health-summary-${id}`).textContent = message;
+        document.getElementById(`health-summary-${id}-time`).textContent = '—';
+      });
+      if (typeof window.CareMateAPI.getHealthLogs !== 'function') {
+        setEmpty('Health readings unavailable');
+        status.textContent = 'Health readings are unavailable right now.';
+        return false;
+      }
+      status.textContent = 'Loading saved readings…';
+      try {
+        const result = await window.CareMateAPI.getHealthLogs(userId);
+        if (!result.success || !Array.isArray(result.data)) throw new Error('Health readings could not be loaded.');
+        const ownRecords = result.data.filter(record => record && record.userId === userId);
+        const latestByType = {};
+        ownRecords.forEach(record => {
+          const type = record.type || (record.heartRate !== undefined ? 'heart_rate' : null);
+          if (!metricTypes.includes(type)) return;
+          const timestamp = Date.parse(record.timestamp);
+          if (!Number.isFinite(timestamp)) return;
+          if (!latestByType[type] || timestamp > Date.parse(latestByType[type].timestamp)) latestByType[type] = record;
+        });
+        metricTypes.forEach(type => {
+          const record = latestByType[type];
+          const id = type.replaceAll('_', '-');
+          const valueElement = document.getElementById(`health-summary-${id}`);
+          const timeElement = document.getElementById(`health-summary-${id}-time`);
+          if (!record) {
+            valueElement.textContent = 'No reading yet';
+            timeElement.textContent = '—';
+            return;
+          }
+          let value;
+          if (type === 'blood_pressure') {
+            if (!Number.isFinite(Number(record.systolic)) || !Number.isFinite(Number(record.diastolic))) {
+              valueElement.textContent = 'No reading yet';
+              timeElement.textContent = '—';
+              return;
+            }
+            value = `${record.systolic}/${record.diastolic} ${record.unit || 'mmHg'}`;
+          } else if (type === 'steps') {
+            const steps = record.steps ?? record.value;
+            if (!Number.isInteger(Number(steps)) || Number(steps) < 0) {
+              valueElement.textContent = 'No reading yet';
+              timeElement.textContent = '—';
+              return;
+            }
+            value = `${Number(steps).toLocaleString()} steps`;
+          }
+          else {
+            const number = record.value ?? (type === 'heart_rate' ? record.heartRate : undefined);
+            if (!Number.isFinite(Number(number))) {
+              valueElement.textContent = 'No reading yet';
+              timeElement.textContent = '—';
+              return;
+            }
+            value = `${number} ${record.unit || (type === 'heart_rate' ? 'bpm' : '')}`.trim();
+            if (type === 'blood_sugar' && record.context) value += ` · ${String(record.context).replaceAll('_', ' ')}`;
+          }
+          valueElement.textContent = value;
+          timeElement.textContent = new Date(record.timestamp).toLocaleString();
+        });
+        status.textContent = metricTypes.some(type => latestByType[type]) ? 'Latest saved readings' : 'No health readings recorded yet.';
+        return true;
+      } catch (_) {
+        setEmpty('Health readings unavailable');
+        status.textContent = 'Health readings could not be loaded. Try again from Health Logs.';
+        return false;
+      }
+    }
+    window.refreshDashboardHealthSummary = refreshDashboardHealthSummary;
 
     async function loadDashboard() {
       // These are independent reads; don't make profile latency hold up the
@@ -1208,6 +1275,9 @@
         window.CareMateAPI.getAppointments(userId),
       ]);
 
+      // Health context is independent; it must not delay core dashboard panels.
+      if (typeof refreshDashboardHealthSummary === 'function') void refreshDashboardHealthSummary();
+
       if (medRes.success && Array.isArray(medRes.data)) {
         medicineDataState = 'loaded';
         userMedicines = medRes.data;
@@ -1217,14 +1287,10 @@
         renderMedicinesUnavailable();
       }
 
-      if (apptRes.success && Array.isArray(apptRes.data) && apptRes.data.length > 0) {
+      if (apptRes.success && Array.isArray(apptRes.data)) {
         appointmentDataState = 'loaded';
-        userAppointments = apptRes.data;
-        renderNextAppointment(userAppointments[0]);
-      } else if (apptRes.success && Array.isArray(apptRes.data)) {
-        appointmentDataState = 'loaded';
-        userAppointments = [];
-        renderNoAppointments();
+        userAppointments = window.CareMateAPI.filterUpcomingAppointments(apptRes.data, userId);
+        renderUpcomingAppointments(userAppointments);
       } else {
         appointmentDataState = 'error';
         renderAppointmentsUnavailable();
@@ -1239,21 +1305,16 @@
       }
 
       box.innerHTML = list.map(m => {
-        const status = m.todayStatus || 'pending';
+        const doses = Array.isArray(m.todayDoses) && m.todayDoses.length ? m.todayDoses : [{ scheduledTime: m.time, status: m.todayStatus || 'pending' }];
         return `
           <div class="med-item" id="med-${m.medId}">
             <div class="med-info">
               <h4>${escapeHtml(m.medicineName)}</h4>
               <div class="med-meta">
                 <span>💊 ${escapeHtml(m.dosage)}</span>
-                <span>⏰ ${escapeHtml(m.time)}</span>
                 <span>(${escapeHtml(m.frequency)})</span>
               </div>
-            </div>
-            <div>
-              <button type="button" class="status-pill ${status}" data-dose="${m.medId}" onclick="cycleStatus('${m.medId}', '${status}')" title="${status === 'taken' ? 'Undo taken status' : 'Mark as taken'}">
-                ${status === 'taken' ? 'Taken / Undo' : status === 'missed' ? 'Missed' : 'Mark as taken'}
-              </button>
+              ${doses.map(dose => `<div class="dose-row ${dose.status === 'taken' ? 'dose-complete' : ''}"><span>⏰ ${escapeHtml(dose.scheduledTime)}</span><label class="dose-checkbox"><input type="checkbox" aria-label="Taken: ${escapeHtml(m.medicineName)} at ${escapeHtml(dose.scheduledTime)}" data-med-id="${escapeHtml(m.medId)}" data-dose-time="${escapeHtml(dose.scheduledTime)}" data-dose-date="${todayKey}" ${dose.status === 'taken' ? 'checked' : ''} onchange="setMedicineDoseTaken(this)"><span>Taken</span></label></div>`).join('')}
             </div>
           </div>
         `;
@@ -1274,39 +1335,67 @@
       document.getElementById('medicines-container').innerHTML = '<p role="status" style="padding:1.5rem;color:var(--text-muted);text-align:center;">Medicine schedule could not be loaded. Check your connection and try again.</p>';
     }
 
-    function renderNextAppointment(appt) {
-      document.getElementById('next-appt-doctor').textContent = appt.doctorName || 'Doctor Appointment';
-      document.getElementById('next-appt-time').textContent = `📅 ${appt.date} at ${appt.time}`;
-      document.getElementById('next-appt-loc').textContent = `📍 ${appt.location || 'Clinic'}`;
-    }
-
-    function renderNoAppointments() {
-      document.getElementById('next-appt-doctor').textContent = 'No upcoming visits';
-      document.getElementById('next-appt-time').textContent = 'You are all caught up on clinic visits.';
-      document.getElementById('next-appt-loc').textContent = 'Schedule a visit anytime.';
+    function renderUpcomingAppointments(appointments) {
+      const box = document.getElementById('upcoming-appointments-list');
+      if (!appointments.length) {
+        box.innerHTML = '<p style="padding:1rem; color:var(--text-muted);">No upcoming doctor visits.</p>';
+        return;
+      }
+      box.innerHTML = appointments.map(appointment => {
+        const date = new Date(`${appointment.date}T00:00:00`);
+        const formattedDate = Number.isNaN(date.getTime())
+          ? escapeHtml(appointment.date)
+          : escapeHtml(date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
+        const status = appointment.status || appointment.appointmentStatus;
+        const visitAt = new Date(`${appointment.date}T${appointment.time || '00:00'}:00`);
+        const canComplete = !Number.isNaN(visitAt.getTime()) && visitAt.getTime() <= Date.now();
+        return `<article style="padding:1rem; background:var(--bg-subtle); border-radius:var(--radius-md); border:1px solid var(--border-light);">
+          <h3 style="font-size:1rem; color:var(--terra-main); margin:0 0 .3rem; font-family:inherit; font-weight:700;">${escapeHtml(appointment.doctorName || 'Doctor appointment')}</h3>
+          <p style="font-size:.88rem; color:var(--text-sub); margin:.2rem 0;">${formattedDate} at ${escapeHtml(appointment.time || '')}</p>
+          <p style="font-size:.82rem; color:var(--text-muted); margin:.2rem 0 0;">${escapeHtml(appointment.location || '')}</p>
+          ${status ? `<span style="display:inline-block;margin-top:.45rem;font-size:.76rem;color:var(--sage-dark);">${escapeHtml(status)}</span>` : ''}
+          <label class="visit-checkbox"><input type="checkbox" aria-label="Visit completed: ${escapeHtml(appointment.doctorName || 'Doctor appointment')}" title="${canComplete ? '' : 'Available after the scheduled visit time'}" data-appt-id="${escapeHtml(appointment.apptId)}" ${appointment.completed === true ? 'checked' : ''} ${canComplete ? '' : 'disabled'} onchange="setAppointmentCompleted(this)"><span>${appointment.completed === true ? 'Visit completed' : 'Complete'}</span></label>
+        </article>`;
+      }).join('');
     }
 
     function renderAppointmentsUnavailable() {
-      document.getElementById('next-appt-doctor').textContent = 'Appointments unavailable';
-      document.getElementById('next-appt-time').textContent = 'The schedule could not be loaded. Check your connection and try again.';
-      document.getElementById('next-appt-loc').textContent = '';
+      document.getElementById('upcoming-appointments-list').innerHTML = '<div role="alert" style="padding:1rem;color:var(--text-muted);">Upcoming appointments could not be loaded. Check your connection and <button type="button" class="btn btn-secondary" onclick="loadDashboard()">retry</button>.</div>';
     }
 
-    async function cycleStatus(medId, currentStatus) {
-      if (pendingDoseUpdates.has(medId)) return;
-      pendingDoseUpdates.add(medId);
-      const buttons = document.querySelectorAll('[data-dose="' + CSS.escape(medId) + '"]');
-      buttons.forEach(button => { button.disabled = true; button.textContent = 'Saving?'; });
-      const nextStatus = currentStatus === 'taken' ? 'pending' : 'taken';
-      const res = await window.CareMateAPI.updateMedicineDose(medId, nextStatus, todayKey);
-      pendingDoseUpdates.delete(medId);
-      if (res.success) {
+    async function setMedicineDoseTaken(checkbox) {
+      const { medId, doseTime, doseDate } = checkbox.dataset;
+      const updateKey = `${medId}:${doseDate}:${doseTime}`;
+      if (pendingDoseUpdates.has(updateKey)) return;
+      const previous = !checkbox.checked;
+      pendingDoseUpdates.add(updateKey);
+      checkbox.disabled = true;
+      try {
+        const res = await window.CareMateAPI.updateMedicineDose(medId, checkbox.checked ? 'taken' : 'pending', doseDate, doseTime);
+        if (!res.success) throw new Error(res.error || 'Could not update this dose. Please try again.');
         await loadDashboard();
         renderModalMedicines();
-        if (nextStatus === 'taken') speak('Dose marked as taken.');
-      } else {
-        buttons.forEach(button => { button.disabled = false; button.textContent = currentStatus === 'taken' ? 'Taken / Undo' : 'Mark as taken'; });
-        alert(res.error || 'Could not update this dose. Please try again.');
+        if (checkbox.checked) speak('Dose marked as taken.');
+      } catch (error) {
+        checkbox.checked = previous;
+        alert(error.message || 'Could not update this dose. Please try again.');
+      } finally {
+        pendingDoseUpdates.delete(updateKey);
+        checkbox.disabled = false;
+      }
+    }
+
+    async function setAppointmentCompleted(checkbox) {
+      const previous = !checkbox.checked;
+      checkbox.disabled = true;
+      try {
+        const result = await window.CareMateAPI.updateAppointmentCompletion(checkbox.dataset.apptId, checkbox.checked, userId);
+        if (!result.success) throw new Error(result.error || 'Could not update this visit. Please try again.');
+        await loadDashboard();
+      } catch (error) {
+        checkbox.checked = previous;
+        checkbox.disabled = false;
+        alert(error.message || 'Could not update this visit. Please try again.');
       }
     }
 
@@ -1346,35 +1435,38 @@
     }
 
     function speakSummary() {
-      if (medicineDataState !== 'loaded' || appointmentDataState !== 'loaded') {
-        const error = 'I could not load your daily summary. Check your connection and try again.';
-        setAssistantResponse(error);
-        setVoiceState('Error', error);
-        return;
-      }
-      const pendingCount = userMedicines.filter(m => (m.todayStatus || 'pending') === 'pending').length;
-      let text = `Hello ${userName}. `;
-      if (userMedicines.length > 0) text += `You have ${userMedicines.length} medicines scheduled today, and ${pendingCount} are pending. `;
-      else text += `You have no medicines scheduled for today. `;
-      if (userAppointments.length > 0) text += `Your next appointment is with ${userAppointments[0].doctorName} on ${userAppointments[0].date} at ${userAppointments[0].time}.`;
-      else text += 'You have no upcoming appointments listed.';
-      setAssistantResponse(text);
-      speak(text);
+      sendAssistantPrompt('Please summarize my medicines for today and my next appointment.');
     }
 
     // Speech Recognition
     let recognition = null;
     let isListening = false;
+    let isRecognitionStarting = false;
+    let recognitionResultHandled = false;
+    let recognitionErrorHandled = false;
+    let recognitionErrorMessage = '';
+    let recognitionWatchdog = null;
+    let assistantRequestInFlight = false;
+    let mediaRecorder = null;
+    let microphoneStream = null;
+    let recordedAudioChunks = [];
+    let recordingWatchdog = null;
+    let groqTranscriptionInFlight = false;
+    let groqTranscriptHandled = false;
 
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRec();
       recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.interimResults = true;
       recognition.lang = 'en-US';
 
       recognition.onstart = () => {
+        isRecognitionStarting = false;
         isListening = true;
+        recognitionResultHandled = false;
+        recognitionErrorHandled = false;
+        recognitionErrorMessage = '';
         const orbs = [document.getElementById('mascot-orb'), document.getElementById('drawer-mascot-orb')];
         const badges = [document.getElementById('voice-badge'), document.getElementById('drawer-voice-badge')];
         orbs.forEach(o => { if (o) o.classList.add('listening'); });
@@ -1391,19 +1483,49 @@
         document.getElementById('voice-transcript').textContent = 'Listening for your command...';
         const dt = document.getElementById('drawer-voice-transcript');
         if (dt) dt.value = '';
+        clearTimeout(recognitionWatchdog);
+        recognitionWatchdog = setTimeout(() => {
+          if (!isListening || recognitionResultHandled) return;
+          recognitionErrorMessage = 'Speech recognition took too long to respond. Check your connection, then try again or type your message.';
+          recognitionErrorHandled = true;
+          console.warn('[Carewise Voice] Recognition timed out', { operation: 'SpeechRecognition.result', language: recognition.lang, origin: location.origin, secureContext: window.isSecureContext });
+          try { recognition.abort(); } catch (_) { resetMic(); }
+          setAssistantResponse(recognitionErrorMessage);
+          setVoiceState('Error', recognitionErrorMessage);
+        }, 20000);
       };
 
       recognition.onresult = async (event) => {
-        const transcript = event.results[0][0].transcript;
+        let transcript = '';
+        for (let i = event.resultIndex || 0; i < event.results.length; i += 1) {
+          if (event.results[i].isFinal && event.results[i][0]) transcript += `${event.results[i][0].transcript} `;
+        }
+        transcript = transcript.trim();
+        if (!transcript || recognitionResultHandled) return;
+        recognitionResultHandled = true;
+        clearTimeout(recognitionWatchdog);
         const dt = document.getElementById('drawer-voice-transcript');
         if (dt) dt.value = transcript;
         const cardText = document.getElementById('voice-transcript');
         if (cardText) cardText.textContent = `Transcript ready: ${transcript}`;
-        setVoiceState('Success', 'Transcript ready. Review or edit it, then submit.');
+        setVoiceState('Processing', 'I heard you. Sending your message…');
+        if (dt) dt.value = '';
+        await sendAssistantPrompt(transcript);
       };
 
       recognition.onerror = (event) => {
         resetMic();
+        if (recognitionErrorHandled) {
+          console.warn('[Carewise Voice] Duplicate recognition error ignored', { error: event.error || 'unknown', message: event.message || '' });
+          return;
+        }
+        recognitionErrorHandled = true;
+        if (recognitionResultHandled) {
+          console.warn('[Carewise Voice] Recognition reported an error after delivering a transcript', {
+            operation: 'SpeechRecognition.onerror', error: event.error || 'unknown', message: event.message || '', language: recognition.lang,
+          });
+          return;
+        }
         const messages = {
           'not-allowed': 'Chrome blocked speech input. Check the site and device microphone settings, then try again.',
           'service-not-allowed': "Chrome's speech recognition service is blocked or unavailable. Check browser policy and try again.",
@@ -1413,16 +1535,18 @@
           aborted: 'Speech recognition stopped before hearing a request. Tap the microphone to try again.',
           'language-not-supported': 'Speech recognition does not support the selected language in this browser.',
         };
-        const message = messages[event.error] || 'Speech recognition failed. Please try again.';
+        const message = recognitionErrorMessage || messages[event.error] || 'Speech recognition failed. Please try again, or type your message.';
+        clearTimeout(recognitionWatchdog);
         setAssistantResponse(message);
         setVoiceState('Error', message);
         document.getElementById('voice-transcript').textContent = message;
 
         const logDetails = (microphonePermission) => console.warn('[Carewise Voice] SpeechRecognition.onerror', {
-          operation: 'SpeechRecognition.start',
+          operation: 'SpeechRecognition.onerror',
           name: event.name || 'SpeechRecognitionErrorEvent',
           error: event.error || 'unknown',
-          message: event.message || '',
+          message: event.message || recognitionErrorMessage || '',
+          language: recognition.lang,
           microphonePermission,
           origin: location.origin,
           secureContext: window.isSecureContext,
@@ -1437,23 +1561,152 @@
       };
 
       recognition.onend = () => {
+        clearTimeout(recognitionWatchdog);
+        isRecognitionStarting = false;
         resetMic();
       };
     }
 
+    function setMicRecordingUi(isRecording) {
+      isListening = isRecording;
+      const orbs = [document.getElementById('mascot-orb'), document.getElementById('drawer-mascot-orb')];
+      orbs.forEach(orb => { if (orb) orb.classList.toggle('listening', isRecording); });
+      const stopButton = document.getElementById('btn-stop-listening');
+      if (stopButton) stopButton.disabled = !isRecording;
+      document.getElementById('btn-mic-text').textContent = isRecording ? 'Recording... Speak now' : 'Speak to Companion';
+      const drawerText = document.getElementById('drawer-mic-text');
+      if (drawerText) drawerText.textContent = isRecording ? 'Recording... Speak now' : 'Tap to Speak';
+      document.getElementById('btn-toggle-mic').classList.toggle('active', isRecording);
+      const drawerMic = document.getElementById('btn-drawer-mic');
+      if (drawerMic) drawerMic.classList.toggle('active', isRecording);
+      const badges = [document.getElementById('voice-badge'), document.getElementById('drawer-voice-badge')];
+      badges.forEach(badge => { if (badge) badge.textContent = isRecording ? 'Listening' : 'Ready'; });
+    }
+
+    function releaseMicrophone() {
+      clearTimeout(recordingWatchdog);
+      if (microphoneStream) microphoneStream.getTracks().forEach(track => track.stop());
+      microphoneStream = null;
+      mediaRecorder = null;
+    }
+
+    async function startGroqVoiceRecording() {
+      if (assistantRequestInFlight || groqTranscriptionInFlight) return;
+      setVoiceState('Listening', 'Allow microphone access, then speak. Your recording will be transcribed securely by the backend.');
+      try {
+        microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const supportedTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/mp4', 'audio/webm'];
+        const mimeType = supportedTypes.find(type => MediaRecorder.isTypeSupported(type));
+        mediaRecorder = new MediaRecorder(microphoneStream, mimeType ? { mimeType } : undefined);
+        recordedAudioChunks = [];
+        groqTranscriptHandled = false;
+        mediaRecorder.ondataavailable = event => { if (event.data?.size) recordedAudioChunks.push(event.data); };
+        mediaRecorder.onerror = event => {
+          console.warn('[Carewise Voice] Audio recording failed', { errorName: event.error?.name || 'MediaRecorderError' });
+          releaseMicrophone();
+          setMicRecordingUi(false);
+          const message = 'The microphone recording failed. Please try again or type your message.';
+          setAssistantResponse(message);
+          setVoiceState('Error', message);
+        };
+        mediaRecorder.onstop = async () => {
+          const blob = new Blob(recordedAudioChunks, { type: mediaRecorder?.mimeType || mimeType || 'audio/webm' });
+          recordedAudioChunks = [];
+          releaseMicrophone();
+          setMicRecordingUi(false);
+          if (!blob.size) {
+            const message = 'No audio was recorded. Please try again or type your message.';
+            setAssistantResponse(message);
+            setVoiceState('Error', message);
+            return;
+          }
+          groqTranscriptionInFlight = true;
+          setVoiceState('Processing', 'Transcribing your recording...');
+          try {
+            const result = await window.CareMateAPI.transcribeAssistantAudio(blob);
+            const transcript = result.success ? result.data.text.trim() : '';
+            if (!transcript) {
+              const message = result.error || 'No speech was recognized. Please try again or type your message.';
+              setAssistantResponse(message);
+              setVoiceState('Error', message);
+              return;
+            }
+            if (groqTranscriptHandled) return;
+            groqTranscriptHandled = true;
+            const input = document.getElementById('drawer-voice-transcript');
+            if (input) input.value = transcript;
+            document.getElementById('voice-transcript').textContent = `Transcript ready: ${transcript}`;
+            setVoiceState('Processing', 'Transcript ready. Sending your message once...');
+            await sendAssistantPrompt(transcript);
+          } catch (error) {
+            console.warn('[Carewise Voice] Transcription request failed', { errorName: error.name || 'Error' });
+            const message = 'Carewise could not transcribe that recording. Please try again or type your message.';
+            setAssistantResponse(message);
+            setVoiceState('Error', message);
+          } finally {
+            groqTranscriptionInFlight = false;
+          }
+        };
+        mediaRecorder.start();
+        setMicRecordingUi(true);
+        document.getElementById('voice-transcript').textContent = 'Listening for your command...';
+        const input = document.getElementById('drawer-voice-transcript');
+        if (input) input.value = '';
+        recordingWatchdog = setTimeout(() => {
+          if (mediaRecorder?.state === 'recording') mediaRecorder.stop();
+        }, 15_000);
+      } catch (error) {
+        releaseMicrophone();
+        setMicRecordingUi(false);
+        const errors = {
+          NotAllowedError: 'Microphone access was denied. Allow microphone access for Carewise, then try again or type your message.',
+          NotFoundError: 'No microphone is available. Connect or enable a microphone, then try again.',
+          NotReadableError: 'The microphone is busy or unavailable. Close other apps using it, then try again.',
+          SecurityError: 'Microphone access requires localhost or a secure HTTPS page.',
+        };
+        const message = errors[error.name] || 'The microphone could not start. Please try again or type your message.';
+        console.warn('[Carewise Voice] Recording could not start', { errorName: error.name || 'Error', secureContext: window.isSecureContext });
+        setAssistantResponse(message);
+        setVoiceState('Error', message);
+      }
+    }
+
     function toggleSpeech() {
+      if (mediaRecorder?.state === 'recording') {
+        clearTimeout(recordingWatchdog);
+        mediaRecorder.stop();
+        setVoiceState('Processing', 'Preparing your recording...');
+        return;
+      }
+      if (navigator.mediaDevices?.getUserMedia && window.MediaRecorder) {
+        void startGroqVoiceRecording();
+        return;
+      }
       if (!recognition) {
-        const error = 'Speech recognition is not supported in this browser. Try a browser with Web Speech API support.';
+        const error = 'This browser cannot record audio for speech recognition. Try a supported browser or type your message.';
         setAssistantResponse(error); setVoiceState('Error', error);
         return;
       }
+      if (isRecognitionStarting) return;
       if (isListening) {
-        recognition.stop();
+        try { recognition.stop(); }
+        catch (error) {
+          console.warn('[Carewise Voice] SpeechRecognition.stop failed', { name: error.name, message: error.message });
+          const message = 'Voice input could not stop cleanly. You can still type your message.';
+          setAssistantResponse(message);
+          setVoiceState('Error', message);
+          resetMic();
+        }
       } else {
-        setVoiceState('Listening', 'Listening. Speak now; your transcript stays here until you submit.');
+        recognitionResultHandled = false;
+        recognitionErrorHandled = false;
+        recognitionErrorMessage = '';
+        isRecognitionStarting = true;
+        setVoiceState('Listening', 'Listening. Speak naturally; I will send the recognized message once.');
         try {
           recognition.start();
         } catch (e) {
+          isRecognitionStarting = false;
           console.warn('[Carewise Voice] SpeechRecognition.start threw', {
             operation: 'SpeechRecognition.start',
             name: e.name,
@@ -1468,14 +1721,25 @@
             SecurityError: 'Chrome blocked speech input for this page. Open Carewise from its local development address or a secure site.',
             InvalidStateError: 'Speech recognition is already starting. Wait a moment and try again.',
           };
-          const message = startErrorMessages[e.name] || 'Speech recognition could not start. Check your microphone and try again.';
+          const message = startErrorMessages[e.name] || 'Speech recognition could not start. Try again or type your message.';
           setAssistantResponse(message);
           setVoiceState('Error', message);
         }
       }
     }
 
-    function stopSpeech() { if (recognition && isListening) recognition.stop(); }
+    function stopSpeech() {
+      if (mediaRecorder?.state === 'recording') {
+        clearTimeout(recordingWatchdog);
+        mediaRecorder.stop();
+        setVoiceState('Processing', 'Preparing your recording...');
+        return;
+      }
+      clearTimeout(recognitionWatchdog);
+      if (recognition && (isListening || isRecognitionStarting)) {
+        try { recognition.stop(); } catch (error) { console.warn('[Carewise Voice] SpeechRecognition.stop failed', { name: error.name, message: error.message }); resetMic(); }
+      }
+    }
 
     function setVoiceState(state, message) {
       const badge = document.getElementById('drawer-voice-badge');
@@ -1485,21 +1749,376 @@
     }
 
     function setAssistantResponse(text) {
-      const response = document.getElementById('drawer-voice-response');
-      if (response) response.textContent = text;
-      const card = document.getElementById('voice-transcript');
-      if (card) card.textContent = text;
+      addConversationMessage('assistant', text);
     }
 
     function submitVoiceTranscript() {
-      const transcript = document.getElementById('drawer-voice-transcript').value.trim();
-      if (!transcript) { const error = 'Enter or dictate a request before submitting.'; setAssistantResponse(error); setVoiceState('Error', error); return; }
-      setVoiceState('Processing', 'Processing your request...');
-      handleVoiceCommand(transcript);
+      const input = document.getElementById('drawer-voice-transcript');
+      const transcript = input.value.trim();
+      if (!transcript) { setVoiceState('Ready', 'Type a message or use the microphone.'); input.focus(); return; }
+      input.value = '';
+      sendAssistantPrompt(transcript);
     }
+
+    function toggleAssistantDemoMode() {
+      assistantDemoMode = !assistantDemoMode;
+      document.getElementById('assistant-demo-mode-toggle').textContent = assistantDemoMode ? 'Return to Live AI' : 'Use Demo Mode';
+      document.getElementById('assistant-demo-active').hidden = !assistantDemoMode;
+      document.getElementById('assistant-demo-panel').open = assistantDemoMode || document.getElementById('assistant-demo-panel').open;
+      setVoiceState('Ready', assistantDemoMode
+        ? 'Demo Mode is active. Replies are prewritten samples; live AI and your records are not used.'
+        : 'Live AI mode selected. The configured provider may be unavailable if its quota is exhausted.');
+    }
+
+    function useAssistantDemoSample(topic) {
+      const questions = {
+        medicine: 'How can I remember my medicines?',
+        family: 'How can family help from afar?',
+        safety: 'How can I make my home safer?',
+      };
+      const question = questions[topic];
+      if (!question) return;
+      if (!assistantDemoMode) toggleAssistantDemoMode();
+      sendAssistantPrompt(question);
+    }
+
+    function addConversationMessage(role, content, addToHistory = true) {
+      const log = document.getElementById('voice-chat-messages');
+      const bubble = document.createElement('div');
+      bubble.className = `voice-chat-message voice-chat-message--${role === 'user' ? 'user' : 'assistant'}`;
+      bubble.textContent = content;
+      log.appendChild(bubble);
+      log.scrollTop = log.scrollHeight;
+      if (addToHistory) assistantConversation.push({ role: role === 'user' ? 'user' : 'assistant', content });
+      if (role === 'assistant' && assistantReplyVoiceEnabled) speak(content);
+    }
+
+    function toggleAssistantVoice() {
+      assistantReplyVoiceEnabled = !assistantReplyVoiceEnabled;
+      const button = document.getElementById('assistant-voice-toggle');
+      button.setAttribute('aria-pressed', String(assistantReplyVoiceEnabled));
+      button.textContent = assistantReplyVoiceEnabled ? 'Voice replies on' : 'Voice replies off';
+      if (!assistantReplyVoiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+      setVoiceState('Ready', assistantReplyVoiceEnabled ? 'Spoken replies are on.' : 'Spoken replies are off.');
+    }
+
+    function contextForPrompt(text) {
+      const recentUserContext = assistantConversation.slice(-8).filter(turn => turn.role === 'user').map(turn => turn.content).join(' ');
+      const query = `${recentUserContext} ${text}`.toLowerCase();
+      const context = { medicines: [], appointments: [] };
+      if (/medicine|medication|pill|dose|took|taken|schedule|today|summary/.test(query)) {
+        context.medicines = medicineDataState === 'loaded' ? userMedicines : null;
+      }
+      if (/appointment|doctor|visit|schedule|summary/.test(query)) {
+        context.appointments = appointmentDataState === 'loaded' ? userAppointments : null;
+      }
+      return context;
+    }
+
+    function actionDraftSummary(action) {
+      const f = action.fields || {};
+      const patientWords = assistantConversation.filter(turn => turn.role === 'user').map(turn => turn.content.toLocaleLowerCase()).join(' ');
+      const patientProvided = value => typeof value === 'string' && value.trim() && patientWords.includes(value.trim().toLocaleLowerCase());
+      const patientProvidedDate = value => {
+        if (patientProvided(value)) return true;
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+        if (!match) return false;
+        const [, year, month, day] = match;
+        const monthName = new Date(Number(year), Number(month) - 1, 1).toLocaleString('en', { month: 'long' }).toLowerCase();
+        return patientWords.includes(`${Number(day)} ${monthName} ${year}`) || patientWords.includes(`${monthName} ${Number(day)} ${year}`) || patientWords.includes(`${monthName} ${Number(day)}, ${year}`);
+      };
+      const patientProvidedTime = value => {
+        if (patientProvided(value)) return true;
+        const wanted = /^(\d{2}):(\d{2})$/.exec(value || '');
+        if (!wanted) return false;
+        return [...patientWords.matchAll(/\b(\d{1,2})(?::([0-5]\d))?\s*(a\.?m\.?|p\.?m\.?)\b/gi)].some(match => {
+          const hour = (Number(match[1]) % 12) + (match[3].toLowerCase().startsWith('p') ? 12 : 0);
+          return hour === Number(wanted[1]) && Number(match[2] || 0) === Number(wanted[2]);
+        });
+      };
+      if (action.type === 'add_medicine') {
+        const times = Array.isArray(f.times) ? f.times : [f.time];
+        if (!f.confirmationToken || !f.medicineName || !f.dosage || !f.frequency || !times.length
+          || times.some(time => !/^([01]\d|2[0-3]):([0-5]\d)$/.test(time || ''))) return null;
+        const schedule = times.join(' and ');
+        const instructions = f.instructions ? `; ${f.instructions}` : '';
+        return { type: action.type, fields: f, summary: `Add ${f.medicineName}, ${f.dosage}, at ${schedule}, ${f.frequency}${instructions}?` };
+      }
+      if (action.type === 'add_appointment') {
+        if (!patientProvided(f.doctorName) || !/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(f.date || '') || !patientProvidedDate(f.date) || !/^([01]\d|2[0-3]):([0-5]\d)$/.test(f.time || '') || !patientProvidedTime(f.time) || !patientProvided(f.location) || !f.idempotencyKey) return null;
+        return { type: action.type, fields: f, summary: `Schedule ${f.doctorName} on ${f.date} at ${f.time}, at ${f.location}?` };
+      }
+      if (action.type === 'mark_taken') {
+        const matches = userMedicines.filter(m => m.medId === f.medId);
+        if (medicineDataState !== 'loaded' || matches.length !== 1 || !patientProvided(matches[0].medicineName)) return null;
+        const med = matches[0];
+        return { type: action.type, fields: { medId: med.medId }, summary: `Mark ${med.medicineName} (${med.dosage}) as taken for today?` };
+      }
+      return null;
+    }
+
+    function appointmentFieldReply(message) {
+      return /\b(?:Dr\.?\s|doctor|appointment|visit|January|February|March|April|May|June|July|August|September|October|November|December|address|location|Pune|Maharashtra|\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?))\b/i.test(message);
+    }
+
+    async function sendAssistantPrompt(text) {
+      const message = String(text || '').trim();
+      if (!message || assistantRequestInFlight) return;
+      const cancelWords = /^(cancel|never mind|nevermind|stop)$/i.test(message);
+      if (cancelWords && (assistantPendingAction || assistantMedicineWorkflow || assistantAppointmentWorkflow)) {
+        const cancelType = assistantPendingAction?.type || (assistantAppointmentWorkflow ? 'add_appointment' : 'add_medicine');
+        if (cancelType === 'add_medicine') {
+          clearAssistantPendingAction('add_medicine');
+          assistantMedicineWorkflow = null;
+          assistantMedicineMessages = [];
+        }
+        if (cancelType === 'add_appointment') {
+          clearAssistantPendingAction('add_appointment');
+          assistantAppointmentWorkflow = null;
+          assistantAppointmentMessages = [];
+        }
+        if (!assistantPendingAction) document.getElementById('assistant-action-confirmation').hidden = true;
+        addConversationMessage('user', message);
+        addConversationMessage('assistant', 'Of course. I cancelled that draft.');
+        setVoiceState('Ready', 'Draft cancelled.');
+        return;
+      }
+      const medicineConfirmation = /^(?:yes(?:,?\s+(?:please|save it|add it|go ahead))?|confirm(?:ed)?|save it|add it|go ahead|please do|that'?s right|that is right)[.! ]*$/i.test(message)
+        || /\b(?:confirm|save)\b[\s\S]{0,80}\b(?:it|this|medicine|schedule|log)\b|\badd\s+it\s+(?:to|in)\s+(?:the\s+)?medicine\s+(?:log|list|schedule)\b/i.test(message);
+      const appointmentConfirmation = /^(?:yes(?:,?\s+(?:please|save it|add it|go ahead))?|confirm(?:ed)?|save it|go ahead|please do)[.! ]*$/i.test(message)
+        || /\b(?:confirm|save)\b[\s\S]{0,80}\b(?:it|this|appointment|visit)\b/i.test(message);
+      const medicineFieldReply = /\b\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml)\b|\b(?:tablet|capsule|pill|daily|every\s+(?:day|morning|evening|night)|morning|evening|before\s+breakfast|after\s+food|with\s+water|by\s+mouth|label|package|box|exact product)\b|\b\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)\b/i.test(message);
+      const medicineDraftReference = /\badd\s+that\s+medicine\b/i.test(message);
+      const newAppointmentRequest = /\b(?:add|schedule|book|create|set up)\b/i.test(message)
+        && /\b(?:appointment|doctor|visit|clinic)\b|\bDr\.?\s/i.test(message);
+      const newMedicineRequest = !medicineDraftReference && !newAppointmentRequest && /\b(?:add|schedule|create|start|set up)\s+(?:(?:a|an|new)\s+)?(?:medicine\s+(?:called\s+|named\s+)?)?/i.test(message)
+        && (/\b(?:medicine|medication|pill|prescription)\b/i.test(message) || /\b(?:add|schedule|create|start|set up)\s+(?:(?:a|an|new)\s+)?(?:medicine\s+(?:called\s+|named\s+)?)?[a-z][\w-]*\s+\d+(?:[/-]\d+)?(?:\s*(?:mg|mcg|g|ml))?\b/i.test(message));
+      const appointmentDraftReference = /\badd\s+that\s+appointment\b/i.test(message);
+
+      if (assistantMedicineWorkflow?.state === 'saved' && medicineConfirmation && assistantPendingAction?.type !== 'add_appointment') {
+        addConversationMessage('user', message);
+        addConversationMessage('assistant', 'That medicine schedule was already saved. I did not create another record.');
+        setVoiceState('Ready', 'Schedule already saved.');
+        return;
+      }
+      if (assistantAppointmentWorkflow?.state === 'saved' && appointmentConfirmation && assistantPendingAction?.type !== 'add_medicine') {
+        addConversationMessage('user', message);
+        addConversationMessage('assistant', 'That appointment was already saved. I did not create another record.');
+        setVoiceState('Ready', 'Appointment already saved.');
+        return;
+      }
+      const namesAppointment = /\b(?:appointment|visit)\b/i.test(message);
+      const namesMedicine = /\b(?:medicine|medication)\b/i.test(message);
+      if (assistantAppointmentPendingAction && ['awaiting_confirmation', 'save_failed'].includes(assistantAppointmentWorkflow?.state) && appointmentConfirmation
+        && (namesAppointment || (!namesMedicine && assistantPendingAction?.type === 'add_appointment'))) {
+        assistantPendingAction = assistantAppointmentPendingAction;
+        addConversationMessage('user', message);
+        await confirmAssistantAction();
+        return;
+      }
+      if (assistantMedicineWorkflow?.state === 'collecting_details' && medicineConfirmation && !namesAppointment) {
+        addConversationMessage('user', message);
+        addConversationMessage('assistant', assistantMedicineWorkflow.clarification || `I still need ${assistantMedicineWorkflow.missingFields.join(', ')} before I can prepare this schedule. Nothing has been saved.`);
+        setVoiceState('Ready', 'Please provide the missing medicine details.');
+        return;
+      }
+      if (assistantMedicinePendingAction && medicineConfirmation
+        && (namesMedicine || (!namesAppointment && assistantPendingAction?.type === 'add_medicine') || !assistantAppointmentPendingAction)) {
+        assistantPendingAction = assistantMedicinePendingAction;
+        addConversationMessage('user', message);
+        await confirmAssistantAction();
+        return;
+      }
+      if (assistantPendingAction?.type && /^(?:no|no thanks)$/i.test(message)) {
+        const cancelledType = assistantPendingAction.type;
+        clearAssistantPendingAction(cancelledType);
+        if (cancelledType === 'add_medicine') { assistantMedicineWorkflow = null; assistantMedicineMessages = []; }
+        if (cancelledType === 'add_appointment') { assistantAppointmentWorkflow = null; assistantAppointmentMessages = []; }
+        addConversationMessage('user', message);
+        addConversationMessage('assistant', 'Of course. I cancelled that medicine draft. Nothing was saved.');
+        setVoiceState('Ready', 'Draft cancelled.');
+        return;
+      }
+      if (newMedicineRequest) {
+        const activeName = assistantMedicineWorkflow?.fields?.medicineName?.toLocaleLowerCase();
+        const sameDraft = assistantMedicineWorkflow?.state !== 'saved' && activeName && message.toLocaleLowerCase().includes(activeName);
+        if (!sameDraft) assistantMedicineWorkflow = null;
+        clearAssistantPendingAction('add_medicine');
+        assistantMedicineMessages = [];
+        if (!assistantPendingAction) document.getElementById('assistant-action-confirmation').hidden = true;
+      }
+      if (newAppointmentRequest) {
+        const activeDoctor = assistantAppointmentWorkflow?.fields?.doctorName?.toLocaleLowerCase();
+        const sameDraft = assistantAppointmentWorkflow?.state !== 'saved' && activeDoctor && message.toLocaleLowerCase().includes(activeDoctor);
+        if (!sameDraft) assistantAppointmentWorkflow = null;
+        clearAssistantPendingAction('add_appointment');
+        assistantAppointmentMessages = [];
+        if (!assistantPendingAction) document.getElementById('assistant-action-confirmation').hidden = true;
+      }
+      if (newMedicineRequest || (assistantMedicineWorkflow && (medicineFieldReply || medicineConfirmation || medicineDraftReference))) {
+        assistantMedicineMessages.push({ role: 'user', content: message });
+        assistantMedicineMessages = assistantMedicineMessages.slice(-30);
+      }
+      if (newAppointmentRequest || (assistantAppointmentWorkflow && (appointmentFieldReply(message) || appointmentDraftReference))) {
+        assistantAppointmentMessages.push({ role: 'user', content: message });
+        assistantAppointmentMessages = assistantAppointmentMessages.slice(-30);
+      }
+      if (assistantDemoMode) {
+        addConversationMessage('user', message, false);
+        const topic = /medicine|medication|pill|dose|schedule/i.test(message) ? 'medicine'
+          : /family|check.?in|afar|relative/i.test(message) ? 'family'
+            : /safe|safety|home|fall|walkway/i.test(message) ? 'safety' : 'general';
+        addConversationMessage('assistant', `Demo Mode sample answer (not live AI): ${assistantDemoAnswers[topic]}`, false);
+        setVoiceState('Ready', 'Demo Mode sample response. No health records were read or changed.');
+        return;
+      }
+      addConversationMessage('user', message);
+      const sendButton = document.getElementById('btn-submit-voice');
+      const composer = document.getElementById('drawer-voice-transcript');
+      const micButton = document.getElementById('btn-drawer-mic');
+      assistantRequestInFlight = true;
+      sendButton.disabled = true;
+      composer.disabled = true;
+      micButton.disabled = true;
+      setVoiceState('Thinking', 'Thinking…');
+      try {
+        const result = await window.CareMateAPI.chatWithAssistant({
+          messages: assistantConversation.slice(-30),
+          userId,
+          medicineDraftId: assistantMedicineWorkflow?.draftId || null,
+          medicineMessages: assistantMedicineMessages,
+          appointmentDraftId: assistantAppointmentWorkflow?.draftId || null,
+          appointmentMessages: assistantAppointmentMessages,
+          patientContext: contextForPrompt(message),
+        });
+        if (!result.success || !result.data) throw new Error(result.error || 'The assistant could not respond.');
+        const data = result.data;
+        if (data.medicineWorkflow) assistantMedicineWorkflow = data.medicineWorkflow;
+        if (data.appointmentWorkflow) assistantAppointmentWorkflow = data.appointmentWorkflow;
+        if (data.demoModeAvailable) document.getElementById('assistant-demo-panel').open = true;
+        let actionNeedsDetails = '';
+        if (data.action) {
+          if (data.action.type === 'add_appointment' && !data.action.fields?.idempotencyKey) {
+            data.action.fields = { ...data.action.fields, idempotencyKey: window.crypto.randomUUID() };
+            assistantAppointmentWorkflow = { state: 'awaiting_confirmation', draftId: data.action.fields.idempotencyKey, fields: data.action.fields, missingFields: [] };
+          }
+          const draft = actionDraftSummary(data.action);
+          if (draft) {
+            setAssistantPendingAction(draft);
+          } else if (data.action.type === 'add_medicine') {
+            actionNeedsDetails = ' I still need you to state the medicine name, dosage, exact time, and frequency. I will not guess any of them.';
+          } else if (data.action.type === 'add_appointment') {
+            actionNeedsDetails = ' I still need you to state the provider, date, exact time, and location. I will not guess any of them.';
+          } else if (data.action.type === 'mark_taken') {
+            actionNeedsDetails = ' I could not match that to exactly one scheduled medicine. Please tell me its name.';
+          }
+        }
+        if (data.medicineWorkflow?.state === 'collecting_details') clearAssistantPendingAction('add_medicine');
+        if (data.appointmentWorkflow?.state === 'collecting_details') clearAssistantPendingAction('add_appointment');
+        addConversationMessage('assistant', (data.reply || 'I’m here with you. What would you like to talk about?') + actionNeedsDetails);
+        setVoiceState(data.unavailable ? 'Error' : 'Ready', data.unavailable
+          ? (data.reason === 'not_configured'
+            ? 'Carewise conversational AI is not configured on the backend. No changes were made; use the Medicine or Appointments sections for now.'
+            : data.reason === 'quota_exceeded'
+              ? 'Live AI quota is exhausted. Use the clearly labeled Demo Mode sample questions below, or try Live AI after quota resets.'
+              : data.reason === 'service_unavailable'
+                ? 'Live AI is temporarily unavailable. Use the clearly labeled Demo Mode samples below, or retry Live AI later.'
+            : 'Carewise could not reach its conversation provider. No changes were made; please retry later or use the Medicine and Appointments sections.')
+          : 'Ready when you are.');
+      } catch (error) {
+        console.warn('[Carewise Assistant] Message request failed:', error.name || 'Error', error.message || '');
+        addConversationMessage('assistant', 'I’m sorry, I could not reach the assistant just now. Your message is still here. Please try again, or use the Medicines and Appointments sections.');
+        setVoiceState('Error', 'Could not reach Carewise Assistant. Check your connection and try again.');
+      } finally {
+        assistantRequestInFlight = false;
+        sendButton.disabled = false;
+        composer.disabled = false;
+        micButton.disabled = false;
+      }
+    }
+
+    async function confirmAssistantAction() {
+      const action = assistantPendingAction;
+      if (!action || assistantConfirmationInFlight) return;
+      const fields = action.fields;
+      const confirmButton = document.getElementById('assistant-action-confirm');
+      const cancelButton = document.getElementById('assistant-action-cancel');
+      assistantConfirmationInFlight = true;
+      if (action.type === 'add_medicine' && assistantMedicineWorkflow) assistantMedicineWorkflow = { ...assistantMedicineWorkflow, state: 'saving' };
+      if (action.type === 'add_appointment' && assistantAppointmentWorkflow) assistantAppointmentWorkflow = { ...assistantAppointmentWorkflow, state: 'saving' };
+      confirmButton.disabled = true;
+      if (cancelButton) cancelButton.disabled = true;
+      try {
+        let result;
+        if (action.type === 'add_medicine') result = await window.CareMateAPI.confirmAssistantMedicine(fields.confirmationToken, userId);
+        else if (action.type === 'add_appointment') result = await window.CareMateAPI.addAppointment({ userId, ...fields, confirmed: true });
+        else if (action.type === 'mark_taken') {
+          const scheduledTime = fields.scheduledTime || userMedicines.find(medicine => medicine.medId === fields.medId)?.time;
+          if (!scheduledTime) throw new Error('The scheduled time for this medicine dose could not be found.');
+          result = await window.CareMateAPI.updateMedicineDose(fields.medId, 'taken', todayKey, scheduledTime);
+        }
+        const medicineSaved = action.type === 'add_medicine' && result?.success && result.data?.success;
+        if (medicineSaved || (action.type !== 'add_medicine' && result?.success)) {
+          clearAssistantPendingAction(action.type);
+          if (action.type === 'add_medicine' && assistantMedicineWorkflow) assistantMedicineWorkflow = { ...assistantMedicineWorkflow, state: 'saved' };
+          if (action.type === 'add_appointment' && assistantAppointmentWorkflow) assistantAppointmentWorkflow = { ...assistantAppointmentWorkflow, state: 'saved' };
+          document.getElementById('assistant-action-confirmation').hidden = true;
+          try {
+            await loadDashboard();
+            renderModalMedicines();
+            renderModalAppointments();
+          } catch (refreshError) {
+            console.warn('[Carewise Assistant] Saved record, but dashboard refresh failed:', refreshError?.name || 'Error');
+          }
+          const successMessage = action.type === 'mark_taken'
+            ? 'That dose is now marked as taken.'
+            : action.type === 'add_medicine'
+              ? (result.data.message || 'The confirmed medicine schedule was saved successfully.')
+              : 'That has been saved to your Carewise records.';
+          addConversationMessage('assistant', successMessage);
+          setVoiceState('Ready', 'Your confirmed change was saved.');
+        } else {
+          if (action.type === 'add_medicine' && assistantMedicineWorkflow) assistantMedicineWorkflow = { ...assistantMedicineWorkflow, state: 'save_failed' };
+          if (action.type === 'add_appointment' && assistantAppointmentWorkflow) assistantAppointmentWorkflow = { ...assistantAppointmentWorkflow, state: 'save_failed' };
+          const errorMessage = result?.error || result?.data?.error || 'I could not save that change. Please try again.';
+          addConversationMessage('assistant', `${errorMessage} Your confirmed draft is still available to retry; no success was reported.`);
+          setVoiceState('Error', 'The change could not be saved.');
+        }
+      } catch (error) {
+        if (action.type === 'add_medicine' && assistantMedicineWorkflow) assistantMedicineWorkflow = { ...assistantMedicineWorkflow, state: 'save_failed' };
+        if (action.type === 'add_appointment' && assistantAppointmentWorkflow) assistantAppointmentWorkflow = { ...assistantAppointmentWorkflow, state: 'save_failed' };
+        console.warn('[Carewise Assistant] Confirmed record save failed:', error.name || 'Error', error.message || '');
+        addConversationMessage('assistant', 'I could not save that change because the server did not respond. The confirmed draft is still available to retry.');
+        setVoiceState('Error', 'The change could not be saved.');
+      } finally {
+        assistantConfirmationInFlight = false;
+        confirmButton.disabled = false;
+        if (cancelButton) cancelButton.disabled = false;
+      }
+    }
+
+    document.getElementById('assistant-action-confirm').addEventListener('click', confirmAssistantAction);
+    document.getElementById('assistant-action-cancel').addEventListener('click', () => {
+      if (!assistantPendingAction) return;
+      if (assistantPendingAction.type === 'add_appointment') {
+        assistantAppointmentWorkflow = null;
+        assistantAppointmentMessages = [];
+      }
+      if (assistantPendingAction.type === 'add_medicine') {
+        assistantMedicineWorkflow = null;
+        assistantMedicineMessages = [];
+      }
+      clearAssistantPendingAction(assistantPendingAction.type);
+      addConversationMessage('assistant', 'Of course. I cancelled that draft.');
+      setVoiceState('Ready', 'Draft cancelled.');
+    });
+    document.getElementById('drawer-voice-transcript').addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submitVoiceTranscript(); }
+    });
 
     function resetMic() {
       isListening = false;
+      isRecognitionStarting = false;
       const orbs = [document.getElementById('mascot-orb'), document.getElementById('drawer-mascot-orb')];
       const badges = [document.getElementById('voice-badge'), document.getElementById('drawer-voice-badge')];
       orbs.forEach(o => { if (o) o.classList.remove('listening'); });
@@ -1517,36 +2136,6 @@
       if (bdm) bdm.classList.remove('active');
     }
 
-    async function handleVoiceCommand(cmd) {
-      const request = String(cmd || '').toLowerCase();
-      let answer;
-      if (request.includes('medicine') || request.includes('pill') || request.includes('medication')) {
-        if (medicineDataState !== 'loaded') {
-          const error = 'The medicine schedule could not be loaded. Check your connection and try again.';
-          setAssistantResponse(error); setVoiceState('Error', error);
-          return;
-        }
-        const pending = userMedicines.filter(m => (m.todayStatus || 'pending') === 'pending');
-        answer = pending.length ? `You have ${pending.length} medicine dose${pending.length === 1 ? '' : 's'} pending: ${pending.map(m => `${m.medicineName} at ${m.time}`).join(', ')}.` : userMedicines.length ? 'All scheduled medicine doses are marked taken today.' : 'You have no medicines scheduled today.';
-      } else if (request.includes('appointment') || request.includes('doctor') || request.includes('visit')) {
-        if (appointmentDataState !== 'loaded') {
-          const error = 'The appointment schedule could not be loaded. Check your connection and try again.';
-          setAssistantResponse(error); setVoiceState('Error', error);
-          return;
-        }
-        answer = userAppointments.length ? `Your next visit is with ${userAppointments[0].doctorName} on ${userAppointments[0].date} at ${userAppointments[0].time}.` : 'You have no upcoming doctor appointments listed.';
-      } else if (request.includes('heart') || request.includes('pulse') || request.includes('vitals') || request.includes('steps')) {
-        answer = 'No current health reading is available to report.';
-      } else {
-        const error = 'I could not match that request to available dashboard information. Try a medicine or appointment question.';
-        setAssistantResponse(error); setVoiceState('Error', error);
-        return;
-      }
-      setAssistantResponse(answer);
-      setVoiceState('Success', 'Request processed using your current dashboard data.');
-      speak(answer);
-    }
-
     function escapeHtml(str) {
       if (!str) return '';
       return String(str).replace(/[&<>"']/g, function(m) {
@@ -1557,6 +2146,7 @@
 
     // Initialize
     loadDashboard();
+    if (window.location.hash === '#health-logs') openVitalsModal();
   </script>
 </body>
 </html>
